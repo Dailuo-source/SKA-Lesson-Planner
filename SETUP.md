@@ -8,7 +8,7 @@ SKA Lesson Planner keeps everything in a Google Sheet. The app itself is hosted 
 1. Make a new sheet at sheets.new and name it **SKA Lesson Planner**.
 2. Open **Extensions → Apps Script**, delete what's in `Code.gs`, paste in this repo's `Code.gs`, and save.
 3. Pick **setup** in the function list at the top and press **Run**. Allow the permissions it asks for.
-   This makes the **Plans**, **Plan items**, **Exercises** and **Lists** tabs, fills Lists with the five
+   This makes the **Plans**, **Plan items**, **Exercises**, **Lists** and **Instructors** tabs, creates the dojo code, fills Lists with the five
    sections, class types, class lengths and the attendance link, and adds Kata Teiiru and Demonstrations
    to the library.
 4. Choose **Deploy → New deployment**, pick type **Web app**, set *Execute as: Me* and
@@ -22,16 +22,20 @@ SKA Lesson Planner keeps everything in a Google Sheet. The app itself is hosted 
 3. The app is then at `https://ska-lesson-planner.pages.dev/`. If Cloudflare gives you a different
    address, change `APP_SITE` near the top of `Code.gs` to match and save.
 
-## 3. Each instructor's phone
+## 3. Each instructor
 
-1. In the sheet, choose **SKA Lesson Planner → Show app key and phone link**.
-2. Send that link to the instructor. They open it once in Chrome (Android) or Safari (iPhone). It connects
-   the app to the sheet and remembers it.
-3. They enter their title, first and last name. They're shown as Mr./Ms. and their last name, with an
-   option to show their first name too. They can change it later by tapping their initials.
+1. In the sheet, choose **SKA Lesson Planner → Show app link and dojo code**.
+2. Send them the app link and the dojo code. They open the link in Chrome (Android) or Safari (iPhone), tap
+   **Create an account**, enter the dojo code, their title, name, email and a password (or use **Sign in with Google**).
+3. They're shown as Mr./Ms. and their last name, with an option to show their first name too. They can change it
+   later by tapping their initials. Their account works on any phone or computer.
 4. Install it: Android Chrome menu **⋮ → Add to Home screen → Install**. iPhone Safari **Share → Add to Home Screen**.
 
-Anyone with the phone link can edit plans, so only share it with instructors.
+- **Forgotten password:** clear their *Password* cell in the **Instructors** tab. They then use *Forgot your password?*
+  in the app with the dojo code to choose a new one.
+- **Remove someone:** delete their row in **Instructors**. Change the dojo code too if they knew it.
+- **Google sign-in:** create an OAuth client ID (type *Web application*, authorised JavaScript origin
+  `https://ska-lesson-planner.pages.dev`) in Google Cloud, then paste it in **SKA Lesson Planner → Set Google sign-in client ID…**.
 
 ## Changing things later
 

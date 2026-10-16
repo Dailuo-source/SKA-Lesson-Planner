@@ -8,8 +8,12 @@
  *   Lists       — sections (with colours), class types, class lengths, the attendance link.
  *                 Edit these and the app picks them up on its next sync.
  *
+ *   Instructors — one row per instructor account (sign-in details and how their name shows).
+ *                 Password hashes are kept in hidden columns; never share this tab.
+ *
  * - doPost is the JSON API the app calls (it's hosted on Cloudflare Pages)
- * - Every request must carry the app key (menu: SKA Lesson Planner → Show app key and phone link).
+ * - Instructors sign in with email + password or with Google. New accounts need the dojo code
+ *   (menu: SKA Lesson Planner → Show app link and dojo code).
  */
 
 const APP_NAME = 'SKA Lesson Planner';
@@ -18,6 +22,25 @@ const APP_SITE = 'https://ska-lesson-planner.pages.dev/';
 
 const CLASS_TYPES = ['Regular', 'Kids', 'Advanced'];
 const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Attendance link'];
+const TOKEN_DAYS = 400; // how long a sign-in lasts on a phone before asking again
+
+// Instructor accounts live in their own tab and are never sent to the app as data.
+const INSTR = {
+  sheet: 'Instructors', key: 'email',
+  cols: [
+    ['id', 'ID', 'id', 90],
+    ['email', 'Email', 'text', 230],
+    ['title', 'Title', 'text', 60],
+    ['first', 'First name', 'text', 120],
+    ['last', 'Last name', 'text', 130],
+    ['showFirst', 'Show first name', 'text', 120],
+    ['google', 'Google sign-in', 'text', 110],
+    ['hash', 'Password (hashed, clear to reset)', 'secret', 120],
+    ['salt', 'Salt', 'secret', 90],
+    ['joined', 'Joined', 'datetime', 160],
+    ['lastSeen', 'Last signed in', 'datetime', 160],
+  ],
+};
 
 // [field, header label, type, column width]. `key` is the field a row must have to count.
 const SCHEMA = {
@@ -100,8 +123,9 @@ function doPost(e) {
 }
 
 /**
- * Request:  { key, ops: [{op: 'add'|'update'|'del', coll: 'plans'|'items'|'exercises'|'lists', id, data}] }
- * Response: { ok: true, state: {plans, items, exercises, lists}, sheetUrl } or { ok: false, error, message }
+ * Request:  { token, ops: [{op: 'add'|'update'|'del', coll, id, data}], profile?, password? }
+ *       or  { auth: 'config' | 'signup' | 'login' | 'reset' | 'google', ... } to sign in
+ * Response: { ok: true, token, me, state: {plans, items, exercises, lists}, sheetUrl } or { ok: false, error, message }
  */
 function api(body) {
   let req;
@@ -110,23 +134,212 @@ function api(body) {
   } catch (err) {
     return { ok: false, error: 'bad_request', message: 'The request could not be read.' };
   }
+  req = req || {};
   const props = PropertiesService.getScriptProperties();
-  const key = props.getProperty('APP_KEY');
-  if (!key) return { ok: false, error: 'not_setup', message: 'Run "Set up / repair sheets" from the ' + APP_NAME + ' menu first.' };
-  if (!req || String(req.key || '').trim() !== key) return { ok: false, error: 'bad_key', message: 'That app key is not right.' };
+  if (req.auth === 'config') return { ok: true, config: { googleClientId: props.getProperty('GOOGLE_CLIENT_ID') || '' } };
+  if (!props.getProperty('DOJO_CODE')) return { ok: false, error: 'not_setup', message: 'Run "Set up / repair sheets" from the ' + APP_NAME + ' menu first.' };
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(20000)) return { ok: false, error: 'busy', message: 'The sheet is busy. Try again in a moment.' };
   try {
+    let me, token;
+    if (req.auth) {
+      const r = auth_(req);
+      if (!r.ok) return r;
+      me = r.me; token = r.token;
+    } else {
+      me = checkToken_(req.token);
+      if (!me) return { ok: false, error: 'bad_token', message: 'Please sign in again.' };
+      token = req.token;
+      if (req.profile) me = updateProfile_(me, req.profile);
+      if (req.password) {
+        const r = changePassword_(me, req.password);
+        if (!r.ok) return r;
+        me = r.me;
+      }
+    }
     (req.ops || []).forEach(applyOp_);
     SpreadsheetApp.flush();
-    return { ok: true, state: readAll_(), sheetUrl: ss_().getUrl() };
+    return { ok: true, token: token, me: me_(me), state: readAll_(), sheetUrl: ss_().getUrl() };
   } catch (err) {
     return { ok: false, error: 'server', message: String((err && err.message) || err) };
   } finally {
     lock.releaseLock();
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Instructor accounts                                                 */
+/* ------------------------------------------------------------------ */
+
+const fail_ = function (error, message) { return { ok: false, error: error, message: message }; };
+const normEmail_ = function (e) { return String(e || '').trim().toLowerCase(); };
+
+function auth_(req) {
+  const email = normEmail_(req.email);
+  const pw = String(req.password || '');
+  switch (req.auth) {
+    case 'signup': {
+      if (!codeOk_(req.code)) return fail_('bad_code', 'That dojo code isn\'t right. Ask the head instructor for the current code.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail_('bad_email', 'That email doesn\'t look right.');
+      if (pw.length < 6) return fail_('weak_password', 'Use at least 6 characters for your password.');
+      if (findInstr_('email', email)) return fail_('email_taken', 'There\'s already an account with that email. Sign in instead.');
+      const p = cleanProfile_(req.profile);
+      if (!p.first || !p.last) return fail_('need_name', 'Please enter your first and last name.');
+      const salt = newKey_();
+      const me = addInstr_(Object.assign(p, { email: email, hash: hash_(pw, salt), salt: salt, google: '' }));
+      return { ok: true, me: me, token: makeToken_(me.id) };
+    }
+    case 'login': {
+      const me = findInstr_('email', email);
+      if (!me) return fail_('bad_login', 'That email and password don\'t match.');
+      if (!me.hash) {
+        if (me.google) return fail_('use_google', 'This account signs in with Google. Use the Google button.');
+        return fail_('reset_needed', 'Your password was reset. Choose a new one with the dojo code.');
+      }
+      if (hash_(pw, me.salt) !== me.hash) return fail_('bad_login', 'That email and password don\'t match.');
+      seen_(me);
+      return { ok: true, me: me, token: makeToken_(me.id) };
+    }
+    case 'reset': {
+      // Only works after the head instructor clears the password cell in the Instructors tab.
+      const me = findInstr_('email', email);
+      if (!me || me.hash) return fail_('cant_reset', 'Ask the head instructor to clear your password in the sheet first.');
+      if (!codeOk_(req.code)) return fail_('bad_code', 'That dojo code isn\'t right. Ask the head instructor for the current code.');
+      if (pw.length < 6) return fail_('weak_password', 'Use at least 6 characters for your password.');
+      const salt = newKey_();
+      const out = updInstr_(me, { hash: hash_(pw, salt), salt: salt, lastSeen: Date.now() });
+      return { ok: true, me: out, token: makeToken_(out.id) };
+    }
+    case 'google': {
+      const cid = PropertiesService.getScriptProperties().getProperty('GOOGLE_CLIENT_ID');
+      if (!cid) return fail_('google_off', 'Google sign-in isn\'t turned on yet.');
+      const info = verifyGoogle_(req.credential, cid);
+      if (!info) return fail_('google_bad', 'Google sign-in didn\'t work. Try again.');
+      const gEmail = normEmail_(info.email);
+      let me = findInstr_('email', gEmail);
+      if (me) {
+        me = updInstr_(me, { google: 'Yes', lastSeen: Date.now() });
+        return { ok: true, me: me, token: makeToken_(me.id) };
+      }
+      if (!req.code) return { ok: false, error: 'need_signup', email: gEmail, first: info.given_name || '', last: info.family_name || '', message: 'New here? Finish creating your account.' };
+      if (!codeOk_(req.code)) return fail_('bad_code', 'That dojo code isn\'t right. Ask the head instructor for the current code.');
+      const p = cleanProfile_(req.profile);
+      if (!p.first || !p.last) return fail_('need_name', 'Please enter your first and last name.');
+      me = addInstr_(Object.assign(p, { email: gEmail, hash: '', salt: '', google: 'Yes' }));
+      return { ok: true, me: me, token: makeToken_(me.id) };
+    }
+  }
+  return fail_('bad_request', 'Unknown sign-in request.');
+}
+
+function cleanProfile_(p) {
+  p = p || {};
+  const s = function (v) { return String(v || '').trim().slice(0, 60); };
+  return { title: /^ms/i.test(p.title) ? 'Ms.' : 'Mr.', first: s(p.first), last: s(p.last), showFirst: p.showFirst ? 'Yes' : '' };
+}
+
+function me_(o) {
+  return { id: o.id, email: o.email, title: o.title || 'Mr.', first: o.first || '', last: o.last || '',
+    showFirst: /^y/i.test(String(o.showFirst || '')), google: !!o.google, password: !!o.hash };
+}
+
+function updateProfile_(me, p) {
+  const c = cleanProfile_(p);
+  if (!c.first || !c.last) return me;
+  return updInstr_(me, c);
+}
+
+function changePassword_(me, p) {
+  const nw = String(p.next || '');
+  if (me.hash && hash_(String(p.current || ''), me.salt) !== me.hash) return fail_('bad_password', 'Your current password isn\'t right.');
+  if (nw.length < 6) return fail_('weak_password', 'Use at least 6 characters for your password.');
+  const salt = newKey_();
+  return { ok: true, me: updInstr_(me, { hash: hash_(nw, salt), salt: salt }) };
+}
+
+function codeOk_(code) {
+  const want = PropertiesService.getScriptProperties().getProperty('DOJO_CODE') || '';
+  return !!want && String(code || '').trim().toUpperCase() === want.toUpperCase();
+}
+
+function hash_(pw, salt) {
+  let h = salt + ':' + pw;
+  for (let i = 0; i < 300; i++) {
+    h = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, h, Utilities.Charset.UTF_8));
+  }
+  return h;
+}
+
+function secret_() {
+  const props = PropertiesService.getScriptProperties();
+  let s = props.getProperty('TOKEN_SECRET');
+  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); props.setProperty('TOKEN_SECRET', s); }
+  return s;
+}
+
+function sign_(payload) {
+  return Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(payload, secret_())).replace(/=+$/, '');
+}
+
+function makeToken_(id) {
+  const p = id + '.' + (Date.now() + TOKEN_DAYS * 864e5);
+  return p + '.' + sign_(p);
+}
+
+function checkToken_(token) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3) return null;
+  const p = parts[0] + '.' + parts[1];
+  if (sign_(p) !== parts[2] || Number(parts[1]) < Date.now()) return null;
+  return findInstr_('id', parts[0]); // a deleted instructor row signs that person out
+}
+
+function verifyGoogle_(credential, clientId) {
+  if (!credential) return null;
+  const res = UrlFetchApp.fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(credential), { muteHttpExceptions: true });
+  if (res.getResponseCode() !== 200) return null;
+  const j = JSON.parse(res.getContentText());
+  if (j.aud !== clientId) return null;
+  if (!/(^|\.)accounts\.google\.com$/.test(String(j.iss || '').replace(/^https:\/\//, ''))) return null;
+  if (String(j.email_verified) !== 'true' || Number(j.exp) * 1000 < Date.now()) return null;
+  return j;
+}
+
+function instrRows_() {
+  const ss = ss_();
+  const sh = ss.getSheetByName(INSTR.sheet) || buildTab_(ss, INSTR);
+  if (sh.getLastRow() < 2) return [];
+  const vals = sh.getRange(1, 1, sh.getLastRow(), sh.getLastColumn()).getValues();
+  const cols = headerMap_(vals[0], INSTR);
+  const out = [];
+  for (let r = 1; r < vals.length; r++) {
+    const o = {};
+    INSTR.cols.forEach(function (c) { const i = cols[c[0]]; if (i != null) o[c[0]] = fromCell_(vals[r][i], c[2]); });
+    if (!o.email) continue;
+    o.email = normEmail_(o.email);
+    out.push(o);
+  }
+  return out;
+}
+
+function findInstr_(field, val) {
+  if (!val) return null;
+  return instrRows_().filter(function (o) { return o.id && o[field] === val; })[0] || null;
+}
+
+function addInstr_(data) {
+  const id = newId_();
+  applyTo_(INSTR, { op: 'add', id: id, data: Object.assign({ joined: Date.now(), lastSeen: Date.now() }, data) });
+  return findInstr_('id', id);
+}
+
+function updInstr_(me, data) {
+  applyTo_(INSTR, { op: 'update', id: me.id, data: data });
+  return findInstr_('id', me.id) || me;
+}
+
+function seen_(me) { updInstr_(me, { lastSeen: Date.now() }); }
 
 /* ------------------------------------------------------------------ */
 /* Reading and writing                                                 */
@@ -196,6 +409,7 @@ function fromCell_(v, type) {
 function toCell_(v, type) {
   switch (type) {
     case 'num': return v == null || v === '' ? '' : Number(v);
+    case 'secret': return v == null ? '' : String(v);
     case 'date':
     case 'datetime': return v ? new Date(v) : '';
     case 'list': return Array.isArray(v) ? v.join(', ') : (v || '');
@@ -247,6 +461,10 @@ function readAll_() {
 function applyOp_(op) {
   const sch = SCHEMA[op.coll];
   if (!sch) throw new Error('Unknown list "' + op.coll + '".');
+  applyTo_(sch, op);
+}
+
+function applyTo_(sch, op) {
   const ss = ss_();
   const sh = ss.getSheetByName(sch.sheet) || buildTab_(ss, sch);
   const t = table_(sh, sch);
@@ -269,7 +487,7 @@ function applyOp_(op) {
       if (i != null && c[0] in data) vals[i] = toCell_(data[c[0]], c[2]);
     });
     sh.getRange(t.lastRow + 1, 1, 1, t.width).setValues([vals]);
-    if (op.coll === 'lists' && data.colour) paintSwatch_(sh, t.lastRow + 1, t.cols, data.colour);
+    if (sch === SCHEMA.lists && data.colour) paintSwatch_(sh, t.lastRow + 1, t.cols, data.colour);
     return;
   }
 
@@ -288,11 +506,13 @@ function applyOp_(op) {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu(APP_NAME)
-    .addItem('Show app key and phone link', 'showKey')
+    .addItem('Show app link and dojo code', 'showKey')
+    .addItem('Change the dojo code…', 'setDojoCode')
     .addItem('Set web app link…', 'setWebAppUrl')
+    .addItem('Set Google sign-in client ID…', 'setGoogleClientId')
     .addItem('Set up / repair sheets', 'setup')
     .addSeparator()
-    .addItem('Make a new app key', 'resetKey')
+    .addItem('Sign everyone out', 'signEveryoneOut')
     .addToUi();
 }
 
@@ -302,6 +522,7 @@ function setup() {
   props.setProperty('SHEET_ID', ss.getId());
 
   Object.keys(SCHEMA).forEach(function (coll) { buildTab_(ss, SCHEMA[coll]); });
+  buildTab_(ss, INSTR);
 
   ['Sheet1', 'Sheet 1'].forEach(function (n) {
     const blank = ss.getSheetByName(n);
@@ -312,14 +533,15 @@ function setup() {
   seedExercises_(ss);
   paintAllSwatches_(ss);
 
-  let key = props.getProperty('APP_KEY');
-  if (!key) {
-    key = newKey_();
-    props.setProperty('APP_KEY', key);
+  let code = props.getProperty('DOJO_CODE');
+  if (!code) {
+    code = 'SKA-' + newKey_().slice(0, 4).toUpperCase();
+    props.setProperty('DOJO_CODE', code);
   }
+  secret_();
   ss.setActiveSheet(ss.getSheetByName(SCHEMA.plans.sheet));
 
-  const msg = APP_NAME + ' is set up.\n\nYour app key: ' + key +
+  const msg = APP_NAME + ' is set up.\n\nDojo code for new instructor accounts: ' + code +
     '\n\nNext: Deploy → New deployment → Web app (Execute as: Me, Who has access: Anyone). ' +
     'Then choose ' + APP_NAME + ' → Set web app link… and paste the link it gives you.';
   console.log(msg);
@@ -328,32 +550,25 @@ function setup() {
 
 /**
  * Apps Script can't reliably report its own deployment URL, so the /exec URL
- * is pasted in once and saved. The phone link carries both the URL and the key
- * after a # so they never reach any server.
+ * is pasted in once and saved. The app has it built in too; the link below
+ * only matters if the deployment ever changes.
  */
 function showKey() {
   const props = PropertiesService.getScriptProperties();
-  const key = props.getProperty('APP_KEY');
   const ui = SpreadsheetApp.getUi();
-  if (!key) { ui.alert('Run "Set up / repair sheets" first.'); return; }
+  const code = props.getProperty('DOJO_CODE');
+  if (!code) { ui.alert('Run "Set up / repair sheets" first.'); return; }
   const url = props.getProperty('WEB_APP_URL');
-  if (!url) {
-    ui.alert(APP_NAME,
-      'App key: ' + key +
-      '\n\nYour web app link isn\'t saved yet. Choose ' + APP_NAME + ' → Set web app link… and paste the ' +
-      'Web app URL from Deploy → Manage deployments (it ends in /exec).',
-      ui.ButtonSet.OK);
-    return;
-  }
-  const phone = APP_SITE + '#api=' + encodeURIComponent(url) + '&key=' + key;
+  const link = url ? APP_SITE + '#api=' + encodeURIComponent(url) : APP_SITE;
   const html = HtmlService.createHtmlOutput(
     '<div style="font:14px/1.5 Arial,sans-serif">' +
-    '<p style="margin:0 0 6px"><b>App key:</b> <code>' + key + '</code></p>' +
-    '<p style="margin:12px 0 6px">Open this link once on each instructor\'s phone. It connects the app to this sheet and remembers it.</p>' +
-    '<input readonly style="width:100%;padding:6px;font:12px monospace" value="' + phone + '" onclick="this.select()">' +
-    '<p style="margin:12px 0"><a href="' + phone + '" target="_blank">Open ' + APP_NAME + ' ↗</a></p>' +
-    '<p style="margin:12px 0 4px;color:#555">Web app link (for typing in by hand):</p>' +
-    '<input readonly style="width:100%;padding:6px;font:12px monospace" value="' + url + '" onclick="this.select()">' +
+    '<p style="margin:0 0 6px"><b>Dojo code:</b> <code style="font-size:16px">' + code + '</code></p>' +
+    '<p style="margin:4px 0 12px;color:#555">New instructors need this once, to create their account.</p>' +
+    '<p style="margin:0 0 6px"><b>App link</b> (send this to instructors):</p>' +
+    '<input readonly style="width:100%;padding:6px;font:12px monospace" value="' + link + '" onclick="this.select()">' +
+    '<p style="margin:12px 0"><a href="' + link + '" target="_blank">Open ' + APP_NAME + ' ↗</a></p>' +
+    '<p style="margin:12px 0 0;color:#555">Forgotten password? Clear that person\'s <i>Password</i> cell in the Instructors tab. ' +
+    'They then choose a new one in the app with the dojo code.</p>' +
     '</div>').setWidth(480).setHeight(300);
   ui.showModalDialog(html, APP_NAME);
 }
@@ -379,12 +594,37 @@ function setWebAppUrl() {
   showKey();
 }
 
-function resetKey() {
+function setDojoCode() {
   const ui = SpreadsheetApp.getUi();
-  const r = ui.alert('Make a new app key?', 'Phones using the old key will ask to reconnect.', ui.ButtonSet.YES_NO);
-  if (r !== ui.Button.YES) return;
-  PropertiesService.getScriptProperties().setProperty('APP_KEY', newKey_());
+  const r = ui.prompt('Change the dojo code',
+    'New instructors need this code to create an account. Existing accounts keep working. Type a new code:',
+    ui.ButtonSet.OK_CANCEL);
+  if (r.getSelectedButton() !== ui.Button.OK) return;
+  const code = String(r.getResponseText() || '').trim();
+  if (code.length < 4) { ui.alert('Use at least 4 characters.'); return; }
+  PropertiesService.getScriptProperties().setProperty('DOJO_CODE', code);
   showKey();
+}
+
+function setGoogleClientId() {
+  const ui = SpreadsheetApp.getUi();
+  const props = PropertiesService.getScriptProperties();
+  const r = ui.prompt('Google sign-in',
+    'Paste the OAuth client ID from Google Cloud (ends in .apps.googleusercontent.com). Leave blank to turn Google sign-in off.',
+    ui.ButtonSet.OK_CANCEL);
+  if (r.getSelectedButton() !== ui.Button.OK) return;
+  const id = String(r.getResponseText() || '').trim();
+  if (id && !/\.apps\.googleusercontent\.com$/.test(id)) { ui.alert('That doesn\'t look like a client ID.'); return; }
+  if (id) props.setProperty('GOOGLE_CLIENT_ID', id); else props.deleteProperty('GOOGLE_CLIENT_ID');
+  ui.alert(id ? 'Google sign-in is on.' : 'Google sign-in is off.');
+}
+
+function signEveryoneOut() {
+  const ui = SpreadsheetApp.getUi();
+  const r = ui.alert('Sign everyone out?', 'Every phone and computer will ask to sign in again.', ui.ButtonSet.YES_NO);
+  if (r !== ui.Button.YES) return;
+  PropertiesService.getScriptProperties().setProperty('TOKEN_SECRET', Utilities.getUuid() + Utilities.getUuid());
+  ui.alert('Done. Everyone will be asked to sign in again.');
 }
 
 function newKey_() {
@@ -429,7 +669,9 @@ function buildTab_(ss, sch) {
     if (field === 'value') rng.setNumberFormat('@');
     if (field === 'note' || field === 'notes' || field === 'description' || field === 'sections') rng.setWrap(true);
     if (w) sh.setColumnWidth(col, w);
-    if (field === 'id') sh.hideColumns(col);
+    // The password column stays visible so it can be cleared to reset someone; the salt is hidden.
+    if (field === 'id' || field === 'salt') sh.hideColumns(col);
+    if (type === 'secret') rng.setNumberFormat('@');
   });
   return sh;
 }
