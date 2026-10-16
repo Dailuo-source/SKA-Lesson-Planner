@@ -89,6 +89,10 @@ ul.pts li{margin:1px 0}
 .points{display:flex;flex-direction:column;gap:8px}
 .ptrow{display:flex;align-items:center;gap:6px}
 .ptrow .dot{width:14px;text-align:center;font-weight:800;color:var(--red);flex:none}
+.ptrow .dot.num{width:auto;min-width:50px;text-align:left;font-size:13px;white-space:nowrap}
+ol.steps{list-style:none;counter-reset:st;margin:0 8px 6px 0;padding:0;font-size:14px;color:var(--ink2)}
+ol.steps li{counter-increment:st;margin:3px 0}
+ol.steps li::before{content:"Step " counter(st) ". ";font-weight:800;color:var(--ink)}
 .ptrow .inp{flex:1;min-width:0;height:44px}
 .clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 details.libref{background:var(--sunk);border-radius:14px;padding:12px 14px;margin:0 0 16px}
@@ -280,12 +284,18 @@ const cleanSec=s=>String(s||"").replace(/,/g," /").replace(/\s+/g," ").trim().sl
 const toPoints=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*(?:[•\-*·]\s*)+/,"").trim()).filter(Boolean);
 const fromPoints=a=>a.map(p=>String(p).replace(/\r?\n/g," ").trim()).filter(Boolean).map(p=>"• "+p).join("\n");
 const ptsHTML=s=>{const p=toPoints(s);return p.length?`<ul class="pts">${p.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";};
-const ptRow=(name,v,ph)=>`<div class="ptrow"><span class="dot" aria-hidden="true">•</span><input class="inp pt" type="text" value="${esc(v)}" placeholder="${esc(ph||"Add a point")}" aria-label="Point" enterkeyhint="next" autocomplete="off"><button type="button" class="iconbtn" data-act="delPoint" aria-label="Remove this point">${ICON.x}</button></div>`;
-function pointsEditor(name,s,ph){const p=toPoints(s);if(!p.length)p.push("");
-  return`<div class="points" data-name="${name}">${p.map((x,i)=>ptRow(name,x,i?"":ph)).join("")}</div><button type="button" class="btn ghost small" data-act="addPoint" data-name="${name}" style="align-self:flex-start">${ICON.plus}Add a point</button>`;}
+/* Instructions are numbered steps, stored as "1. step" lines */
+const toSteps=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*(?:[•\-*·]\s*)+/,"").replace(/^\s*(?:step\s*)?\d+\s*[.):-]\s*/i,"").trim()).filter(Boolean);
+const fromSteps=a=>a.map(p=>String(p).replace(/\r?\n/g," ").trim()).filter(Boolean).map((p,i)=>(i+1)+". "+p).join("\n");
+const stepsHTML=s=>{const p=toSteps(s);return p.length?`<ol class="steps">${p.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";};
+const stepsText=s=>toSteps(s).map((p,i)=>"Step "+(i+1)+". "+p).join("\n");
+const ptRow=(name,v,ph,num)=>`<div class="ptrow">${num?`<span class="dot num">Step ${num}</span>`:`<span class="dot" aria-hidden="true">•</span>`}<input class="inp pt" type="text" value="${esc(v)}" placeholder="${esc(ph||(num?"Add a step":"Add a point"))}" aria-label="${num?"Step "+num:"Point"}" enterkeyhint="next" autocomplete="off"><button type="button" class="iconbtn" data-act="delPoint" aria-label="Remove this ${num?"step":"point"}">${ICON.x}</button></div>`;
+function pointsEditor(name,s,ph,numbered){const p=numbered?toSteps(s):toPoints(s);if(!p.length)p.push("");
+  return`<div class="points" data-name="${name}"${numbered?' data-num="1"':""}>${p.map((x,i)=>ptRow(name,x,i?"":ph,numbered?i+1:0)).join("")}</div><button type="button" class="btn ghost small" data-act="addPoint" data-name="${name}" style="align-self:flex-start">${ICON.plus}${numbered?"Add a step":"Add a point"}</button>`;}
+function renumber(box){if(!box.dataset.num)return;box.querySelectorAll(".ptrow").forEach((r,i)=>{r.querySelector(".num").textContent="Step "+(i+1);r.querySelector("input").setAttribute("aria-label","Step "+(i+1));r.querySelector("[data-act=delPoint]").setAttribute("aria-label","Remove step "+(i+1));});}
 const readPoints=(form,name)=>[...form.querySelectorAll(`.points[data-name="${name}"] .pt`)].map(i=>i.value.trim()).filter(Boolean);
-function addPointAfter(box,row){const tmp=document.createElement("div");tmp.innerHTML=ptRow(box.dataset.name,"","");const nr=tmp.firstElementChild;
-  if(row&&row.nextSibling)box.insertBefore(nr,row.nextSibling);else box.appendChild(nr);nr.querySelector("input").focus();}
+function addPointAfter(box,row){const tmp=document.createElement("div");tmp.innerHTML=ptRow(box.dataset.name,"","",box.dataset.num?1:0);const nr=tmp.firstElementChild;
+  if(row&&row.nextSibling)box.insertBefore(nr,row.nextSibling);else box.appendChild(nr);renumber(box);nr.querySelector("input").focus();}
 
 /* =====================================================================
    SYNC — the Google Sheet is the source of truth.
@@ -536,7 +546,7 @@ function exListHTML(){
     return`<div class="card excard" style="margin-bottom:10px">
       <button type="button" class="body" data-act="editEx" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)} in the library">
         <span class="row" style="gap:8px;align-items:baseline"><span class="nm grow">${esc(e.name)}</span><span style="font-size:14px;font-weight:800;color:${col}">${e.minutes} min</span></span>
-        ${e.description?`<span class="ds clamp">${esc(e.description)}</span>`:""}${toPoints(e.notes).length?`<span class="ds" style="color:var(--muted);font-weight:700">${toPoints(e.notes).length} ${toPoints(e.notes).length===1?"note":"notes"}</span>`:""}
+        ${e.description?`<span class="ds clamp">${esc(stepsText(e.description))}</span>`:""}${toPoints(e.notes).length?`<span class="ds" style="color:var(--muted);font-weight:700">${toPoints(e.notes).length} ${toPoints(e.notes).length===1?"note":"notes"}</span>`:""}
         <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span><span>${meta}</span></span>
       </button>
       <button type="button" class="iconbtn" data-act="quickAdd" data-id="${esc(e.id)}" aria-label="Add ${esc(e.name)} to the open class" style="background:${tint(col)};color:${col}">${ICON.plus}</button>
@@ -660,7 +670,7 @@ function sheetItem(s){
   const quick=[5,10,15,20,30].map(n=>`<button type="button" class="chip" data-act="setMin" data-v="${n}">${n}</button>`).join("");
   return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
   `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
-  ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.description?`<h3>Instructions</h3><p>${esc(lib.description)}</p>`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
+  ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.description?`<h3>Instructions</h3>${stepsHTML(lib.description)}`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
   <form id="itemForm" data-id="${esc(it.id)}">
     <div class="field"><label for="fMin">Minutes for this class</label>
       <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
@@ -705,7 +715,7 @@ function sheetEx(s){
     <div class="field"><label for="eName">Name</label><input class="inp" id="eName" name="name" type="text" maxlength="80" required value="${esc(e?e.name:"")}" data-focus></div>
     <div class="field"><label for="eSec">Section</label><select class="inp" id="eSec" name="section">${secs.map(x=>`<option${eqi(x,sec)?" selected":""}>${esc(x)}</option>`).join("")}</select></div>
     <div class="field"><label for="eMin">Usual minutes</label><input class="inp" id="eMin" name="minutes" type="number" inputmode="numeric" min="1" max="240" required value="${e?e.minutes:10}"></div>
-    <div class="field"><label for="eDesc">Instructions</label><textarea class="inp" id="eDesc" name="description" rows="4" placeholder="How it runs, step by step">${esc(e?e.description:"")}</textarea></div>
+    <fieldset class="field"><legend>Instructions</legend>${pointsEditor("steps",e?e.description:"","e.g. Line up in rows",true)}</fieldset>
     <fieldset class="field"><legend>Notes</legend>${pointsEditor("notes",e?e.notes:"","e.g. Watch for dropped hands")}</fieldset>
     <div class="btnrow">${e?`<button type="button" class="btn danger" data-act="askDelEx" data-id="${esc(e.id)}">Delete</button>`:(s.back?`<button type="button" class="btn outline" data-act="backToPick">Back</button>`:"")}<button type="submit" class="btn primary" style="flex:2">${e?"Save":s.addTo?"Save and add":"Save"}</button></div>
   </form>`;
@@ -807,7 +817,7 @@ document.addEventListener("click",e=>{
       toast(`Added to ${planTitle(p)}`,[{label:"Undo",fn:()=>{store.del("items",id);}}]);break;}
     case"addPoint":{const box=$(`#sheetBody .points[data-name="${t.dataset.name}"]`);if(box)addPointAfter(box,null);break;}
     case"delPoint":{const row=t.closest(".ptrow"),box=row&&row.parentElement;if(!box)break;
-      if(box.children.length>1){const prev=row.previousElementSibling||row.nextElementSibling;row.remove();prev.querySelector("input").focus();}
+      if(box.children.length>1){const prev=row.previousElementSibling||row.nextElementSibling;row.remove();renumber(box);prev.querySelector("input").focus();}
       else{const i=row.querySelector("input");i.value="";i.focus();}break;}
     case"toggleFirst":if(draft){draft.showFirst=!draft.showFirst;t.setAttribute("aria-pressed",draft.showFirst);updateProfilePreview();}break;
   }
@@ -851,7 +861,7 @@ document.addEventListener("submit",e=>{
     const lib=exById(it.exercise);if(val("scope")==="lib"&&lib&&lib.minutes!==m)store.update("exercises",lib.id,{minutes:m,editedBy:who()});
     touchPlan(it.plan);closeSheet();toast("Saved");return;}
   if(id==="exForm"){const s=sheet;if(!s)return;
-    const data={name:val("name").slice(0,80),section:val("section"),minutes:Math.max(1,Math.min(240,parseInt(val("minutes"),10)||10)),description:val("description"),notes:fromPoints(readPoints(f,"notes"))};
+    const data={name:val("name").slice(0,80),section:val("section"),minutes:Math.max(1,Math.min(240,parseInt(val("minutes"),10)||10)),description:fromSteps(readPoints(f,"steps")),notes:fromPoints(readPoints(f,"notes"))};
     if(!data.name)return;
     if(s.id){store.update("exercises",s.id,Object.assign(data,{editedBy:who()}));closeSheet();toast("Saved to the library");return;}
     const exId=store.add("exercises",Object.assign(data,{addedBy:who(),editedBy:""}));
@@ -877,7 +887,7 @@ document.addEventListener("keydown",e=>{
   const t=e.target;if(!t.classList||!t.classList.contains("pt"))return;
   const row=t.closest(".ptrow"),box=row.parentElement;
   if(e.key==="Enter"){e.preventDefault();if(t.value.trim())addPointAfter(box,row);}
-  if(e.key==="Backspace"&&!t.value&&box.children.length>1){e.preventDefault();const prev=row.previousElementSibling||row.nextElementSibling;row.remove();const pi=prev.querySelector("input");pi.focus();pi.setSelectionRange(pi.value.length,pi.value.length);}
+  if(e.key==="Backspace"&&!t.value&&box.children.length>1){e.preventDefault();const prev=row.previousElementSibling||row.nextElementSibling;row.remove();renumber(box);const pi=prev.querySelector("input");pi.focus();pi.setSelectionRange(pi.value.length,pi.value.length);}
 });
 
 function boot(){
