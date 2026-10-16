@@ -140,6 +140,15 @@ details.libref h3{margin:10px 0 4px;font-size:13px;font-weight:800;color:var(--m
 .tag.red{background:var(--red);color:#fff}
 .tag.creator{background:var(--ink);color:#fff;display:inline-flex;align-items:center;gap:4px}
 .tag.creator svg{width:12px;height:12px}
+/* Creator label tucked into the top-right corner of an exercise */
+.cornered{position:relative}
+.ctag{position:absolute;top:0;right:0;display:inline-flex;align-items:center;gap:4px;background:var(--ink);color:#fff;font-size:11px;font-weight:800;line-height:1.2;padding:4px 10px 4px 9px;border-radius:0 18px 0 12px;max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.ctag svg{width:11px;height:11px;flex:none}
+.item .ctag{border-radius:0 0 0 10px}
+.pickrow .ctag{border-radius:0 14px 0 10px}
+.excard.cornered{padding-top:30px}
+.item.cornered{padding-top:28px}
+.pickrow.cornered{padding-top:26px}
 
 .plan{display:flex;align-items:center;gap:8px;padding:14px 8px 14px 16px}
 .plan.next{border-color:var(--red)}
@@ -291,6 +300,7 @@ const cleanSec=s=>String(s||"").replace(/,/g," /").replace(/\s+/g," ").trim().sl
 /* ---------- point-form notes: stored in the sheet as "• point" lines ---------- */
 const toPoints=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*(?:[•\-*·]\s*)+/,"").trim()).filter(Boolean);
 const fromPoints=a=>a.map(p=>String(p).replace(/\r?\n/g," ").trim()).filter(Boolean).map(p=>"• "+p).join("\n");
+const ctagHTML=n=>n?`<span class="ctag" title="Created by ${esc(n)}"><span aria-hidden="true" style="display:flex">${ICON.user}</span><span class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Created by </span>${esc(n)}</span>`:"";
 const ptsHTML=s=>{const p=toPoints(s);return p.length?`<ul class="pts">${p.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";};
 /* Instructions are numbered steps, stored as "1. step" lines */
 const toSteps=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*(?:[•\-*·]\s*)+/,"").replace(/^\s*(?:step\s*)?\d+\s*[.):-]\s*/i,"").trim()).filter(Boolean);
@@ -494,7 +504,8 @@ function itemHTML(p,it,col){
   const lib=exById(it.exercise);
   const changed=lib&&it.minutes!==lib.minutes;
   const meta=changed?`${esc(it.editedBy||it.addedBy||"Someone")} changed to ${it.minutes} min · library ${lib.minutes}`:(it.addedBy?`Added by ${esc(it.addedBy)}`:(lib?"From the library":"One-off for this class"));
-  return`<div class="item">
+  const creator=lib?lib.addedBy:"";
+  return`<div class="item${creator?" cornered":""}">${ctagHTML(creator)}
     <div class="r1"><div class="iname">${esc(it.name)}</div><button type="button" class="iconbtn" data-act="editItem" data-id="${esc(it.id)}" aria-label="Edit ${esc(it.name)} for this class">${ICON.edit}</button></div>
     ${ptsHTML(it.note)}
     <div class="r2"><div class="meta" style="${changed?"color:"+col:""}">${meta}</div>
@@ -551,11 +562,11 @@ function exListHTML(){
   return list.map(e=>{
     const col=secColour(e.section),n=use[e.id]?use[e.id].size:0;
     const meta=`in ${n} ${n===1?"plan":"plans"}`+(e.editedBy&&e.editedBy!==e.addedBy?` · edited by ${esc(e.editedBy)}`:"");
-    return`<div class="card excard" style="margin-bottom:10px">
+    return`<div class="card excard${e.addedBy?" cornered":""}" style="margin-bottom:10px">${ctagHTML(e.addedBy)}
       <button type="button" class="body" data-act="editEx" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)} in the library">
         <span class="row" style="gap:8px;align-items:baseline"><span class="nm grow">${esc(e.name)}</span><span style="font-size:14px;font-weight:800;color:${col}">${e.minutes} min</span></span>
         ${e.description?`<span class="ds clamp">${esc(stepsText(e.description))}</span>`:""}${toPoints(e.notes).length?`<span class="ds" style="color:var(--muted);font-weight:700">${toPoints(e.notes).length} ${toPoints(e.notes).length===1?"note":"notes"}</span>`:""}
-        <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span>${e.addedBy?`<span class="tag creator" title="Created by ${esc(e.addedBy)}">${ICON.user}${esc(e.addedBy)}</span>`:""}<span>${meta}</span></span>
+        <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span><span>${meta}</span></span>
       </button>
       <button type="button" class="iconbtn" data-act="quickAdd" data-id="${esc(e.id)}" aria-label="Add ${esc(e.name)} to the open class" style="background:${tint(col)};color:${col}">${ICON.plus}</button>
     </div>`;
@@ -792,7 +803,7 @@ function pickListHTML(s){
   const inPlan=new Set(secItems(p,s.sec).map(i=>i.exercise).filter(Boolean));
   const list=S.exercises.filter(e=>(s.all||eqi(e.section,s.sec))&&(!q||(e.name+" "+e.description+" "+e.notes).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name));
   if(!list.length)return`<p class="small" style="margin:8px 4px 14px">${S.exercises.some(e=>eqi(e.section,s.sec))||s.all?"Nothing matches.":"No "+esc(s.sec)+" exercises in the library yet."}</p>`;
-  return list.map(e=>{const c=secColour(e.section);return`<button type="button" class="pickrow" data-act="addEx" data-id="${esc(e.id)}">
+  return list.map(e=>{const c=secColour(e.section);return`<button type="button" class="pickrow${e.addedBy?" cornered":""}" data-act="addEx" data-id="${esc(e.id)}">${ctagHTML(e.addedBy)}
     <span class="nm">${esc(e.name)}${s.all&&!eqi(e.section,s.sec)?`<br><span class="tag" style="color:${c};background:${tint(c)};margin-top:4px">${esc(e.section)}</span>`:""}</span>
     ${inPlan.has(e.id)?`<span class="ok">In plan</span>`:""}<span class="m" style="color:${c}">${e.minutes} min</span>${ICON.plus}</button>`;}).join("");
 }
