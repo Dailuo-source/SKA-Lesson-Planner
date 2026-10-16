@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#C8102E">
+<meta name="color-scheme" content="light only">
+<title>SKA Lesson Planner</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon-64.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SKA Planner">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+/* Layout: one-column phone app — red header, scrolling view, fixed bottom tab bar, bottom sheets for details */
+:root{
+  --red:#C8102E; --red-d:#A00D25; --red-soft:#FDE7EA; --red-tint:#FDF1F2;
+  --ink:#111111; --ink2:#3A3A3A; --muted:#5E5E5E; --line:#E2E2E2; --line2:#D6D6D6; --sunk:#F5F5F5; --bg:#FFFFFF;
+  --scrim:rgba(0,0,0,.55);
+  --f-d:"M PLUS Rounded 1c","Avenir Next",system-ui,sans-serif;
+  --f-b:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --tabh:66px; color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--red-d)}
+:focus-visible{outline:3px solid rgba(200,16,46,.5);outline-offset:2px}
+svg{flex:none}
+
+.top{position:sticky;top:0;z-index:20;background:var(--red);color:#fff;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px 14px}
+.top .logo{width:46px;height:46px;border-radius:50%;background:#fff;object-fit:contain;padding:2px;flex:none}
+.brand{flex:1;min-width:0}
+.brand b{display:block;font-family:var(--f-d);font-weight:800;font-size:18px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync{display:block;font-size:12px;font-weight:700;color:#fff;opacity:.92;background:none;border:0;padding:2px 0;text-align:left;min-height:20px}
+.sync.bad{opacity:1;text-decoration:underline}
+.me{width:44px;height:44px;border-radius:50%;background:#fff;color:var(--red);border:0;font-weight:800;font-size:15px;flex:none;display:flex;align-items:center;justify-content:center}
+
+main{padding:18px 16px calc(var(--tabh) + 32px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+body.notabs main{padding-bottom:32px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:16px;font-size:12px;font-weight:700;color:var(--ink2);min-height:52px}
+.tabs button[aria-current=page]{background:var(--red);color:#fff;font-weight:800}
+.tabs svg{width:22px;height:22px}
+
+h1{font-family:var(--f-d);font-weight:800;font-size:26px;line-height:1.2;margin:0}
+.kicker{font-size:13px;font-weight:700;color:var(--muted)}
+.small{font-size:12.5px;font-weight:700;color:var(--muted)}
+.label{display:block;font-size:13px;font-weight:800;color:var(--muted);margin:0 0 8px}
+.row{display:flex;align-items:center;gap:12px}
+.grow{flex:1;min-width:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.mt{margin-top:16px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:44px;padding:0 16px;border-radius:22px;border:1.5px solid var(--line2);background:#fff;font-size:15px;font-weight:800;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;position:relative}
+.chip.sm{height:44px;font-size:14px;padding:0 14px}
+.chip[aria-pressed=true]{background:var(--red);border-color:var(--red);color:#fff}
+.rchip input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.rchip:has(input:checked){background:var(--red);border-color:var(--red);color:#fff}
+.rchip:has(input:focus-visible){outline:3px solid rgba(200,16,46,.5);outline-offset:2px}
+
+.card{background:#fff;border:1.5px solid var(--line);border-radius:20px}
+.timecard{padding:16px;display:flex;flex-direction:column;gap:12px}
+.big{font-family:var(--f-d);font-size:32px;font-weight:800;line-height:1}
+.pill{font-size:13px;font-weight:800;padding:6px 10px;border-radius:12px;background:var(--ink);color:#fff;white-space:nowrap}
+.pill.over{background:var(--red)}
+.bar{height:12px;border-radius:6px;background:#EFEFEF;display:flex;overflow:hidden;gap:2px}
+.bar.thin{height:8px;border-radius:4px}
+.bar span{height:100%;display:block}
+
+.section{overflow:hidden}
+.shead{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px}
+.badge{width:28px;height:28px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
+.shead h2{margin:0;font-family:var(--f-d);font-size:16px;font-weight:800;line-height:1.3}
+.textbtn{min-height:44px;padding:0 12px;border:0;background:none;border-radius:22px;font-size:13px;font-weight:800;color:var(--ink2)}
+.item{padding:10px 8px 12px 16px;border-top:1px solid #ECECEC}
+.item .r1{display:flex;align-items:center;gap:8px}
+.iname{flex:1;min-width:0;font-size:16px;font-weight:800;overflow-wrap:anywhere;line-height:1.3}
+.inote{font-size:13px;color:var(--ink2);margin:0 8px 6px 0;white-space:pre-line;overflow-wrap:anywhere}
+.item .r2{display:flex;align-items:center;gap:8px;padding-right:8px}
+.meta{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.35;color:var(--muted)}
+.iconbtn{width:44px;height:44px;flex:none;border:0;background:none;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--ink2);text-decoration:none}
+.iconbtn svg{width:20px;height:20px}
+.iconbtn.round{background:var(--sunk);color:var(--ink)}
+.iconbtn.outline{border:1.5px solid var(--line);color:var(--ink)}
+.stepper{display:flex;align-items:center;background:var(--sunk);border-radius:22px;flex:none}
+.stepper button{width:44px;height:44px;border:0;background:none;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.stepper svg{width:18px;height:18px}
+.stepper .v{min-width:58px;text-align:center;font-size:16px;font-weight:800}
+.addrow{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;padding:12px 16px;border:0;border-top:1px dashed var(--line2);background:none;font-size:14px;font-weight:800;text-align:left}
+.addrow svg{width:18px;height:18px}
+.dashed{width:100%;min-height:56px;border-radius:20px;border:2px dashed #CFCFCF;background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:800;color:var(--ink)}
+.dashed svg{width:20px;height:20px;color:var(--red)}
+
+.btn{min-height:52px;border-radius:26px;border:0;padding:0 20px;font-size:16px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;text-align:center}
+.btn svg{width:20px;height:20px}
+.btn.primary{background:var(--red);color:#fff}
+.btn.outline{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.ghost{background:var(--sunk);color:var(--ink)}
+.btn.danger{background:#fff;color:var(--red-d);border:1.5px solid #EDB9BF}
+.btn.small{min-height:44px;font-size:14px;padding:0 16px;border-radius:22px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.square{border-radius:18px;min-height:56px;font-size:15px}
+.btnrow{display:flex;gap:10px}
+.btnrow .btn{flex:1}
+
+.search{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-radius:24px;border:1.5px solid var(--line2);background:#fff}
+.search input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:16px;height:44px}
+.search svg{width:20px;height:20px;color:var(--muted)}
+.excard{display:flex;align-items:center;gap:8px;padding:12px 8px 12px 16px}
+.excard .body{flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+.excard .nm{font-size:16px;font-weight:800;overflow-wrap:anywhere}
+.excard .ds{font-size:13px;font-weight:600;color:var(--ink2)}
+.tagline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--muted)}
+.tag{padding:2px 8px;border-radius:8px;font-size:12px;font-weight:800;display:inline-block}
+.tag.dark{background:var(--ink);color:#fff}
+.tag.red{background:var(--red);color:#fff}
+
+.plan{display:flex;align-items:center;gap:8px;padding:14px 8px 14px 16px}
+.plan.next{border-color:var(--red)}
+.plan .body{flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+.plan .t{font-size:17px;font-weight:800;margin-right:2px}
+.plan .l{font-size:13px;font-weight:700;color:var(--muted)}
+.grouph{font-size:14px;font-weight:800;color:var(--muted);margin:6px 4px 0}
+.empty{padding:22px 18px;text-align:center;color:var(--ink2);font-weight:600}
+.empty p{margin:0 0 14px}
+
+.field{display:flex;flex-direction:column;gap:8px;margin:0 0 16px;border:0;padding:0;min-width:0}
+.field>label,.field>legend{font-size:14px;font-weight:800;padding:0}
+.field legend{margin-bottom:8px}
+.inp{height:48px;padding:0 14px;border-radius:14px;border:1.5px solid var(--line2);font-size:16px;background:#fff;width:100%;color:var(--ink)}
+textarea.inp{height:auto;min-height:72px;padding:12px 14px;resize:vertical;line-height:1.4}
+select.inp{appearance:auto}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line2);cursor:pointer}
+.opt:has(input:checked){border:2px solid var(--red);background:var(--red-tint)}
+.opt input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--red);flex:none}
+.opt b{display:block;font-size:15px}
+.opt span span{font-size:13px;font-weight:600;color:var(--muted)}
+.switch{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 14px;border-radius:14px;border:1.5px solid var(--line2);background:#fff;text-align:left;color:var(--ink)}
+.switch .trk{width:52px;height:32px;flex:none;border-radius:16px;padding:3px;display:flex;background:#9A9A9A;transition:background .15s}
+.switch .trk i{width:26px;height:26px;border-radius:13px;background:#fff;transition:transform .15s}
+.switch[aria-pressed=true] .trk{background:var(--red)}
+.switch[aria-pressed=true] .trk i{transform:translateX(20px)}
+.preview{border-radius:18px;background:var(--sunk);padding:14px 16px}
+.preview .nm{font-family:var(--f-d);font-size:22px;font-weight:800;color:var(--red)}
+.avatar{width:64px;height:64px;flex:none;border-radius:32px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--f-d);font-weight:800;font-size:24px}
+
+.sheetwrap{position:fixed;inset:0;z-index:50}
+.scrim{position:absolute;inset:0;background:var(--scrim);border:0;width:100%;padding:0}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92vh;max-height:92dvh;overflow:auto;overscroll-behavior:contain;background:#fff;border-radius:28px 28px 0 0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+.sheet.center{bottom:auto;top:50%;transform:translateY(-50%);left:20px;right:20px;border-radius:24px;padding:24px 20px 20px;text-align:center;max-width:420px}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--line2);margin:0 auto 12px}
+.sh{display:flex;align-items:flex-start;gap:8px;margin-bottom:14px}
+.sh h2{margin:0;font-family:var(--f-d);font-size:22px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+.ring{width:56px;height:56px;border-radius:28px;background:var(--red-soft);color:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.ring svg{width:28px;height:28px}
+.center h2{margin:0 0 8px;font-family:var(--f-d);font-size:22px;font-weight:800}
+.center p{margin:0 0 18px;font-size:15px;font-weight:600;color:var(--ink2);line-height:1.45}
+.minbig{display:flex;align-items:center;gap:12px}
+.minbig button{width:52px;height:52px;border-radius:26px;border:0;background:var(--sunk);display:flex;align-items:center;justify-content:center}
+.minbig button svg{width:22px;height:22px}
+.minbig input{flex:1;min-width:0;text-align:center;font-family:var(--f-d);font-size:34px;font-weight:800;border:0;border-bottom:2px solid var(--line2);height:56px;background:none;border-radius:0}
+.minbig .unit{font-size:16px;font-weight:700;color:var(--muted)}
+.qgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.pickrow{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:10px 12px;border:1.5px solid var(--line);border-radius:16px;background:#fff;text-align:left;margin-bottom:8px;color:var(--ink)}
+.pickrow .nm{flex:1;min-width:0;font-size:15px;font-weight:800;overflow-wrap:anywhere}
+.pickrow .m{font-size:14px;font-weight:800}
+.pickrow .ok{font-size:12px;font-weight:800;color:#0F5E54;background:#DDF3EF;padding:2px 8px;border-radius:8px}
+.menu .btn{margin-bottom:10px}
+.msg{min-height:20px;font-size:13px;font-weight:700;color:var(--muted);margin:8px 0 0}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom));z-index:60;background:#111;color:#fff;border-radius:16px;padding:10px 8px 10px 16px;display:flex;align-items:center;gap:8px;font-weight:700;max-width:600px;margin:0 auto;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+body.notabs .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
+.toast span{flex:1}
+.toast button{background:none;border:0;color:#FF9AA8;font-weight:800;min-height:40px;padding:0 10px}
+.connect{max-width:460px;margin:0 auto}
+.err{background:var(--red-soft);color:var(--red-d);border-radius:14px;padding:12px 14px;font-weight:700;margin:0 0 16px}
+@media (min-width:700px){.tabs{max-width:640px;margin:0 auto;border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0}}
+</style>
+</head>
+<body>
+<header class="top">
+  <img class="logo" src="logo-96.png" alt="Scarborough Academy of Karate">
+  <div class="brand"><b>SKA Lesson Planner</b><button class="sync" id="sync" data-act="syncNow" type="button"></button></div>
+  <button class="me" id="me" data-act="profile" type="button" hidden></button>
+</header>
+<main id="view" tabindex="-1"></main>
+<nav class="tabs" id="tabs" aria-label="Main"></nav>
+<div class="sheetwrap" id="sheetWrap" hidden>
+  <button class="scrim" type="button" data-act="closeSheet" aria-label="Close" tabindex="-1"></button>
+  <div class="sheet" id="sheetBox" role="dialog" aria-modal="true"><div id="sheetBody"></div></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+"use strict";
+/* =====================================================================
+   CONFIG — optional. Leave blank and connect each phone once with the
+   phone link from the sheet (SKA Lesson Planner menu → Show app key and phone link).
+   ===================================================================== */
+const API_URL = "";
+const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eqi=(a,b)=>String(a==null?"":a).trim().toLowerCase()===String(b==null?"":b).trim().toLowerCase();
+const LS={get(k,d){try{const v=localStorage.getItem("skal."+k);return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem("skal."+k,v);}catch(e){}}};
+const svg=(p,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ICON={
+  plus:svg('<path d="M5 12h14M12 5v14"/>',2.5), minus:svg('<path d="M5 12h14"/>',2.5),
+  edit:svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'),
+  cal:svg('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+  list:svg('<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>'),
+  book:svg('<path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h10"/>'),
+  clip:svg('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 13l2 2 4-4"/>'),
+  back:svg('<path d="M15 5l-7 7 7 7"/>',2.5), x:svg('<path d="M6 6l12 12M18 6L6 18"/>',2.4),
+  more:svg('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',1.4),
+  copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
+  up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
+  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
+};
+
+/* ---------- dates and times ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const dayKey=ms=>{const d=new Date(ms);return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());};
+const todayKey=()=>dayKey(Date.now());
+const keyMs=k=>{const p=String(k).split("-").map(Number);return new Date(p[0],(p[1]||1)-1,p[2]||1,12).getTime();};
+const fmtDay=ms=>ms?new Date(ms).toLocaleDateString("en-CA",{weekday:"short",month:"short",day:"numeric"}):"No date";
+const fmtLongDay=ms=>ms?new Date(ms).toLocaleDateString("en-CA",{weekday:"long",month:"long",day:"numeric"}):"No date";
+const fmtHM=m=>{m=Math.max(0,Math.round(m||0));return Math.floor(m/60)+"h "+pad(m%60)+"m";};
+const fmtLen=m=>{m=Math.round(m||0);const h=Math.floor(m/60),r=m%60;return h?(h+"h"+(r?" "+pad(r)+"m":"")):(r+"m");};
+function fmtWhen(ms){if(!ms)return"";const k=dayKey(ms),t=new Date(ms).toLocaleTimeString("en-CA",{hour:"numeric",minute:"2-digit"});
+  if(k===todayKey())return"today "+t;const y=new Date();y.setDate(y.getDate()-1);if(k===dayKey(y.getTime()))return"yesterday "+t;return new Date(ms).toLocaleDateString("en-CA",{month:"short",day:"numeric"});}
+
+/* ---------- instructor profile (kept on this phone) ---------- */
+let PROFILE=null;try{PROFILE=JSON.parse(LS.get("profile","null"));}catch(e){PROFILE=null;}
+if(PROFILE&&!(PROFILE.first&&PROFILE.last))PROFILE=null;
+const nameOf=p=>p?(p.title+" "+(p.showFirst?p.first.trim()+" ":"")+p.last.trim()):"";
+const who=()=>nameOf(PROFILE)||"An instructor";
+const initialsOf=p=>p?((p.first.trim()[0]||"")+(p.last.trim()[0]||"")).toUpperCase():"";
+
+/* ---------- sections, class types, lengths (from the Lists tab) ---------- */
+const BUILTIN=[["Warm-up / Physical training","#B85A14"],["Technique / Kihon","#2F5DC0"],["Kata / Kigu","#6A3FB8"],["Kumite","#B8372F"],["Final activity","#157A6E"]];
+const SPARE=["#4E6E8E","#8A5A3B","#2E7D32","#AD1457","#5D4037","#00796B","#7B1FA2","#455A64"];
+function listRows(name){return S.lists.filter(r=>eqi(r.list,name)&&r.value);}
+const okHex=h=>/^#[0-9a-f]{6}$/i.test(String(h||"").trim());
+function secColour(name){
+  const r=listRows("Section").find(x=>eqi(x.value,name));if(r&&okHex(r.colour))return r.colour.trim();
+  const b=BUILTIN.find(x=>eqi(x[0],name));if(b)return b[1];
+  let h=0;for(const c of String(name).toLowerCase())h=(h*31+c.charCodeAt(0))>>>0;return SPARE[h%SPARE.length];
+}
+function tint(hex,amt){const n=parseInt(hex.slice(1),16),mix=c=>Math.round(c+(255-c)*(amt||.86));return"rgb("+mix(n>>16)+","+mix((n>>8)&255)+","+mix(n&255)+")";}
+function defaultSections(){const r=listRows("Section").filter(x=>/^y/i.test(x.inNew)).map(x=>x.value);return r.length?r:BUILTIN.map(b=>b[0]);}
+function allSections(){const out=[];const add=v=>{if(v&&!out.some(o=>eqi(o,v)))out.push(v);};
+  listRows("Section").forEach(r=>add(r.value));if(!out.length)BUILTIN.forEach(b=>add(b[0]));S.exercises.forEach(e=>add(e.section));return out;}
+function classTypes(){const t=[...new Set(listRows("Class type").map(r=>r.value))];return t.length?t:["Regular","Kids","Advanced"];}
+function classLengths(){const l=[...new Set(listRows("Class length").map(r=>parseInt(r.value,10)).filter(n=>n>0))];return l.length?l:[90,105,120];}
+function attendUrl(){const r=listRows("Attendance link")[0];return r&&/^https:\/\//.test(r.value)?r.value:ATTEND_URL;}
+const cleanSec=s=>String(s||"").replace(/,/g," /").replace(/\s+/g," ").trim().slice(0,60);
+
+/* =====================================================================
+   SYNC — the Google Sheet is the source of truth.
+   Changes show on screen right away, then go to the sheet in batches.
+   ===================================================================== */
+let S={plans:[],items:[],exercises:[],lists:[]};
+let ready=false,auth="ok",KEY=LS.get("key",""),API=API_URL||LS.get("api",""),lastSync=0;
+let queue=[],inflight=false,flushT=null,retryT=null;
+let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
+function readLinkParams(){
+  try{
+    const h=new URLSearchParams((location.hash||"").replace(/^#/,""));const q=new URLSearchParams(location.search);
+    const api=h.get("api")||q.get("api"),key=h.get("key")||q.get("key");
+    if(api&&/^https:\/\/script\.google\.com\//.test(api)){API=api;LS.set("api",api);}
+    if(key){KEY=key.trim();LS.set("key",KEY);}
+    if(api||key)history.replaceState(null,"",location.pathname);
+  }catch(e){}
+}
+function callApi(payload){return fetch(API,{method:"POST",body:JSON.stringify(payload),redirect:"follow"}).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json();});}
+const uid=()=>("x"+Date.now().toString(36)+Math.random().toString(36).slice(2,9));
+function applyLocal(o){const arr=S[o.coll];if(o.op==="add"){const rec=Object.assign({id:o.id},o.data);const i=arr.findIndex(d=>d.id===o.id);if(i>=0)arr[i]=rec;else arr.push(rec);}else if(o.op==="update"){const x=arr.find(d=>d.id===o.id);if(x)Object.assign(x,o.data);}else S[o.coll]=arr.filter(d=>d.id!==o.id);}
+function enqueue(o){queue.push(o);applyLocal(o);onData();clearTimeout(flushT);flushT=setTimeout(flush,350);}
+const store={
+  add(c,data){const id=uid();enqueue({op:"add",coll:c,id,data});return id;},
+  update(c,id,data){enqueue({op:"update",coll:c,id,data});},
+  del(c,id){enqueue({op:"del",coll:c,id});}
+};
+const strs=v=>Array.isArray(v)?v.map(s=>String(s).trim()).filter(Boolean):String(v==null?"":v).split(",").map(s=>s.trim()).filter(Boolean);
+function normalize(st){
+  st=st||{};const str=v=>String(v==null?"":v).trim();const num=(v,d)=>v==null||v===""||isNaN(+v)?d:+v;
+  return{
+    lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),inNew:str(r.inNew)})),
+    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
+    items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy)})),
+    exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
+  };
+}
+async function flush(){
+  if(auth!=="ok")return;
+  if(inflight){clearTimeout(flushT);flushT=setTimeout(flush,400);return;}
+  clearTimeout(retryT);
+  const ops=queue.slice();inflight=true;setSync(ops.length?"saving":ready?"loading":"connecting");
+  let res;
+  try{res=await callApi({key:KEY,ops});}catch(e){res={ok:false,error:"network"};}
+  inflight=false;
+  if(res&&res.ok){
+    queue=queue.slice(ops.length);
+    S=normalize(res.state);queue.forEach(applyLocal);
+    const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
+    if(first)render();else onData();
+    if(queue.length){clearTimeout(flushT);flushT=setTimeout(flush,350);}
+    return;
+  }
+  if(res&&res.error==="bad_key"){auth="need";setSync("off");render("That key didn't work. Get a fresh phone link from the sheet: SKA Lesson Planner menu → Show app key and phone link.");return;}
+  setSync("error");
+  if(res&&res.message&&res.error!=="network")toast(res.message);
+  else toast(ops.length?"Can't reach the sheet. Your changes will save when you're back online.":"Can't reach the sheet. Tap the status to retry.");
+  retryT=setTimeout(flush,15000);
+}
+function setSync(s){const el=$("#sync");if(!el)return;
+  const t={connecting:"Connecting…",loading:"Refreshing…",saving:"Saving…",ok:"Synced "+new Date(lastSync).toLocaleTimeString("en-CA",{hour:"numeric",minute:"2-digit"}),error:"Offline · tap to retry",off:"Not connected"}[s];
+  el.textContent=t;el.className="sync"+(s==="error"||s==="off"?" bad":"");}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&auth==="ok"&&Date.now()-lastSync>15000)flush();});
+setInterval(()=>{if(!document.hidden&&auth==="ok"&&!queue.length&&!inflight&&Date.now()-lastSync>60000)flush();},20000);
+window.addEventListener("beforeunload",e=>{if(queue.length){e.preventDefault();e.returnValue="";}});
+
+/* ---------- data helpers ---------- */
+const planById=id=>S.plans.find(p=>p.id===id);
+const exById=id=>id?S.exercises.find(e=>e.id===id):null;
+const itemById=id=>S.items.find(i=>i.id===id);
+const byOrder=(a,b)=>(a.order-b.order)||String(a.id).localeCompare(String(b.id));
+const itemsOf=pid=>S.items.filter(i=>i.plan===pid).sort(byOrder);
+function planSections(p){const out=[];const add=v=>{if(v&&!out.some(o=>eqi(o,v)))out.push(v);};
+  (p.sections.length?p.sections:defaultSections()).forEach(add);itemsOf(p.id).forEach(i=>add(i.section));return out;}
+const isSkipped=(p,sec)=>p.skipped.some(s=>eqi(s,sec));
+const secItems=(p,sec)=>itemsOf(p.id).filter(i=>eqi(i.section,sec));
+const secTotal=(p,sec)=>isSkipped(p,sec)?0:secItems(p,sec).reduce((a,i)=>a+(i.minutes||0),0);
+const planTotal=p=>planSections(p).reduce((a,s)=>a+secTotal(p,s),0);
+const planTitle=p=>p.focus||(p.type?p.type+" class":"Class plan");
+function touchPlan(pid){if(planById(pid))store.update("plans",pid,{editedBy:who(),updated:Date.now()});}
+function addItem(p,sec,ex,extra){
+  const sections=planSections(p);const data={};
+  if(!sections.some(s=>eqi(s,sec)))data.sections=sections.concat(sec);
+  if(isSkipped(p,sec))data.skipped=p.skipped.filter(s=>!eqi(s,sec));
+  if(Object.keys(data).length)store.update("plans",p.id,data);
+  const order=secItems(p,sec).reduce((m,i)=>Math.max(m,i.order||0),0)+1;
+  const id=store.add("items",Object.assign({plan:p.id,section:sec,order,name:ex.name,minutes:ex.minutes||10,note:"",exercise:ex.id||"",addedBy:who(),editedBy:""},extra||{}));
+  touchPlan(p.id);return id;
+}
+function usage(){const m={};S.items.forEach(i=>{if(!i.exercise)return;(m[i.exercise]=m[i.exercise]||new Set()).add(i.plan);});return m;}
+
+/* =====================================================================
+   NAVIGATION — every screen and panel is a step in the phone's history,
+   so the Android back button closes panels and goes back a screen.
+   On the home screen, back once shows "Press back again to exit".
+   ===================================================================== */
+let needGuard=true;
+const stateNow=()=>({t:tab,p:PLAN});
+function go(t,plan){
+  if(plan!==undefined){PLAN=plan;LS.set("plan",PLAN);}
+  if(t===tab&&plan===undefined){window.scrollTo(0,0);return;}
+  tab=t;history.pushState(stateNow(),"");render();window.scrollTo(0,0);
+}
+document.addEventListener("click",()=>{if(needGuard&&auth==="ok"&&PROFILE){history.pushState(stateNow(),"");needGuard=false;}},true);
+window.addEventListener("popstate",e=>{
+  const s=e.state||{t:"plans",root:true};
+  const hadSheet=!!sheet;
+  if(sheet&&!s.sheet)hideSheet();
+  if(!sheet&&s.sheet){history.replaceState(Object.assign({},s,{sheet:0}),"");}
+  if(s.p!==undefined&&s.p!==PLAN){PLAN=s.p;LS.set("plan",PLAN);}
+  const changed=s.t&&s.t!==tab;
+  if(s.t)tab=s.t;
+  if(s.root){needGuard=true;if(!hadSheet)toast("Press back again to exit");}
+  if(changed||!hadSheet){render();if(changed)window.scrollTo(0,0);}
+});
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function render(msg){
+  const me=$("#me");
+  if(PROFILE&&auth==="ok"){me.hidden=false;me.textContent=initialsOf(PROFILE);me.setAttribute("aria-label","Your profile, "+who());}else me.hidden=true;
+  const firstRun=auth==="ok"&&!PROFILE;
+  const showTabs=auth==="ok"&&!firstRun&&tab!=="profile";
+  document.body.classList.toggle("notabs",!showTabs);
+  const tb=$("#tabs");tb.hidden=!showTabs;
+  if(showTabs){
+    const T=[["plans","Plans",ICON.cal],["plan","This class",ICON.list],["library","Library",ICON.book],["attend","Attendance",ICON.clip]];
+    tb.innerHTML=T.map(([k,l,i])=>`<button type="button" data-act="tab" data-tab="${k}"${tab===k?' aria-current="page"':""}>${i}<span>${l}</span></button>`).join("");
+  }
+  renderView(msg);
+}
+function renderView(msg){
+  const v=$("#view");
+  const a=document.activeElement,keep=a&&a.id&&v.contains(a)?{id:a.id,s:a.selectionStart,e:a.selectionEnd}:null;
+  let html;
+  if(auth!=="ok")html=viewConnect(msg);
+  else if(!PROFILE)html=viewProfile(true);
+  else if(tab==="profile")html=viewProfile(false);
+  else if(!ready)html=`<div class="empty"><p>Loading your plans…</p></div>`;
+  else if(tab==="plan")html=viewPlan();
+  else if(tab==="library")html=viewLibrary();
+  else html=viewPlans();
+  v.innerHTML=html;
+  if(keep){const el=document.getElementById(keep.id);if(el){el.focus({preventScroll:true});try{if(keep.s!=null)el.setSelectionRange(keep.s,keep.e);}catch(_){}}}
+}
+function onData(){if(!ready||auth!=="ok"||!PROFILE||tab==="profile")return;renderView();}
+
+/* ---------- Plans ---------- */
+function planCard(p,next){
+  const len=p.length||105,tot=planTotal(p),scale=Math.max(len,tot)||1;
+  const segs=planSections(p).map(s=>{const m=secTotal(p,s);return m?`<span style="width:${(m/scale*100).toFixed(2)}%;background:${secColour(s)}"></span>`:"";}).join("");
+  const edited=p.editedBy?` · last edited by ${esc(p.editedBy)}`:"";
+  return`<div class="card plan${next?" next":""}">
+    <button type="button" class="body" data-act="openPlan" data-id="${esc(p.id)}">
+      <span class="row" style="gap:8px;flex-wrap:wrap"><span class="t">${esc(planTitle(p))}</span>${p.type?`<span class="tag dark">${esc(p.type)}</span>`:""}${next?`<span class="tag red">Next class</span>`:""}</span>
+      <span class="l">${esc(fmtDay(p.date))} · ${fmtHM(tot)} of ${fmtHM(len)}${edited}</span>
+      <span class="bar thin" style="margin-top:4px">${segs}</span>
+    </button>
+    <button type="button" class="iconbtn round" data-act="copyPlan" data-id="${esc(p.id)}" aria-label="Copy ${esc(planTitle(p))} to a new date">${ICON.copy}</button>
+  </div>`;
+}
+function viewPlans(){
+  const types=classTypes();if(plansFilter!=="All"&&!types.includes(plansFilter))plansFilter="All";
+  const list=S.plans.filter(p=>plansFilter==="All"||eqi(p.type,plansFilter));
+  const t0=keyMs(todayKey())-12*3600e3;
+  const up=list.filter(p=>p.date>=t0).sort((a,b)=>a.date-b.date);
+  const past=list.filter(p=>p.date<t0).sort((a,b)=>b.date-a.date);
+  const chips=["All"].concat(types).map(t=>`<button type="button" class="chip sm" data-act="pfilter" data-v="${esc(t)}" aria-pressed="${plansFilter===t}">${esc(t)}</button>`).join("");
+  let body="";
+  if(!S.plans.length)body=`<div class="card empty"><p>No plans yet. Start your first class plan. It begins with the ${defaultSections().length} usual sections.</p><button type="button" class="btn primary" data-act="newPlan">${ICON.plus}New plan</button></div>`;
+  else if(!list.length)body=`<div class="card empty"><p>No ${esc(plansFilter)} plans yet.</p></div>`;
+  else{
+    if(up.length)body+=`<h2 class="grouph">Coming up</h2>`+up.map((p,i)=>planCard(p,i===0)).join("");
+    if(past.length)body+=`<h2 class="grouph">Past classes</h2>`+past.map(p=>planCard(p,false)).join("");
+  }
+  return`<div class="stack">
+    <h1>Lesson plans</h1>
+    <div class="btnrow"><button type="button" class="btn primary square" data-act="newPlan">${ICON.plus}New plan</button><button type="button" class="btn outline square" data-act="copyPick">${ICON.copy}Copy a plan</button></div>
+    <p class="small" style="margin:0 4px">New plans start with the ${defaultSections().length} usual sections. Skip or add sections inside the plan.</p>
+    <div class="chips" role="group" aria-label="Class type">${chips}</div>
+    ${body}
+  </div>`;
+}
+
+/* ---------- This class ---------- */
+function itemHTML(p,it,col){
+  const lib=exById(it.exercise);
+  const changed=lib&&it.minutes!==lib.minutes;
+  const meta=changed?`${esc(it.editedBy||it.addedBy||"Someone")} changed to ${it.minutes} min · library ${lib.minutes}`:(it.addedBy?`Added by ${esc(it.addedBy)}`:(lib?"From the library":"One-off for this class"));
+  return`<div class="item">
+    <div class="r1"><div class="iname">${esc(it.name)}</div><button type="button" class="iconbtn" data-act="editItem" data-id="${esc(it.id)}" aria-label="Edit ${esc(it.name)} for this class">${ICON.edit}</button></div>
+    ${it.note?`<div class="inote">${esc(it.note)}</div>`:""}
+    <div class="r2"><div class="meta" style="${changed?"color:"+col:""}">${meta}</div>
+      <div class="stepper"><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="-5" aria-label="5 minutes less for ${esc(it.name)}">${ICON.minus}</button><div class="v">${it.minutes} min</div><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="5" aria-label="5 minutes more for ${esc(it.name)}">${ICON.plus}</button></div>
+    </div>
+  </div>`;
+}
+function viewPlan(){
+  const p=planById(PLAN);
+  if(!p)return`<div class="stack"><h1>This class</h1><div class="card empty"><p>No class open. Pick one from your plans or start a new one.</p><div class="btnrow"><button type="button" class="btn outline" data-act="tab" data-tab="plans">See plans</button><button type="button" class="btn primary" data-act="newPlan">${ICON.plus}New plan</button></div></div></div>`;
+  const len=p.length||105,tot=planTotal(p),diff=len-tot,scale=Math.max(len,tot)||1;
+  const secs=planSections(p);
+  const types=classTypes();const lens=classLengths();
+  const typeChips=types.map(t=>`<button type="button" class="chip" data-act="setType" data-v="${esc(t)}" aria-pressed="${eqi(p.type,t)}">${esc(t)}</button>`).join("");
+  let lenChips=lens.map(l=>`<button type="button" class="chip" data-act="setLength" data-v="${l}" aria-pressed="${l===len}">${fmtLen(l)}</button>`).join("");
+  lenChips+=`<button type="button" class="chip" data-act="otherLength" aria-pressed="${!lens.includes(len)}">${lens.includes(len)?"Other":fmtLen(len)}</button>`;
+  const segs=secs.map(s=>{const m=secTotal(p,s);return m?`<span style="width:${(m/scale*100).toFixed(2)}%;background:${secColour(s)}"></span>`:"";}).join("");
+  const sum=diff>0?`${fmtHM(diff)} to spare`:diff===0?"Right on time":`${fmtHM(-diff)} over`;
+  const sections=secs.map((s,i)=>{
+    const col=secColour(s),sk=isSkipped(p,s),its=secItems(p,s),st=secTotal(p,s);
+    return`<section class="card section">
+      <div class="shead" style="background:${sk?"#F5F5F5":tint(col)}">
+        <div class="badge" style="background:${sk?"#9A9A9A":col}">${i+1}</div>
+        <div class="grow"><h2 style="color:${sk?"#767676":"var(--ink)"}">${esc(s)}</h2><div class="small" style="color:${sk?"var(--muted)":col};font-weight:800">${sk?"Skipped this class":st+" min"+(its.length?"":" · nothing yet")}</div></div>
+        <button type="button" class="textbtn" data-act="skip" data-sec="${esc(s)}">${sk?"Restore":"Skip"}</button>
+      </div>
+      ${sk?"":its.map(it=>itemHTML(p,it,col)).join("")+`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" style="color:${col}">${ICON.plus}Add from library</button>`}
+    </section>`;
+  }).join("");
+  const edited=p.editedBy?`Last edited by ${esc(p.editedBy)}${p.updated?" · "+esc(fmtWhen(p.updated)):""}`:(p.addedBy?`Started by ${esc(p.addedBy)}`:"");
+  return`<div class="stack">
+    <div class="row" style="align-items:flex-start">
+      <div class="grow"><div class="kicker">${esc(fmtLongDay(p.date))}</div><h1>${esc(planTitle(p))}</h1>${edited?`<div class="small" style="margin-top:2px">${edited}</div>`:""}</div>
+      <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: date, focus, copy, delete">${ICON.more}</button>
+    </div>
+    <div><span class="label">Class type</span><div class="chips">${typeChips}</div></div>
+    <div><span class="label">Class length</span><div class="chips">${lenChips}</div></div>
+    <div class="card timecard">
+      <div class="row" style="align-items:baseline;gap:8px;flex-wrap:wrap"><div class="big">${fmtHM(tot)}</div><div class="grow" style="font-size:15px;font-weight:700;color:var(--muted)">of ${fmtHM(len)} planned</div><div class="pill${diff<0?" over":""}">${sum}</div></div>
+      <div class="bar">${segs}</div>
+    </div>
+    ${sections}
+    <button type="button" class="dashed" data-act="addSection">${ICON.plus}Add a section</button>
+  </div>`;
+}
+
+/* ---------- Library ---------- */
+function exListHTML(){
+  const q=libQuery.trim().toLowerCase();
+  const use=usage();
+  const list=S.exercises.filter(e=>(libFilter==="All"||eqi(e.section,libFilter))&&(!q||(e.name+" "+e.description+" "+e.section).toLowerCase().includes(q)))
+    .sort((a,b)=>{const sa=allSections().findIndex(s=>eqi(s,a.section)),sb=allSections().findIndex(s=>eqi(s,b.section));return(sa-sb)||a.name.localeCompare(b.name);});
+  if(!list.length)return`<div class="card empty"><p>${S.exercises.length?"Nothing matches.":"The library is empty. Add the exercises you use so everyone can slot them into plans."}</p><button type="button" class="btn primary small" data-act="newEx">${ICON.plus}New exercise</button></div>`;
+  return list.map(e=>{
+    const col=secColour(e.section),n=use[e.id]?use[e.id].size:0;
+    const meta=e.editedBy&&e.editedBy!==e.addedBy?`by ${esc(e.addedBy||"—")} · edited by ${esc(e.editedBy)}`:`by ${esc(e.addedBy||"—")} · in ${n} ${n===1?"plan":"plans"}`;
+    return`<div class="card excard" style="margin-bottom:10px">
+      <button type="button" class="body" data-act="editEx" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)} in the library">
+        <span class="row" style="gap:8px;align-items:baseline"><span class="nm grow">${esc(e.name)}</span><span style="font-size:14px;font-weight:800;color:${col}">${e.minutes} min</span></span>
+        ${e.description?`<span class="ds">${esc(e.description)}</span>`:""}
+        <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span><span>${meta}</span></span>
+      </button>
+      <button type="button" class="iconbtn" data-act="quickAdd" data-id="${esc(e.id)}" aria-label="Add ${esc(e.name)} to the open class" style="background:${tint(col)};color:${col}">${ICON.plus}</button>
+    </div>`;
+  }).join("");
+}
+function viewLibrary(){
+  const secs=allSections();if(libFilter!=="All"&&!secs.some(s=>eqi(s,libFilter)))libFilter="All";
+  const chips=["All"].concat(secs).map(s=>{const on=libFilter===s,col=s==="All"?"#C8102E":secColour(s);
+    return`<button type="button" class="chip sm" data-act="lfilter" data-v="${esc(s)}" aria-pressed="${on}" style="${on?`background:${col};border-color:${col};color:#fff`:""}">${esc(s==="All"?"All":s)}</button>`;}).join("");
+  const p=planById(PLAN);
+  const cnt=S.exercises.length;const ppl=new Set(S.exercises.map(e=>e.addedBy).filter(Boolean)).size;
+  return`<div class="stack">
+    <div class="row"><div class="grow"><h1>Exercise library</h1><div class="kicker">${cnt} ${cnt===1?"exercise":"exercises"}${ppl?` from ${ppl} ${ppl===1?"instructor":"instructors"}`:""}</div></div>
+      <button type="button" class="btn primary small" data-act="newEx">${ICON.plus}New</button></div>
+    <div class="search">${ICON.search}<label for="libSearch" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search exercises</label><input id="libSearch" type="search" placeholder="Search exercises" value="${esc(libQuery)}" autocomplete="off"></div>
+    <div class="chips" role="group" aria-label="Section">${chips}</div>
+    ${p?`<p class="small" style="margin:0 4px">Tap + to add to <b style="color:var(--ink)">${esc(planTitle(p))}</b> (${esc(fmtDay(p.date))}).</p>`:""}
+    <div id="exList">${exListHTML()}</div>
+  </div>`;
+}
+
+/* ---------- Profile ---------- */
+let draft=null;
+function viewProfile(first){
+  draft=draft||Object.assign({title:"Mr.",first:"",last:"",showFirst:false},PROFILE||{});
+  const titles=["Mr.","Ms."].map(t=>`<label class="chip rchip"><input type="radio" name="title" value="${t}"${draft.title===t?" checked":""}>${t}</label>`).join("");
+  return`<form id="profileForm" class="stack" autocomplete="on">
+    ${first?`<h1>Welcome to the SKA Lesson Planner</h1><p style="margin:0;font-weight:600;color:var(--ink2)">Tell us who you are. Your name goes on the plans and exercises you add or change, so other instructors know who did what.</p>`
+      :`<div class="row"><button type="button" class="iconbtn outline" data-act="back" aria-label="Back">${ICON.back}</button><h1 class="grow">Your profile</h1></div>`}
+    <div class="row"><div class="avatar" id="pvInit" aria-hidden="true">${esc(initialsOf(draft)||"?")}</div><div class="small" style="font-size:14px;line-height:1.4">You can change this any time by tapping your initials at the top right.</div></div>
+    <fieldset class="field"><legend>Title</legend><div class="chips">${titles}</div></fieldset>
+    <div class="field"><label for="pFirst">First name</label><input class="inp" id="pFirst" name="first" type="text" autocomplete="given-name" value="${esc(draft.first)}" required></div>
+    <div class="field"><label for="pLast">Last name</label><input class="inp" id="pLast" name="last" type="text" autocomplete="family-name" value="${esc(draft.last)}" required></div>
+    <button type="button" class="switch" data-act="toggleFirst" aria-pressed="${!!draft.showFirst}"><span class="grow"><b style="display:block;font-size:15px">Show my first name</b><span style="font-size:13px;font-weight:600;color:var(--muted)">Off: “Mr. Luo” · On: “Mr. Gary Luo”</span></span><span class="trk" aria-hidden="true"><i></i></span></button>
+    <div class="preview"><div class="small">How you’ll appear</div><div class="nm" id="pvName">${esc(previewName())}</div><div style="font-size:13px;font-weight:700;color:var(--ink2)">e.g. “<span id="pvEx">${esc(previewName())}</span> changed to 15 min”</div></div>
+    <p class="msg" id="pMsg" role="alert"></p>
+    <button type="submit" class="btn primary block">${first?"Start planning":"Save"}</button>
+    ${first?"":`<p class="small" style="margin:0">Name changes apply to edits from now on. Earlier labels keep the name used at the time.</p>`}
+  </form>`;
+}
+function previewName(){if(!draft)return"…";const f=draft.first.trim(),l=draft.last.trim();return draft.title+" "+(draft.showFirst&&f?f+" ":"")+(l||"…");}
+function updateProfilePreview(){const n=previewName();const a=$("#pvName"),b=$("#pvEx"),c=$("#pvInit");if(a)a.textContent=n;if(b)b.textContent=n;if(c)c.textContent=initialsOf(draft)||"?";}
+
+/* ---------- Connect ---------- */
+function viewConnect(msg){
+  return`<div class="connect stack">
+    <h1>Connect to the dojo sheet</h1>
+    <p style="margin:0;font-weight:600;color:var(--ink2)">The easiest way is to open the phone link from the SKA Lesson Planner sheet (menu <b>SKA Lesson Planner → Show app key and phone link</b>). Or paste the two parts here.</p>
+    ${msg?`<div class="err" role="alert">${esc(msg)}</div>`:""}
+    <form id="keyForm" class="stack">
+      ${API_URL?"":`<div class="field"><label for="apiInput">Web app link</label><input class="inp" id="apiInput" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(API)}" required></div>`}
+      <div class="field"><label for="keyInput">App key</label><input class="inp" id="keyInput" type="text" autocomplete="off" value="${esc(KEY)}" required></div>
+      <button class="btn primary block" type="submit">Connect</button>
+    </form>
+  </div>`;
+}
+
+/* =====================================================================
+   PANELS (bottom sheets and the centred "are you sure" boxes)
+   ===================================================================== */
+let sheet=null,lastFocus=null;
+function openSheet(s){hideToast();if(!sheet){lastFocus=document.activeElement;history.pushState(Object.assign(stateNow(),{sheet:1}),"");}
+  sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow="hidden";
+  setTimeout(()=>{const f=$("#sheetBody [data-focus]")||$("#sheetBody button, #sheetBody input, #sheetBody a");if(f)f.focus({preventScroll:true});},40);}
+function swapSheet(s){sheet=s;renderSheet();$("#sheetBox").scrollTop=0;}
+function closeSheet(){if(history.state&&history.state.sheet)history.back();else hideSheet();}
+function hideSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style.overflow="";if(lastFocus&&document.contains(lastFocus))try{lastFocus.focus({preventScroll:true});}catch(_){}}
+function finishSheet(t,plan){hideSheet();if(plan!==undefined){PLAN=plan;LS.set("plan",PLAN);}tab=t;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}
+const closeBtn=`<button type="button" class="iconbtn round" data-act="closeSheet" aria-label="Close">${ICON.x}</button>`;
+const sheetHead=(title,sub)=>`<div class="grab"></div><div class="sh"><div class="grow">${sub||""}<h2 id="sheetTitle">${title}</h2></div>${closeBtn}</div>`;
+const secChip=s=>{const c=secColour(s);return`<span class="tag" style="color:${c};background:${tint(c)};margin-bottom:6px">${esc(s)}</span>`;};
+
+function renderSheet(){
+  const box=$("#sheetBox"),body=$("#sheetBody");const s=sheet;if(!s)return;
+  box.className="sheet"+(s.center?" center":"");box.setAttribute("aria-labelledby","sheetTitle");
+  let h="";
+  switch(s.type){
+    case"attend":
+      h=`<div class="ring" aria-hidden="true">${ICON.clip}</div><h2 id="sheetTitle">Open attendance?</h2>
+        <p>This opens Muster Hall in your browser. Your plan stays saved, and your phone’s back button brings you back here.</p>
+        <div class="btnrow"><button type="button" class="btn outline" data-act="closeSheet" data-focus>Stay here</button><a class="btn primary" href="${esc(attendUrl())}" target="_blank" rel="noopener" data-act="attendGo">Open Muster Hall</a></div>`;break;
+    case"confirm":
+      h=`<div class="ring" aria-hidden="true">${ICON.trash}</div><h2 id="sheetTitle">${esc(s.title)}</h2><p>${esc(s.text)}</p>
+        <div class="btnrow"><button type="button" class="btn outline" data-act="closeSheet" data-focus>Keep</button><button type="button" class="btn primary" data-act="${s.act}" data-id="${esc(s.id)}">${esc(s.yes)}</button></div>`;break;
+    case"item":h=sheetItem(s);break;
+    case"pick":h=sheetPick(s);break;
+    case"ex":h=sheetEx(s);break;
+    case"newPlan":h=sheetNewPlan();break;
+    case"copyPick":h=sheetCopyPick();break;
+    case"copy":h=sheetCopy(s);break;
+    case"planMenu":{const p=planById(PLAN);if(!p){h=sheetHead("Plan");break;}
+      h=sheetHead(esc(planTitle(p)),`<div class="small">${esc(fmtLongDay(p.date))}</div>`)+`<div class="menu">
+        <button type="button" class="btn ghost block" data-act="planInfo" data-focus>${ICON.edit}Change date or focus</button>
+        <button type="button" class="btn ghost block" data-act="copyPlan" data-id="${esc(p.id)}">${ICON.copy}Copy to a new date</button>
+        <button type="button" class="btn danger block" data-act="askDelPlan">${ICON.trash}Delete this plan</button></div>`;break;}
+    case"planInfo":{const p=planById(PLAN);if(!p)break;
+      h=sheetHead("Date and focus")+`<form id="infoForm">
+        <div class="field"><label for="iDate">Date</label><input class="inp" id="iDate" name="date" type="date" value="${p.date?dayKey(p.date):todayKey()}" required data-focus></div>
+        <div class="field"><label for="iFocus">Focus</label><input class="inp" id="iFocus" name="focus" type="text" maxlength="60" placeholder="e.g. Kumite focus" value="${esc(p.focus)}"></div>
+        <button class="btn primary block" type="submit">Save</button></form>`;break;}
+    case"length":{const p=planById(PLAN);if(!p)break;const l=p.length||105;
+      h=sheetHead("Class length")+`<form id="lengthForm"><div class="row" style="gap:10px">
+        <div class="field grow"><label for="lH">Hours</label><input class="inp" id="lH" name="h" type="number" inputmode="numeric" min="0" max="5" value="${Math.floor(l/60)}" data-focus></div>
+        <div class="field grow"><label for="lM">Minutes</label><input class="inp" id="lM" name="m" type="number" inputmode="numeric" min="0" max="59" step="5" value="${l%60}"></div></div>
+        <button class="btn primary block" type="submit">Set length</button></form>`;break;}
+    case"addSection":{const p=planById(PLAN);if(!p)break;const have=planSections(p);
+      const opts=allSections().filter(s=>!have.some(x=>eqi(x,s)));
+      h=sheetHead("Add a section")+(opts.length?`<span class="label">Sections you’ve used before</span>`+opts.map(o=>{const c=secColour(o);return`<button type="button" class="pickrow" data-act="addSec" data-v="${esc(o)}"><span class="badge" style="background:${c};width:14px;height:14px"></span><span class="nm">${esc(o)}</span>${ICON.plus}</button>`;}).join(""):"")+
+        `<form id="secForm" class="mt"><div class="field"><label for="secName">New section</label><input class="inp" id="secName" name="name" type="text" maxlength="60" placeholder="e.g. Self-defence" required></div>
+        <button class="btn primary block" type="submit">Add section</button></form>
+        <p class="small" style="margin:12px 0 0">Skipped sections stay in the plan with a Restore button.</p>`;break;}
+  }
+  body.innerHTML=h;
+}
+
+function sheetItem(s){
+  const it=itemById(s.id);if(!it)return sheetHead("Not found")+`<p>This exercise was removed.</p>`;
+  const lib=exById(it.exercise),p=planById(it.plan);
+  const secs=p?secItems(p,it.section):[];const idx=secs.findIndex(x=>x.id===it.id);
+  const quick=[5,10,15,20,30].map(n=>`<button type="button" class="chip" data-act="setMin" data-v="${n}">${n}</button>`).join("");
+  return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
+  `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
+  <form id="itemForm" data-id="${esc(it.id)}">
+    <div class="field"><label for="fMin">Minutes for this class</label>
+      <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
+      <input id="fMin" name="minutes" type="number" inputmode="numeric" min="1" max="240" value="${it.minutes}" required><span class="unit">min</span>
+      <button type="button" data-act="stepMin" data-d="5" aria-label="5 minutes more">${ICON.plus}</button></div>
+      <div class="qgrid" role="group" aria-label="Quick times">${quick}</div></div>
+    <div class="field"><label for="fNote">Notes for this class</label><textarea class="inp" id="fNote" name="note" rows="2" placeholder="e.g. Heian Shodan turns only">${esc(it.note)}</textarea></div>
+    ${lib?`<fieldset class="field"><legend>Save a new time to…</legend>
+      <label class="opt"><input type="radio" name="scope" value="class" checked><span><b>This class only</b><span>The library keeps ${lib.minutes} min</span></span></label>
+      <label class="opt"><input type="radio" name="scope" value="lib"><span><b>Also update the library</b><span>Future plans start at the new time</span></span></label></fieldset>`:""}
+    <div class="field"><span class="label" style="margin:0">Order in ${esc(it.section)}</span><div class="btnrow">
+      <button type="button" class="btn ghost small" data-act="moveItem" data-d="-1"${idx<=0?" disabled":""}>${ICON.up}Move up</button>
+      <button type="button" class="btn ghost small" data-act="moveItem" data-d="1"${idx<0||idx>=secs.length-1?" disabled":""}>${ICON.down}Move down</button></div>
+      <p class="msg" id="moveMsg" aria-live="polite"></p></div>
+    <div class="btnrow"><button type="button" class="btn danger" data-act="removeItem">Remove</button><button type="submit" class="btn primary" style="flex:2">Save</button></div>
+    <p class="small" style="text-align:center;margin:10px 0 0">Changes show as “${esc(who())} changed to …”</p>
+  </form>`;
+}
+function pickListHTML(s){
+  const p=planById(s.plan);if(!p)return"";
+  const q=(s.q||"").trim().toLowerCase();
+  const inPlan=new Set(secItems(p,s.sec).map(i=>i.exercise).filter(Boolean));
+  const list=S.exercises.filter(e=>(s.all||eqi(e.section,s.sec))&&(!q||(e.name+" "+e.description).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!list.length)return`<p class="small" style="margin:8px 4px 14px">${S.exercises.some(e=>eqi(e.section,s.sec))||s.all?"Nothing matches.":"No "+esc(s.sec)+" exercises in the library yet."}</p>`;
+  return list.map(e=>{const c=secColour(e.section);return`<button type="button" class="pickrow" data-act="addEx" data-id="${esc(e.id)}">
+    <span class="nm">${esc(e.name)}${s.all&&!eqi(e.section,s.sec)?`<br><span class="tag" style="color:${c};background:${tint(c)};margin-top:4px">${esc(e.section)}</span>`:""}</span>
+    ${inPlan.has(e.id)?`<span class="ok">In plan</span>`:""}<span class="m" style="color:${c}">${e.minutes} min</span>${ICON.plus}</button>`;}).join("");
+}
+function sheetPick(s){
+  return sheetHead("Add to "+esc(s.sec),`<div class="small">From the library</div>`)+
+  `<div class="search" style="margin-bottom:10px">${ICON.search}<input id="pickSearch" type="search" placeholder="Search" aria-label="Search the library" value="${esc(s.q||"")}" autocomplete="off"></div>
+  <div class="chips" style="margin-bottom:12px"><button type="button" class="chip sm" data-act="pickAll" aria-pressed="${!!s.all}">Show all sections</button></div>
+  <div id="pickList">${pickListHTML(s)}</div>
+  <div class="btnrow" style="margin-top:6px"><button type="button" class="btn outline" data-act="newExFor">${ICON.plus}New exercise</button><button type="button" class="btn primary" data-act="closeSheet">Done</button></div>`;
+}
+function sheetEx(s){
+  const e=s.id?exById(s.id):null;
+  const sec=e?e.section:(s.sec||allSections()[0]||"");
+  const secs=allSections();if(sec&&!secs.some(x=>eqi(x,sec)))secs.push(sec);
+  return sheetHead(e?"Edit exercise":"New exercise",e?`<div class="small">Added by ${esc(e.addedBy||"—")}${e.editedBy?" · last edited by "+esc(e.editedBy):""}</div>`:(s.addTo?`<div class="small">Also adds it to this class</div>`:""))+
+  `<form id="exForm">
+    <div class="field"><label for="eName">Name</label><input class="inp" id="eName" name="name" type="text" maxlength="80" required value="${esc(e?e.name:"")}" data-focus></div>
+    <div class="field"><label for="eSec">Section</label><select class="inp" id="eSec" name="section">${secs.map(x=>`<option${eqi(x,sec)?" selected":""}>${esc(x)}</option>`).join("")}</select></div>
+    <div class="field"><label for="eMin">Usual minutes</label><input class="inp" id="eMin" name="minutes" type="number" inputmode="numeric" min="1" max="240" required value="${e?e.minutes:10}"></div>
+    <div class="field"><label for="eDesc">Description</label><textarea class="inp" id="eDesc" name="description" rows="3" placeholder="How it runs, what to watch for">${esc(e?e.description:"")}</textarea></div>
+    <div class="btnrow">${e?`<button type="button" class="btn danger" data-act="askDelEx" data-id="${esc(e.id)}">Delete</button>`:(s.back?`<button type="button" class="btn outline" data-act="backToPick">Back</button>`:"")}<button type="submit" class="btn primary" style="flex:2">${e?"Save":s.addTo?"Save and add":"Save"}</button></div>
+  </form>`;
+}
+function typeLenFields(type,len){
+  const types=classTypes(),lens=classLengths();if(len&&!lens.includes(len))lens.push(len);
+  return`<fieldset class="field"><legend>Class type</legend><div class="chips">${types.map(t=>`<label class="chip rchip"><input type="radio" name="type" value="${esc(t)}"${eqi(t,type)?" checked":""} required>${esc(t)}</label>`).join("")}</div></fieldset>
+  <fieldset class="field"><legend>Class length</legend><div class="chips">${lens.map(l=>`<label class="chip rchip"><input type="radio" name="length" value="${l}"${l===len?" checked":""}>${fmtLen(l)}</label>`).join("")}</div></fieldset>`;
+}
+function sheetNewPlan(){
+  const lens=classLengths();const def=lens.includes(105)?105:lens[0];
+  return sheetHead("New plan",`<div class="small">Starts with: ${esc(defaultSections().join(" · "))}</div>`)+
+  `<form id="newPlanForm">
+    <div class="field"><label for="nDate">Date</label><input class="inp" id="nDate" name="date" type="date" value="${todayKey()}" required></div>
+    ${typeLenFields(classTypes()[0],def)}
+    <div class="field"><label for="nFocus">Focus (optional)</label><input class="inp" id="nFocus" name="focus" type="text" maxlength="60" placeholder="e.g. Kumite focus"></div>
+    <button class="btn primary block" type="submit">Create plan</button></form>`;
+}
+function sheetCopyPick(){
+  const list=S.plans.slice().sort((a,b)=>b.date-a.date);
+  return sheetHead("Copy a past plan")+(list.length?list.map(p=>`<button type="button" class="pickrow" data-act="copyPlan" data-id="${esc(p.id)}"><span class="nm">${esc(planTitle(p))}<br><span class="small">${esc(fmtDay(p.date))}${p.type?" · "+esc(p.type):""} · ${fmtHM(planTotal(p))}</span></span>${ICON.copy}</button>`).join(""):`<p>No plans to copy yet.</p>`);
+}
+function sheetCopy(s){
+  const p=planById(s.id);if(!p)return sheetHead("Not found");
+  return sheetHead("Copy “"+esc(planTitle(p))+"”",`<div class="small">${itemsOf(p.id).length} exercises, same sections, times and notes</div>`)+
+  `<form id="copyForm" data-id="${esc(p.id)}">
+    <div class="field"><label for="cDate">New date</label><input class="inp" id="cDate" name="date" type="date" value="${todayKey()}" required data-focus></div>
+    ${typeLenFields(p.type||classTypes()[0],p.length||105)}
+    <div class="field"><label for="cFocus">Focus</label><input class="inp" id="cFocus" name="focus" type="text" maxlength="60" value="${esc(p.focus)}"></div>
+    <button class="btn primary block" type="submit">Make the copy</button></form>`;
+}
+
+/* ---------- toast ---------- */
+let toastT=null,toastFns=[];
+function toast(msg,actions){const el=$("#toast");toastFns=actions||[];
+  el.innerHTML=`<span>${esc(msg)}</span>`+toastFns.map((a,i)=>`<button type="button" data-act="toastAct" data-i="${i}">${esc(a.label)}</button>`).join("");
+  el.hidden=false;clearTimeout(toastT);toastT=setTimeout(hideToast,toastFns.length?6000:3500);}
+function hideToast(){const el=$("#toast");if(el)el.hidden=true;clearTimeout(toastT);}
+
+/* =====================================================================
+   ACTIONS
+   ===================================================================== */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-act]");if(!t)return;
+  const act=t.dataset.act;
+  if(act!=="attendGo")e.preventDefault();
+  const p=planById(PLAN);
+  switch(act){
+    case"tab":{const k=t.dataset.tab;if(k==="attend"){openSheet({type:"attend",center:true});break;}go(k);break;}
+    case"profile":draft=null;go("profile");break;
+    case"back":history.back();break;
+    case"syncNow":if(auth==="ok")flush();break;
+    case"closeSheet":closeSheet();break;
+    case"attendGo":setTimeout(closeSheet,50);break;
+    case"toastAct":{const a=toastFns[+t.dataset.i];hideToast();if(a)a.fn();break;}
+    case"pfilter":plansFilter=t.dataset.v;LS.set("pfilter",plansFilter);renderView();break;
+    case"lfilter":libFilter=t.dataset.v;renderView();break;
+    case"openPlan":go("plan",t.dataset.id);break;
+    case"newPlan":openSheet({type:"newPlan"});break;
+    case"copyPick":openSheet({type:"copyPick"});break;
+    case"copyPlan":if(sheet)swapSheet({type:"copy",id:t.dataset.id});else openSheet({type:"copy",id:t.dataset.id});break;
+    case"planMenu":openSheet({type:"planMenu"});break;
+    case"planInfo":swapSheet({type:"planInfo"});break;
+    case"askDelPlan":if(p)swapSheet({type:"confirm",center:true,title:"Delete this plan?",text:`“${planTitle(p)}” on ${fmtDay(p.date)} and its ${itemsOf(p.id).length} exercises will be removed for everyone. The library isn’t affected.`,yes:"Delete",act:"delPlan",id:p.id});break;
+    case"delPlan":{const pp=planById(t.dataset.id);if(!pp)break;itemsOf(pp.id).forEach(i=>store.del("items",i.id));store.del("plans",pp.id);finishSheet("plans","");toast("Plan deleted");break;}
+    case"setType":if(p&&!eqi(p.type,t.dataset.v)){store.update("plans",p.id,{type:t.dataset.v,editedBy:who(),updated:Date.now()});}break;
+    case"setLength":if(p){const l=+t.dataset.v;if(l!==p.length)store.update("plans",p.id,{length:l,editedBy:who(),updated:Date.now()});}break;
+    case"otherLength":if(p)openSheet({type:"length"});break;
+    case"skip":if(p){const sec=t.dataset.sec;const sk=isSkipped(p,sec)?p.skipped.filter(s=>!eqi(s,sec)):p.skipped.concat(sec);
+      const data={skipped:sk,editedBy:who(),updated:Date.now()};if(!p.sections.length)data.sections=planSections(p);store.update("plans",p.id,data);}break;
+    case"addSection":if(p)openSheet({type:"addSection"});break;
+    case"addSec":if(p){addSection(p,t.dataset.v);closeSheet();}break;
+    case"bump":{const it=itemById(t.dataset.id);if(!it)break;const nm=Math.max(1,Math.min(240,(it.minutes||0)+ +t.dataset.d));
+      if(nm!==it.minutes){store.update("items",it.id,{minutes:nm,editedBy:who()});touchPlan(it.plan);}break;}
+    case"editItem":openSheet({type:"item",id:t.dataset.id});break;
+    case"stepMin":{const f=$("#fMin");if(f){f.value=Math.max(1,Math.min(240,(parseInt(f.value,10)||0)+ +t.dataset.d));}break;}
+    case"setMin":{const f=$("#fMin");if(f)f.value=t.dataset.v;break;}
+    case"moveItem":{const form=$("#itemForm");const it=form&&itemById(form.dataset.id);if(!it)break;const pp=planById(it.plan);if(!pp)break;
+      const list=secItems(pp,it.section);const i=list.findIndex(x=>x.id===it.id),j=i+ +t.dataset.d;if(i<0||j<0||j>=list.length)break;
+      list.forEach((x,k)=>{const want=k===i?j:k===j?i:k;if(x.order!==want+1)store.update("items",x.id,{order:want+1});});touchPlan(pp.id);
+      const nl=secItems(pp,it.section),ni=nl.findIndex(x=>x.id===it.id);
+      form.querySelectorAll('[data-act=moveItem]').forEach(b=>{b.disabled=(+b.dataset.d<0&&ni<=0)||(+b.dataset.d>0&&ni>=nl.length-1);});
+      const m=$("#moveMsg");if(m)m.textContent=`Now ${ni+1} of ${nl.length} in ${it.section}`;break;}
+    case"removeItem":{const form=$("#itemForm");const it=form&&itemById(form.dataset.id);if(!it)break;
+      const copy=Object.assign({},it);delete copy.id;store.del("items",it.id);touchPlan(it.plan);closeSheet();
+      toast(`Removed ${it.name}`,[{label:"Undo",fn:()=>{store.add("items",copy);touchPlan(copy.plan);}}]);break;}
+    case"pick":if(p)openSheet({type:"pick",plan:p.id,sec:t.dataset.sec,q:"",all:false});break;
+    case"pickAll":if(sheet&&sheet.type==="pick"){sheet.all=!sheet.all;t.setAttribute("aria-pressed",sheet.all);$("#pickList").innerHTML=pickListHTML(sheet);}break;
+    case"addEx":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),ex=exById(t.dataset.id);if(!pp||!ex)break;
+      addItem(pp,sheet.sec,ex);$("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-id="${ex.id}"]`);if(b)b.focus({preventScroll:true});break;}
+    case"newExFor":if(sheet&&sheet.type==="pick")swapSheet({type:"ex",sec:sheet.sec,addTo:sheet.plan,back:Object.assign({},sheet)});break;
+    case"backToPick":if(sheet&&sheet.back)swapSheet(sheet.back);break;
+    case"newEx":openSheet({type:"ex",sec:libFilter!=="All"?libFilter:""});break;
+    case"editEx":openSheet({type:"ex",id:t.dataset.id});break;
+    case"askDelEx":{const ex=exById(t.dataset.id);if(ex)swapSheet({type:"confirm",center:true,title:`Delete ${ex.name}?`,text:"It’s removed from the library for everyone. Plans that already use it keep it.",yes:"Delete",act:"delEx",id:ex.id});break;}
+    case"delEx":{const ex=exById(t.dataset.id);if(!ex)break;store.del("exercises",ex.id);closeSheet();toast(`Deleted ${ex.name} from the library`);break;}
+    case"quickAdd":{const ex=exById(t.dataset.id);if(!ex)break;if(!p){toast("Open a class plan first, then add exercises to it.");break;}
+      const sec=ex.section||planSections(p)[0];const id=addItem(p,sec,ex);
+      toast(`Added to ${planTitle(p)}`,[{label:"Undo",fn:()=>{store.del("items",id);}}]);break;}
+    case"toggleFirst":if(draft){draft.showFirst=!draft.showFirst;t.setAttribute("aria-pressed",draft.showFirst);updateProfilePreview();}break;
+  }
+});
+function addSection(p,name){
+  name=cleanSec(name);if(!name)return;
+  const secs=planSections(p);
+  const data={editedBy:who(),updated:Date.now()};
+  if(!secs.some(s=>eqi(s,name)))data.sections=secs.concat(name);
+  if(isSkipped(p,name))data.skipped=p.skipped.filter(s=>!eqi(s,name));
+  store.update("plans",p.id,data);
+  if(!listRows("Section").some(r=>eqi(r.value,name))&&!BUILTIN.some(b=>eqi(b[0],name)))store.add("lists",{list:"Section",value:name,colour:"",inNew:""});
+  toast(`Added ${name}`);
+}
+document.addEventListener("input",e=>{
+  const id=e.target.id;
+  if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
+  if(id==="pickSearch"&&sheet&&sheet.type==="pick"){sheet.q=e.target.value;$("#pickList").innerHTML=pickListHTML(sheet);}
+  if(e.target.form&&e.target.form.id==="profileForm"&&draft){const f=e.target.form;draft.first=f.first.value;draft.last=f.last.value;const r=f.querySelector("input[name=title]:checked");if(r)draft.title=r.value;updateProfilePreview();}
+});
+document.addEventListener("change",e=>{
+  if(e.target.form&&e.target.form.id==="profileForm"&&draft&&e.target.name==="title"){draft.title=e.target.value;updateProfilePreview();}
+});
+document.addEventListener("submit",e=>{
+  const f=e.target,id=f.id;e.preventDefault();
+  const fd=new FormData(f);const val=k=>String(fd.get(k)||"").trim();
+  if(id==="keyForm"){const k=$("#keyInput").value.trim();const u=API_URL||$("#apiInput").value.trim();
+    if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u.split(/[?#]/)[0])){render("That web app link doesn't look right. It starts with https://script.google.com and ends with /exec.");return;}
+    if(!k)return;API=u.split(/[?#]/)[0];LS.set("api",API);KEY=k;LS.set("key",KEY);auth="ok";ready=false;render();flush();return;}
+  if(id==="profileForm"){
+    const first=val("first"),last=val("last");const title=val("title")||"Mr.";
+    if(!first||!last){$("#pMsg").textContent="Please enter your first and last name.";return;}
+    const wasFirst=!PROFILE;PROFILE={title,first,last,showFirst:!!(draft&&draft.showFirst)};LS.set("profile",JSON.stringify(PROFILE));draft=null;
+    if(wasFirst){tab="plans";history.replaceState({t:"plans",p:PLAN,root:true},"");needGuard=true;render();window.scrollTo(0,0);toast("Welcome, "+who());}
+    else{toast("Saved. You’re shown as "+who());history.back();}
+    return;}
+  if(id==="itemForm"){const it=itemById(f.dataset.id);if(!it){closeSheet();return;}
+    const m=Math.max(1,Math.min(240,parseInt(val("minutes"),10)||it.minutes||1));const data={note:val("note")};
+    if(m!==it.minutes){data.minutes=m;data.editedBy=who();}
+    store.update("items",it.id,data);
+    const lib=exById(it.exercise);if(val("scope")==="lib"&&lib&&lib.minutes!==m)store.update("exercises",lib.id,{minutes:m,editedBy:who()});
+    touchPlan(it.plan);closeSheet();toast("Saved");return;}
+  if(id==="exForm"){const s=sheet;if(!s)return;
+    const data={name:val("name").slice(0,80),section:val("section"),minutes:Math.max(1,Math.min(240,parseInt(val("minutes"),10)||10)),description:val("description")};
+    if(!data.name)return;
+    if(s.id){store.update("exercises",s.id,Object.assign(data,{editedBy:who()}));closeSheet();toast("Saved to the library");return;}
+    const exId=store.add("exercises",Object.assign(data,{addedBy:who(),editedBy:""}));
+    if(s.addTo){const pp=planById(s.addTo);if(pp)addItem(pp,data.section,Object.assign({id:exId},data));
+      if(s.back){swapSheet(Object.assign({},s.back,{sec:s.back.sec}));toast(`Added ${data.name}`);return;}}
+    closeSheet();toast(`Added ${data.name} to the library`);return;}
+  if(id==="newPlanForm"){
+    const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),focus:val("focus").slice(0,60),type:val("type")||classTypes()[0],length:parseInt(val("length"),10)||105,
+      sections:defaultSections(),skipped:[],addedBy:who(),editedBy:who(),updated:Date.now()});
+    finishSheet("plan",pid);toast("Plan created");return;}
+  if(id==="copyForm"){const src=planById(f.dataset.id);if(!src){closeSheet();return;}
+    const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),focus:val("focus").slice(0,60),type:val("type")||src.type,length:parseInt(val("length"),10)||src.length,
+      sections:planSections(src),skipped:src.skipped.slice(),addedBy:who(),editedBy:who(),updated:Date.now()});
+    itemsOf(src.id).forEach(i=>store.add("items",{plan:pid,section:i.section,order:i.order,name:i.name,minutes:i.minutes,note:i.note,exercise:i.exercise,addedBy:i.addedBy,editedBy:i.editedBy}));
+    finishSheet("plan",pid);toast("Copied. Make any changes for this class.");return;}
+  if(id==="infoForm"){const p=planById(PLAN);if(p)store.update("plans",p.id,{date:keyMs(val("date")||todayKey()),focus:val("focus").slice(0,60),editedBy:who(),updated:Date.now()});closeSheet();return;}
+  if(id==="lengthForm"){const p=planById(PLAN);const l=(parseInt(val("h"),10)||0)*60+(parseInt(val("m"),10)||0);
+    if(p&&l>0)store.update("plans",p.id,{length:Math.min(600,l),editedBy:who(),updated:Date.now()});closeSheet();return;}
+  if(id==="secForm"){const p=planById(PLAN);if(p)addSection(p,val("name"));closeSheet();return;}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheet)closeSheet();});
+
+function boot(){
+  readLinkParams();
+  if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+  if(!API||!KEY)auth="need";
+  history.replaceState({t:"plans",p:PLAN,root:true},"");
+  render();
+  if(auth==="ok")flush();else setSync("off");
+}
+boot();
+})();
+</script>
+</body>
+</html>

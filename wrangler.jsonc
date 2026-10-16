@@ -1,0 +1,6 @@
+// Cloudflare hosting: serves the app's files as a static site.
+{
+  "name": "ska-lesson-planner",
+  "compatibility_date": "2025-09-01",
+  "assets": { "directory": "./" }
+}
