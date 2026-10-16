@@ -196,6 +196,10 @@ body.notabs .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 .toast span{flex:1}
 .toast button{background:none;border:0;color:#FF9AA8;font-weight:800;min-height:40px;padding:0 10px}
 .connect{max-width:460px;margin:0 auto}
+.lead{margin:0;font-weight:600;color:var(--ink2)}
+.gwrap{display:flex;justify-content:center;min-height:44px}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-weight:700;font-size:13px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .err{background:var(--red-soft);color:var(--red-d);border-radius:14px;padding:12px 14px;font-weight:700;margin:0 0 16px}
 @media (min-width:700px){.tabs{max-width:640px;margin:0 auto;border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0}}
 </style>
@@ -218,10 +222,9 @@ body.notabs .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 (function(){
 "use strict";
 /* =====================================================================
-   CONFIG — optional. Leave blank and connect each phone once with the
-   phone link from the sheet (SKA Lesson Planner menu → Show app key and phone link).
+   CONFIG — the sheet's web app link. A phone link with #api=… overrides it.
    ===================================================================== */
-const API_URL = "";
+const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3Ytobt2dnCbeo6BhRW-J7bCeBOZ4rSlz1wmpt3g8Tpe5f/exec";
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 
 const $=s=>document.querySelector(s);
@@ -255,11 +258,14 @@ const fmtLen=m=>{m=Math.round(m||0);const h=Math.floor(m/60),r=m%60;return h?(h+
 function fmtWhen(ms){if(!ms)return"";const k=dayKey(ms),t=new Date(ms).toLocaleTimeString("en-CA",{hour:"numeric",minute:"2-digit"});
   if(k===todayKey())return"today "+t;const y=new Date();y.setDate(y.getDate()-1);if(k===dayKey(y.getTime()))return"yesterday "+t;return new Date(ms).toLocaleDateString("en-CA",{month:"short",day:"numeric"});}
 
-/* ---------- instructor profile (kept on this phone) ---------- */
-let PROFILE=null;try{PROFILE=JSON.parse(LS.get("profile","null"));}catch(e){PROFILE=null;}
-if(PROFILE&&!(PROFILE.first&&PROFILE.last))PROFILE=null;
+/* ---------- the signed-in instructor (account and profile live in the sheet) ---------- */
+let TOKEN=LS.get("token","");
+let ME=null;try{ME=JSON.parse(LS.get("me","null"));}catch(e){ME=null;}
+if(!TOKEN||!ME||!ME.last)ME=null;
+let OLDPROFILE=null;try{OLDPROFILE=JSON.parse(LS.get("profile","null"));}catch(e){OLDPROFILE=null;} // from before sign-in existed
+const signedIn=()=>!!(TOKEN&&ME);
 const nameOf=p=>p?(p.title+" "+(p.showFirst?p.first.trim()+" ":"")+p.last.trim()):"";
-const who=()=>nameOf(PROFILE)||"An instructor";
+const who=()=>nameOf(ME)||"An instructor";
 const initialsOf=p=>p?((p.first.trim()[0]||"")+(p.last.trim()[0]||"")).toUpperCase():"";
 
 /* ---------- sections, class types, lengths (from the Lists tab) ---------- */
@@ -302,7 +308,7 @@ function addPointAfter(box,row){const tmp=document.createElement("div");tmp.inne
    Changes show on screen right away, then go to the sheet in batches.
    ===================================================================== */
 let S={plans:[],items:[],exercises:[],lists:[]};
-let ready=false,auth="ok",KEY=LS.get("key",""),API=API_URL||LS.get("api",""),lastSync=0;
+let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
 function readLinkParams(){
@@ -310,7 +316,6 @@ function readLinkParams(){
     const h=new URLSearchParams((location.hash||"").replace(/^#/,""));const q=new URLSearchParams(location.search);
     const api=h.get("api")||q.get("api"),key=h.get("key")||q.get("key");
     if(api&&/^https:\/\/script\.google\.com\//.test(api)){API=api;LS.set("api",api);}
-    if(key){KEY=key.trim();LS.set("key",KEY);}
     if(api||key)history.replaceState(null,"",location.pathname);
   }catch(e){}
 }
@@ -334,22 +339,23 @@ function normalize(st){
   };
 }
 async function flush(){
-  if(auth!=="ok")return;
+  if(!signedIn())return;
   if(inflight){clearTimeout(flushT);flushT=setTimeout(flush,400);return;}
   clearTimeout(retryT);
   const ops=queue.slice();inflight=true;setSync(ops.length?"saving":ready?"loading":"connecting");
   let res;
-  try{res=await callApi({key:KEY,ops});}catch(e){res={ok:false,error:"network"};}
+  try{res=await callApi({token:TOKEN,ops});}catch(e){res={ok:false,error:"network"};}
   inflight=false;
   if(res&&res.ok){
     queue=queue.slice(ops.length);
+    if(res.me){ME=res.me;LS.set("me",JSON.stringify(ME));const mb=$("#me");if(mb)mb.textContent=initialsOf(ME);}
     S=normalize(res.state);queue.forEach(applyLocal);
     const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
     if(first)render();else onData();
     if(queue.length){clearTimeout(flushT);flushT=setTimeout(flush,350);}
     return;
   }
-  if(res&&res.error==="bad_key"){auth="need";setSync("off");render("That key didn't work. Get a fresh phone link from the sheet: SKA Lesson Planner menu → Show app key and phone link.");return;}
+  if(res&&res.error==="bad_token"){signOut("Please sign in again.");return;}
   setSync("error");
   if(res&&res.message&&res.error!=="network")toast(res.message);
   else toast(ops.length?"Can't reach the sheet. Your changes will save when you're back online.":"Can't reach the sheet. Tap the status to retry.");
@@ -358,8 +364,8 @@ async function flush(){
 function setSync(s){const el=$("#sync");if(!el)return;
   const t={connecting:"Connecting…",loading:"Refreshing…",saving:"Saving…",ok:"Synced "+new Date(lastSync).toLocaleTimeString("en-CA",{hour:"numeric",minute:"2-digit"}),error:"Offline · tap to retry",off:"Not connected"}[s];
   el.textContent=t;el.className="sync"+(s==="error"||s==="off"?" bad":"");}
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&auth==="ok"&&Date.now()-lastSync>15000)flush();});
-setInterval(()=>{if(!document.hidden&&auth==="ok"&&!queue.length&&!inflight&&Date.now()-lastSync>60000)flush();},20000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&signedIn()&&Date.now()-lastSync>15000)flush();});
+setInterval(()=>{if(!document.hidden&&signedIn()&&!queue.length&&!inflight&&Date.now()-lastSync>60000)flush();},20000);
 window.addEventListener("beforeunload",e=>{if(queue.length){e.preventDefault();e.returnValue="";}});
 
 /* ---------- data helpers ---------- */
@@ -399,7 +405,7 @@ function go(t,plan){
   if(t===tab&&plan===undefined){window.scrollTo(0,0);return;}
   tab=t;history.pushState(stateNow(),"");render();window.scrollTo(0,0);
 }
-document.addEventListener("click",()=>{if(needGuard&&auth==="ok"&&PROFILE){history.pushState(stateNow(),"");needGuard=false;}},true);
+document.addEventListener("click",()=>{if(needGuard&&signedIn()){history.pushState(stateNow(),"");needGuard=false;}},true);
 window.addEventListener("popstate",e=>{
   const s=e.state||{t:"plans",root:true};
   const hadSheet=!!sheet;
@@ -417,9 +423,9 @@ window.addEventListener("popstate",e=>{
    ===================================================================== */
 function render(msg){
   const me=$("#me");
-  if(PROFILE&&auth==="ok"){me.hidden=false;me.textContent=initialsOf(PROFILE);me.setAttribute("aria-label","Your profile, "+who());}else me.hidden=true;
-  const firstRun=auth==="ok"&&!PROFILE;
-  const showTabs=auth==="ok"&&!firstRun&&tab!=="profile";
+  if(signedIn()){me.hidden=false;me.textContent=initialsOf(ME);me.setAttribute("aria-label","Your profile, "+who());}else me.hidden=true;
+  $("#sync").hidden=!signedIn();
+  const showTabs=signedIn()&&tab!=="profile";
   document.body.classList.toggle("notabs",!showTabs);
   const tb=$("#tabs");tb.hidden=!showTabs;
   if(showTabs){
@@ -432,17 +438,17 @@ function renderView(msg){
   const v=$("#view");
   const a=document.activeElement,keep=a&&a.id&&v.contains(a)?{id:a.id,s:a.selectionStart,e:a.selectionEnd}:null;
   let html;
-  if(auth!=="ok")html=viewConnect(msg);
-  else if(!PROFILE)html=viewProfile(true);
-  else if(tab==="profile")html=viewProfile(false);
+  if(!signedIn())html=viewAuth();
+  else if(tab==="profile")html=viewProfile();
   else if(!ready)html=`<div class="empty"><p>Loading your plans…</p></div>`;
   else if(tab==="plan")html=viewPlan();
   else if(tab==="library")html=viewLibrary();
   else html=viewPlans();
   v.innerHTML=html;
+  if(!signedIn()){loadGis();mountGis();}
   if(keep){const el=document.getElementById(keep.id);if(el){el.focus({preventScroll:true});try{if(keep.s!=null)el.setSelectionRange(keep.s,keep.e);}catch(_){}}}
 }
-function onData(){if(!ready||auth!=="ok"||!PROFILE||tab==="profile")return;renderView();}
+function onData(){if(!ready||!signedIn()||tab==="profile")return;renderView();}
 
 /* ---------- Plans ---------- */
 function planCard(p,next){
@@ -569,40 +575,129 @@ function viewLibrary(){
   </div>`;
 }
 
-/* ---------- Profile ---------- */
+/* ---------- Profile (stored in the sheet, so it follows you to any device) ---------- */
 let draft=null;
-function viewProfile(first){
-  draft=draft||Object.assign({title:"Mr.",first:"",last:"",showFirst:false},PROFILE||{});
-  const titles=["Mr.","Ms."].map(t=>`<label class="chip rchip"><input type="radio" name="title" value="${t}"${draft.title===t?" checked":""}>${t}</label>`).join("");
-  return`<form id="profileForm" class="stack" autocomplete="on">
-    ${first?`<h1>Welcome to the SKA Lesson Planner</h1><p style="margin:0;font-weight:600;color:var(--ink2)">Tell us who you are. Your name goes on the plans and exercises you add or change, so other instructors know who did what.</p>`
-      :`<div class="row"><button type="button" class="iconbtn outline" data-act="back" aria-label="Back">${ICON.back}</button><h1 class="grow">Your profile</h1></div>`}
-    <div class="row"><div class="avatar" id="pvInit" aria-hidden="true">${esc(initialsOf(draft)||"?")}</div><div class="small" style="font-size:14px;line-height:1.4">You can change this any time by tapping your initials at the top right.</div></div>
-    <fieldset class="field"><legend>Title</legend><div class="chips">${titles}</div></fieldset>
+const titleChips=()=>["Mr.","Ms."].map(t=>`<label class="chip rchip"><input type="radio" name="title" value="${t}"${draft.title===t?" checked":""}>${t}</label>`).join("");
+function nameFields(){
+  return`<fieldset class="field"><legend>Title</legend><div class="chips">${titleChips()}</div></fieldset>
     <div class="field"><label for="pFirst">First name</label><input class="inp" id="pFirst" name="first" type="text" autocomplete="given-name" value="${esc(draft.first)}" required></div>
     <div class="field"><label for="pLast">Last name</label><input class="inp" id="pLast" name="last" type="text" autocomplete="family-name" value="${esc(draft.last)}" required></div>
     <button type="button" class="switch" data-act="toggleFirst" aria-pressed="${!!draft.showFirst}"><span class="grow"><b style="display:block;font-size:15px">Show my first name</b><span style="font-size:13px;font-weight:600;color:var(--muted)">Off: “Mr. Luo” · On: “Mr. Gary Luo”</span></span><span class="trk" aria-hidden="true"><i></i></span></button>
-    <div class="preview"><div class="small">How you’ll appear</div><div class="nm" id="pvName">${esc(previewName())}</div><div style="font-size:13px;font-weight:700;color:var(--ink2)">e.g. “<span id="pvEx">${esc(previewName())}</span> changed to 15 min”</div></div>
+    <div class="preview"><div class="small">How you’ll appear</div><div class="nm" id="pvName">${esc(previewName())}</div><div style="font-size:13px;font-weight:700;color:var(--ink2)">e.g. “<span id="pvEx">${esc(previewName())}</span> changed to 15 min”</div></div>`;
+}
+function viewProfile(){
+  draft=draft||{title:ME.title||"Mr.",first:ME.first||"",last:ME.last||"",showFirst:!!ME.showFirst};
+  return`<div class="stack">
+  <form id="profileForm" class="stack" autocomplete="on">
+    <div class="row"><button type="button" class="iconbtn outline" data-act="back" aria-label="Back">${ICON.back}</button><h1 class="grow">Your profile</h1></div>
+    <div class="row"><div class="avatar" id="pvInit" aria-hidden="true">${esc(initialsOf(draft)||"?")}</div><div class="small" style="font-size:14px;line-height:1.4">Signed in as <b style="color:var(--ink)">${esc(ME.email)}</b>${ME.google?" · Google":""}. Your profile is saved to your account, so it’s the same on every phone and computer.</div></div>
+    ${nameFields()}
     <p class="msg" id="pMsg" role="alert"></p>
-    <button type="submit" class="btn primary block">${first?"Start planning":"Save"}</button>
-    ${first?"":`<p class="small" style="margin:0">Name changes apply to edits from now on. Earlier labels keep the name used at the time.</p>`}
-  </form>`;
+    <button type="submit" class="btn primary block">Save</button>
+    <p class="small" style="margin:0">Name changes apply to edits from now on. Earlier labels keep the name used at the time.</p>
+  </form>
+  <form id="pwForm" class="card stack" style="padding:16px" autocomplete="on">
+    <h2 style="margin:0;font-family:var(--f-d);font-size:18px">${ME.password?"Change password":"Add a password"}</h2>
+    ${ME.password?"":`<p class="small" style="margin:0">So you can also sign in with your email instead of Google.</p>`}
+    <input type="email" name="username" autocomplete="username" value="${esc(ME.email)}" hidden>
+    ${ME.password?`<div class="field" style="margin:0"><label for="pwCur">Current password</label><input class="inp" id="pwCur" name="current" type="password" autocomplete="current-password" required></div>`:""}
+    <div class="field" style="margin:0"><label for="pwNew">New password</label><input class="inp" id="pwNew" name="next" type="password" autocomplete="new-password" minlength="6" required></div>
+    <p class="msg" id="pwMsg" role="alert" style="margin:0"></p>
+    <button type="submit" class="btn outline block">Save password</button>
+  </form>
+  <button type="button" class="btn danger block" data-act="signOut">Sign out on this device</button>
+  </div>`;
 }
 function previewName(){if(!draft)return"…";const f=draft.first.trim(),l=draft.last.trim();return draft.title+" "+(draft.showFirst&&f?f+" ":"")+(l||"…");}
 function updateProfilePreview(){const n=previewName();const a=$("#pvName"),b=$("#pvEx"),c=$("#pvInit");if(a)a.textContent=n;if(b)b.textContent=n;if(c)c.textContent=initialsOf(draft)||"?";}
 
-/* ---------- Connect ---------- */
-function viewConnect(msg){
-  return`<div class="connect stack">
-    <h1>Connect to the dojo sheet</h1>
-    <p style="margin:0;font-weight:600;color:var(--ink2)">The easiest way is to open the phone link from the SKA Lesson Planner sheet (menu <b>SKA Lesson Planner → Show app key and phone link</b>). Or paste the two parts here.</p>
-    ${msg?`<div class="err" role="alert">${esc(msg)}</div>`:""}
-    <form id="keyForm" class="stack">
-      ${API_URL?"":`<div class="field"><label for="apiInput">Web app link</label><input class="inp" id="apiInput" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(API)}" required></div>`}
-      <div class="field"><label for="keyInput">App key</label><input class="inp" id="keyInput" type="text" autocomplete="off" value="${esc(KEY)}" required></div>
-      <button class="btn primary block" type="submit">Connect</button>
+/* ---------- Sign in / create account ---------- */
+let authMode="signin",authMsg="",gPending=null,GCID=LS.get("gcid","");
+const errBox=()=>`<div class="err" id="authErr" role="alert"${authMsg?"":" hidden"}>${esc(authMsg)}</div>`;
+const gBlock=label=>GCID?`<div class="gwrap"><div id="gbtn" data-text="${label}"></div></div><div class="or"><span>or with email</span></div>`:"";
+function viewAuth(){
+  const m=authMode;
+  if(m==="signin")return`<div class="connect stack">
+    <h1>Sign in</h1>
+    <p class="lead">Use the same account on any phone or computer.</p>
+    ${errBox()}${gBlock("signin_with")}
+    <form id="signinForm" class="stack" autocomplete="on">
+      <div class="field"><label for="aEmail">Email</label><input class="inp" id="aEmail" name="email" type="email" inputmode="email" autocomplete="username" required value="${esc(LS.get("email",""))}"></div>
+      <div class="field"><label for="aPw">Password</label><input class="inp" id="aPw" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary block" type="submit">Sign in</button>
     </form>
+    <button type="button" class="btn outline block" data-act="authMode" data-m="signup">New here? Create an account</button>
+    <button type="button" class="textbtn" data-act="authMode" data-m="reset" style="align-self:center">Forgot your password?</button>
   </div>`;
+  if(m==="reset")return`<div class="connect stack">
+    <h1>Choose a new password</h1>
+    <p class="lead">Ask the head instructor to clear your password in the dojo sheet first. Then choose a new one here with the dojo code.</p>
+    ${errBox()}
+    <form id="resetForm" class="stack" autocomplete="on">
+      <div class="field"><label for="rEmail">Email</label><input class="inp" id="rEmail" name="email" type="email" inputmode="email" autocomplete="username" required value="${esc(LS.get("email",""))}"></div>
+      <div class="field"><label for="rCode">Dojo code</label><input class="inp" id="rCode" name="code" type="text" autocapitalize="characters" autocomplete="off" required></div>
+      <div class="field"><label for="rPw">New password</label><input class="inp" id="rPw" name="password" type="password" autocomplete="new-password" minlength="6" required></div>
+      <button class="btn primary block" type="submit">Save and sign in</button>
+    </form>
+    <button type="button" class="btn outline block" data-act="authMode" data-m="signin">Back to sign in</button>
+  </div>`;
+  // signup or gsignup
+  draft=draft||Object.assign({title:"Mr.",first:"",last:"",showFirst:false},OLDPROFILE||{});
+  const g=m==="gsignup"&&gPending;
+  return`<div class="connect stack">
+    <h1>Create your account</h1>
+    <p class="lead">${g?`Signing up with Google as <b>${esc(gPending.email)}</b>.`:"You’ll use it to sign in on any phone or computer."} Your name goes on the plans and exercises you add or change.</p>
+    ${errBox()}${g?"":gBlock("signup_with")}
+    <form id="signupForm" class="stack" autocomplete="on">
+      <div class="field"><label for="sCode">Dojo code</label><input class="inp" id="sCode" name="code" type="text" autocapitalize="characters" autocomplete="off" required><span class="small">Ask the head instructor for it.</span></div>
+      ${nameFields()}
+      ${g?"":`<div class="field"><label for="sEmail">Email</label><input class="inp" id="sEmail" name="email" type="email" inputmode="email" autocomplete="username" required></div>
+      <div class="field"><label for="sPw">Password</label><input class="inp" id="sPw" name="password" type="password" autocomplete="new-password" minlength="6" required><span class="small">At least 6 characters.</span></div>`}
+      <button class="btn primary block" type="submit">Create account</button>
+    </form>
+    <button type="button" class="btn outline block" data-act="authMode" data-m="signin">I already have an account</button>
+  </div>`;
+}
+function showAuthErr(msg){authMsg=msg;const e=$("#authErr");if(e){e.textContent=msg;e.hidden=!msg;e.scrollIntoView({block:"center",behavior:"smooth"});}}
+
+/* Google sign-in (only shown once a client ID is set in the sheet) */
+let gisState=0;
+function loadGis(){
+  if(!GCID||gisState)return;gisState=1;
+  const sc=document.createElement("script");sc.src="https://accounts.google.com/gsi/client";sc.async=true;
+  sc.onload=()=>{try{google.accounts.id.initialize({client_id:GCID,callback:r=>authCall({auth:"google",credential:r.credential},null),ux_mode:"popup"});gisState=2;mountGis();}catch(e){gisState=0;}};
+  sc.onerror=()=>{gisState=0;};
+  document.head.appendChild(sc);
+}
+function mountGis(){
+  const el=$("#gbtn");if(!el||gisState!==2)return;
+  try{google.accounts.id.renderButton(el,{theme:"outline",size:"large",shape:"pill",text:el.dataset.text||"signin_with",width:Math.min(380,Math.max(240,el.parentElement.clientWidth||300))});}catch(e){}
+}
+function fetchConfig(){
+  callApi({auth:"config"}).then(r=>{if(!r||!r.ok)return;const c=(r.config&&r.config.googleClientId)||"";
+    if(c!==GCID){GCID=c;LS.set("gcid",c);if(!signedIn())renderView();}}).catch(()=>{});
+}
+async function authCall(payload,btn){
+  showAuthErr("");
+  if(btn){btn.disabled=true;btn.dataset.l=btn.textContent;btn.textContent="One moment…";}
+  let res;try{res=await callApi(payload);}catch(e){res={ok:false,error:"network",message:"Can’t reach the dojo sheet. Check your connection and try again."};}
+  if(btn&&document.contains(btn)){btn.disabled=false;btn.textContent=btn.dataset.l;}
+  if(res&&res.ok){
+    TOKEN=res.token;LS.set("token",TOKEN);ME=res.me;LS.set("me",JSON.stringify(ME));if(ME.email)LS.set("email",ME.email);
+    S=normalize(res.state);queue=[];ready=true;lastSync=Date.now();gPending=null;draft=null;authMsg="";authMode="signin";
+    tab="plans";history.replaceState({t:"plans",p:PLAN,root:true},"");needGuard=true;render();setSync("ok");window.scrollTo(0,0);
+    toast("Welcome, "+who());return;}
+  if(res&&res.error==="need_signup"){gPending={credential:payload.credential,email:res.email};
+    draft=Object.assign({title:"Mr.",showFirst:false},OLDPROFILE||{},{first:res.first||((OLDPROFILE||{}).first)||"",last:res.last||((OLDPROFILE||{}).last)||""});
+    authMode="gsignup";authMsg="";renderView();window.scrollTo(0,0);return;}
+  if(res&&res.error==="reset_needed"){authMode="reset";authMsg=res.message;renderView();return;}
+  showAuthErr((res&&res.message)||"Something went wrong. Try again.");
+}
+function signOut(msg){
+  TOKEN="";ME=null;LS.set("token","");LS.set("me","null");S={plans:[],items:[],exercises:[],lists:[]};ready=false;queue=[];
+  authMode="signin";authMsg=msg||"";draft=null;tab="plans";history.replaceState({t:"plans",p:PLAN,root:true},"");
+  try{if(window.google&&google.accounts)google.accounts.id.disableAutoSelect();}catch(e){}
+  render();window.scrollTo(0,0);
 }
 
 /* =====================================================================
@@ -767,7 +862,9 @@ document.addEventListener("click",e=>{
     case"tab":{const k=t.dataset.tab;if(k==="attend"){openSheet({type:"attend",center:true});break;}go(k);break;}
     case"profile":draft=null;go("profile");break;
     case"back":history.back();break;
-    case"syncNow":if(auth==="ok")flush();break;
+    case"syncNow":if(signedIn())flush();break;
+    case"authMode":authMode=t.dataset.m;authMsg="";if(authMode!=="gsignup")gPending=null;renderView();window.scrollTo(0,0);break;
+    case"signOut":signOut("You’re signed out on this device.");break;
     case"closeSheet":closeSheet();break;
     case"attendGo":setTimeout(closeSheet,50);break;
     case"toastAct":{const a=toastFns[+t.dataset.i];hideToast();if(a)a.fn();break;}
@@ -836,23 +933,38 @@ document.addEventListener("input",e=>{
   const id=e.target.id;
   if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
   if(id==="pickSearch"&&sheet&&sheet.type==="pick"){sheet.q=e.target.value;$("#pickList").innerHTML=pickListHTML(sheet);}
-  if(e.target.form&&e.target.form.id==="profileForm"&&draft){const f=e.target.form;draft.first=f.first.value;draft.last=f.last.value;const r=f.querySelector("input[name=title]:checked");if(r)draft.title=r.value;updateProfilePreview();}
+  if(e.target.form&&/^(profile|signup)Form$/.test(e.target.form.id)&&draft&&e.target.name!=="code"&&e.target.form.first){const f=e.target.form;draft.first=f.first.value;draft.last=f.last.value;const r=f.querySelector("input[name=title]:checked");if(r)draft.title=r.value;updateProfilePreview();}
 });
 document.addEventListener("change",e=>{
-  if(e.target.form&&e.target.form.id==="profileForm"&&draft&&e.target.name==="title"){draft.title=e.target.value;updateProfilePreview();}
+  if(e.target.form&&/^(profile|signup)Form$/.test(e.target.form.id)&&draft&&e.target.name==="title"){draft.title=e.target.value;updateProfilePreview();}
 });
 document.addEventListener("submit",e=>{
   const f=e.target,id=f.id;e.preventDefault();
   const fd=new FormData(f);const val=k=>String(fd.get(k)||"").trim();
-  if(id==="keyForm"){const k=$("#keyInput").value.trim();const u=API_URL||$("#apiInput").value.trim();
-    if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u.split(/[?#]/)[0])){render("That web app link doesn't look right. It starts with https://script.google.com and ends with /exec.");return;}
-    if(!k)return;API=u.split(/[?#]/)[0];LS.set("api",API);KEY=k;LS.set("key",KEY);auth="ok";ready=false;render();flush();return;}
+  const profileData=()=>({title:val("title")||"Mr.",first:val("first"),last:val("last"),showFirst:!!(draft&&draft.showFirst)});
+  if(id==="signinForm"){authCall({auth:"login",email:val("email"),password:String(fd.get("password")||"")},f.querySelector("[type=submit]"));return;}
+  if(id==="resetForm"){authCall({auth:"reset",email:val("email"),code:val("code"),password:String(fd.get("password")||"")},f.querySelector("[type=submit]"));return;}
+  if(id==="signupForm"){const p=profileData();if(!p.first||!p.last){showAuthErr("Please enter your first and last name.");return;}
+    if(authMode==="gsignup"&&gPending)authCall({auth:"google",credential:gPending.credential,code:val("code"),profile:p},f.querySelector("[type=submit]"));
+    else authCall({auth:"signup",code:val("code"),email:val("email"),password:String(fd.get("password")||""),profile:p},f.querySelector("[type=submit]"));
+    return;}
   if(id==="profileForm"){
-    const first=val("first"),last=val("last");const title=val("title")||"Mr.";
-    if(!first||!last){$("#pMsg").textContent="Please enter your first and last name.";return;}
-    const wasFirst=!PROFILE;PROFILE={title,first,last,showFirst:!!(draft&&draft.showFirst)};LS.set("profile",JSON.stringify(PROFILE));draft=null;
-    if(wasFirst){tab="plans";history.replaceState({t:"plans",p:PLAN,root:true},"");needGuard=true;render();window.scrollTo(0,0);toast("Welcome, "+who());}
-    else{toast("Saved. You’re shown as "+who());history.back();}
+    const p=profileData();if(!p.first||!p.last){$("#pMsg").textContent="Please enter your first and last name.";return;}
+    const btn=f.querySelector("[type=submit]");btn.disabled=true;btn.textContent="Saving…";
+    callApi({token:TOKEN,ops:[],profile:p}).then(res=>{
+      if(res&&res.ok){ME=res.me;LS.set("me",JSON.stringify(ME));S=normalize(res.state);queue.forEach(applyLocal);draft=null;toast("Saved. You’re shown as "+who());history.back();return;}
+      if(res&&res.error==="bad_token"){signOut("Please sign in again.");return;}
+      btn.disabled=false;btn.textContent="Save";$("#pMsg").textContent=(res&&res.message)||"Couldn’t save. Try again.";
+    }).catch(()=>{btn.disabled=false;btn.textContent="Save";$("#pMsg").textContent="Can’t reach the dojo sheet. Check your connection and try again.";});
+    return;}
+  if(id==="pwForm"){
+    const btn=f.querySelector("[type=submit]");btn.disabled=true;
+    callApi({token:TOKEN,ops:[],password:{current:String(fd.get("current")||""),next:String(fd.get("next")||"")}}).then(res=>{
+      btn.disabled=false;
+      if(res&&res.ok){ME=res.me;LS.set("me",JSON.stringify(ME));f.reset();$("#pwMsg").textContent="Password saved.";return;}
+      if(res&&res.error==="bad_token"){signOut("Please sign in again.");return;}
+      $("#pwMsg").textContent=(res&&res.message)||"Couldn’t save. Try again.";
+    }).catch(()=>{btn.disabled=false;$("#pwMsg").textContent="Can’t reach the dojo sheet. Check your connection and try again.";});
     return;}
   if(id==="itemForm"){const it=itemById(f.dataset.id);if(!it){closeSheet();return;}
     const m=Math.max(1,Math.min(240,parseInt(val("minutes"),10)||it.minutes||1));const data={note:fromPoints(readPoints(f,"note"))};
@@ -893,10 +1005,10 @@ document.addEventListener("keydown",e=>{
 function boot(){
   readLinkParams();
   if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-  if(!API||!KEY)auth="need";
   history.replaceState({t:"plans",p:PLAN,root:true},"");
   render();
-  if(auth==="ok")flush();else setSync("off");
+  if(signedIn())flush();
+  fetchConfig();
 }
 boot();
 })();
