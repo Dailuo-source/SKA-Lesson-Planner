@@ -8,15 +8,15 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 | --- | --- |
 | Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main` of `Dailuo-source/SKA-Lesson-Planner`). Never put Gary's full name in a web address |
 | Database | Google Sheet **SKA Lesson Planner** in garyluo.gs@gmail.com's Drive, id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists |
-| Backend | Apps Script project **SKA Lesson Planner** bound to the sheet; source is `Code.gs` here. Web app deployment version 1 is live (Execute as Gary, access Anyone) |
+| Backend | Apps Script project **SKA Lesson Planner** bound to the sheet; source is `Code.gs` here. Web app deployment version 2 is live (Execute as Gary, access Anyone) |
 | Connecting a phone | Sheet menu **SKA Lesson Planner → Show app key and phone link** gives `https://ska-lesson-planner.pages.dev/#api=<exec>&key=<key>`; the app stores both in localStorage (`skal.api`, `skal.key`). `APP_SITE` in Code.gs builds that link |
 | Setup guide | `SETUP.md` |
 
 ## Data model
 
 - **Plans**: Date, Focus, Class type (Regular / Kids / Advanced), Length (min), Sections (in order, comma list), Skipped sections, Added by, Last edited by, Updated.
-- **Plan items**: Plan ID, Section, Order, Exercise, Minutes, Note, Library ID, Added by, Time changed by, Updated. Items are copies of library exercises, so they survive library edits/deletes.
-- **Exercises** (the library): Section, Exercise, Minutes, Description, Added by, Last edited by, Updated. Seeded with Kata Teiiru and Demonstrations (Kata / Kigu, 10 min), the only exercises Gary has named so far.
+- **Plan items**: Plan ID, Section, Order, Exercise, Minutes, Note (point form, "• point" lines), Library ID, Added by, Time changed by, Updated. Items are copies of library exercises, so they survive library edits/deletes.
+- **Exercises** (the library): Section, Exercise, Minutes, Instructions (free text; older header Description still matches), Notes (one point per line, stored as "• point" lines), Added by, Last edited by, Updated. Seeded with Kata Teiiru and Demonstrations (Kata / Kigu, 10 min), the only exercises Gary has named so far.
 - **Lists** (List / Value / Colour / In every new plan): Section (5 defaults with colours, In every new plan = Yes), Class type, Class length (minutes: 90, 105, 120), Attendance link (`https://my.musterhall.app/today`). Extra sections added in the app are saved here without a colour; the app picks a colour from a spare palette.
 - Section names can't contain commas (they're stored as a comma list); the app swaps commas for " /".
 
@@ -34,7 +34,7 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 
 - Browser: Gary has several Chrome instances connected. The one signed in to garyluo.gs@gmail.com, GitHub (Dailuo-source) and Cloudflare is named **GARYMAIN**; select it before doing setup work.
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v1`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v2`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Through Claude in Chrome: open the sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email.
 - Testing: a Node mock of SpreadsheetApp plus Playwright (route `script.google.com` to `api()`) covers the main flows end to end.

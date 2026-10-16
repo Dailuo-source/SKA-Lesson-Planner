@@ -59,7 +59,9 @@ const SCHEMA = {
       ['section', 'Section', 'text', 190],
       ['name', 'Exercise', 'text', 200],
       ['minutes', 'Minutes', 'num', 75],
-      ['description', 'Description', 'text', 320],
+      // Older sheets called this column Description; that header still works
+      ['description', 'Instructions', 'text', 320, ['Description']],
+      ['notes', 'Notes (one point per line)', 'text', 300],
       ['addedBy', 'Added by', 'text', 120],
       ['editedBy', 'Last edited by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
@@ -142,7 +144,10 @@ function label_(s) {
 /** Map field → 0-based column index, matched by header text so columns can be moved. */
 function headerMap_(head, sch) {
   const byLabel = {};
-  sch.cols.forEach(function (c) { byLabel[label_(c[1])] = c[0]; });
+  sch.cols.forEach(function (c) {
+    byLabel[label_(c[1])] = c[0];
+    (c[4] || []).forEach(function (a) { byLabel[label_(a)] = c[0]; });
+  });
   const cols = {};
   head.forEach(function (h, i) {
     const k = byLabel[label_(h)];
@@ -422,7 +427,7 @@ function buildTab_(ss, sch) {
     if (type === 'date') rng.setNumberFormat('ddd mmm d, yyyy');
     if (type === 'datetime') rng.setNumberFormat('mmm d, yyyy h:mm am/pm');
     if (field === 'value') rng.setNumberFormat('@');
-    if (field === 'note' || field === 'description' || field === 'sections') rng.setWrap(true);
+    if (field === 'note' || field === 'notes' || field === 'description' || field === 'sections') rng.setWrap(true);
     if (w) sh.setColumnWidth(col, w);
     if (field === 'id') sh.hideColumns(col);
   });
@@ -471,6 +476,6 @@ function seedExercises_(ss) {
   const sh = ss.getSheetByName(SCHEMA.exercises.sheet);
   if (sh.getLastRow() >= 2) return;
   [['Kata / Kigu', 'Kata Teiiru', 10], ['Kata / Kigu', 'Demonstrations', 10]].forEach(function (r) {
-    applyOp_({ op: 'add', coll: 'exercises', id: newId_(), data: { section: r[0], name: r[1], minutes: r[2], description: '', addedBy: 'Mr. Luo', editedBy: '' } });
+    applyOp_({ op: 'add', coll: 'exercises', id: newId_(), data: { section: r[0], name: r[1], minutes: r[2], description: '', notes: '', addedBy: 'Mr. Luo', editedBy: '' } });
   });
 }

@@ -84,7 +84,17 @@ h1{font-family:var(--f-d);font-weight:800;font-size:26px;line-height:1.2;margin:
 .item{padding:10px 8px 12px 16px;border-top:1px solid #ECECEC}
 .item .r1{display:flex;align-items:center;gap:8px}
 .iname{flex:1;min-width:0;font-size:16px;font-weight:800;overflow-wrap:anywhere;line-height:1.3}
-.inote{font-size:13px;color:var(--ink2);margin:0 8px 6px 0;white-space:pre-line;overflow-wrap:anywhere}
+ul.pts{margin:0 8px 6px 0;padding-left:18px;font-size:13px;color:var(--ink2);overflow-wrap:anywhere}
+ul.pts li{margin:1px 0}
+.points{display:flex;flex-direction:column;gap:8px}
+.ptrow{display:flex;align-items:center;gap:6px}
+.ptrow .dot{width:14px;text-align:center;font-weight:800;color:var(--red);flex:none}
+.ptrow .inp{flex:1;min-width:0;height:44px}
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+details.libref{background:var(--sunk);border-radius:14px;padding:12px 14px;margin:0 0 16px}
+details.libref summary{font-size:14px;font-weight:800;cursor:pointer;min-height:24px}
+details.libref p{margin:8px 0 6px;font-size:14px;white-space:pre-line;color:var(--ink2)}
+details.libref h3{margin:10px 0 4px;font-size:13px;font-weight:800;color:var(--muted)}
 .item .r2{display:flex;align-items:center;gap:8px;padding-right:8px}
 .meta{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.35;color:var(--muted)}
 .iconbtn{width:44px;height:44px;flex:none;border:0;background:none;border-radius:22px;display:flex;align-items:center;justify-content:center;color:var(--ink2);text-decoration:none}
@@ -266,6 +276,16 @@ function classTypes(){const t=[...new Set(listRows("Class type").map(r=>r.value)
 function classLengths(){const l=[...new Set(listRows("Class length").map(r=>parseInt(r.value,10)).filter(n=>n>0))];return l.length?l:[90,105,120];}
 function attendUrl(){const r=listRows("Attendance link")[0];return r&&/^https:\/\//.test(r.value)?r.value:ATTEND_URL;}
 const cleanSec=s=>String(s||"").replace(/,/g," /").replace(/\s+/g," ").trim().slice(0,60);
+/* ---------- point-form notes: stored in the sheet as "• point" lines ---------- */
+const toPoints=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*(?:[•\-*·]\s*)+/,"").trim()).filter(Boolean);
+const fromPoints=a=>a.map(p=>String(p).replace(/\r?\n/g," ").trim()).filter(Boolean).map(p=>"• "+p).join("\n");
+const ptsHTML=s=>{const p=toPoints(s);return p.length?`<ul class="pts">${p.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";};
+const ptRow=(name,v,ph)=>`<div class="ptrow"><span class="dot" aria-hidden="true">•</span><input class="inp pt" type="text" value="${esc(v)}" placeholder="${esc(ph||"Add a point")}" aria-label="Point" enterkeyhint="next" autocomplete="off"><button type="button" class="iconbtn" data-act="delPoint" aria-label="Remove this point">${ICON.x}</button></div>`;
+function pointsEditor(name,s,ph){const p=toPoints(s);if(!p.length)p.push("");
+  return`<div class="points" data-name="${name}">${p.map((x,i)=>ptRow(name,x,i?"":ph)).join("")}</div><button type="button" class="btn ghost small" data-act="addPoint" data-name="${name}" style="align-self:flex-start">${ICON.plus}Add a point</button>`;}
+const readPoints=(form,name)=>[...form.querySelectorAll(`.points[data-name="${name}"] .pt`)].map(i=>i.value.trim()).filter(Boolean);
+function addPointAfter(box,row){const tmp=document.createElement("div");tmp.innerHTML=ptRow(box.dataset.name,"","");const nr=tmp.firstElementChild;
+  if(row&&row.nextSibling)box.insertBefore(nr,row.nextSibling);else box.appendChild(nr);nr.querySelector("input").focus();}
 
 /* =====================================================================
    SYNC — the Google Sheet is the source of truth.
@@ -300,7 +320,7 @@ function normalize(st){
     lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),inNew:str(r.inNew)})),
     plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
     items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy)})),
-    exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
+    exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),notes:str(r.notes),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
   };
 }
 async function flush(){
@@ -458,7 +478,7 @@ function itemHTML(p,it,col){
   const meta=changed?`${esc(it.editedBy||it.addedBy||"Someone")} changed to ${it.minutes} min · library ${lib.minutes}`:(it.addedBy?`Added by ${esc(it.addedBy)}`:(lib?"From the library":"One-off for this class"));
   return`<div class="item">
     <div class="r1"><div class="iname">${esc(it.name)}</div><button type="button" class="iconbtn" data-act="editItem" data-id="${esc(it.id)}" aria-label="Edit ${esc(it.name)} for this class">${ICON.edit}</button></div>
-    ${it.note?`<div class="inote">${esc(it.note)}</div>`:""}
+    ${ptsHTML(it.note)}
     <div class="r2"><div class="meta" style="${changed?"color:"+col:""}">${meta}</div>
       <div class="stepper"><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="-5" aria-label="5 minutes less for ${esc(it.name)}">${ICON.minus}</button><div class="v">${it.minutes} min</div><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="5" aria-label="5 minutes more for ${esc(it.name)}">${ICON.plus}</button></div>
     </div>
@@ -507,7 +527,7 @@ function viewPlan(){
 function exListHTML(){
   const q=libQuery.trim().toLowerCase();
   const use=usage();
-  const list=S.exercises.filter(e=>(libFilter==="All"||eqi(e.section,libFilter))&&(!q||(e.name+" "+e.description+" "+e.section).toLowerCase().includes(q)))
+  const list=S.exercises.filter(e=>(libFilter==="All"||eqi(e.section,libFilter))&&(!q||(e.name+" "+e.description+" "+e.notes+" "+e.section).toLowerCase().includes(q)))
     .sort((a,b)=>{const sa=allSections().findIndex(s=>eqi(s,a.section)),sb=allSections().findIndex(s=>eqi(s,b.section));return(sa-sb)||a.name.localeCompare(b.name);});
   if(!list.length)return`<div class="card empty"><p>${S.exercises.length?"Nothing matches.":"The library is empty. Add the exercises you use so everyone can slot them into plans."}</p><button type="button" class="btn primary small" data-act="newEx">${ICON.plus}New exercise</button></div>`;
   return list.map(e=>{
@@ -516,7 +536,7 @@ function exListHTML(){
     return`<div class="card excard" style="margin-bottom:10px">
       <button type="button" class="body" data-act="editEx" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)} in the library">
         <span class="row" style="gap:8px;align-items:baseline"><span class="nm grow">${esc(e.name)}</span><span style="font-size:14px;font-weight:800;color:${col}">${e.minutes} min</span></span>
-        ${e.description?`<span class="ds">${esc(e.description)}</span>`:""}
+        ${e.description?`<span class="ds clamp">${esc(e.description)}</span>`:""}${toPoints(e.notes).length?`<span class="ds" style="color:var(--muted);font-weight:700">${toPoints(e.notes).length} ${toPoints(e.notes).length===1?"note":"notes"}</span>`:""}
         <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span><span>${meta}</span></span>
       </button>
       <button type="button" class="iconbtn" data-act="quickAdd" data-id="${esc(e.id)}" aria-label="Add ${esc(e.name)} to the open class" style="background:${tint(col)};color:${col}">${ICON.plus}</button>
@@ -581,7 +601,7 @@ function viewConnect(msg){
 let sheet=null,lastFocus=null;
 function openSheet(s){hideToast();if(!sheet){lastFocus=document.activeElement;history.pushState(Object.assign(stateNow(),{sheet:1}),"");}
   sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow="hidden";
-  setTimeout(()=>{const f=$("#sheetBody [data-focus]")||$("#sheetBody button, #sheetBody input, #sheetBody a");if(f)f.focus({preventScroll:true});},40);}
+  setTimeout(()=>{if($("#sheetWrap").contains(document.activeElement))return;const f=$("#sheetBody [data-focus]")||$("#sheetBody button, #sheetBody input, #sheetBody a");if(f)f.focus({preventScroll:true});},40);}
 function swapSheet(s){sheet=s;renderSheet();$("#sheetBox").scrollTop=0;}
 function closeSheet(){if(history.state&&history.state.sheet)history.back();else hideSheet();}
 function hideSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style.overflow="";if(lastFocus&&document.contains(lastFocus))try{lastFocus.focus({preventScroll:true});}catch(_){}}
@@ -640,13 +660,14 @@ function sheetItem(s){
   const quick=[5,10,15,20,30].map(n=>`<button type="button" class="chip" data-act="setMin" data-v="${n}">${n}</button>`).join("");
   return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
   `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
+  ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.description?`<h3>Instructions</h3><p>${esc(lib.description)}</p>`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
   <form id="itemForm" data-id="${esc(it.id)}">
     <div class="field"><label for="fMin">Minutes for this class</label>
       <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
       <input id="fMin" name="minutes" type="number" inputmode="numeric" min="1" max="240" value="${it.minutes}" required><span class="unit">min</span>
       <button type="button" data-act="stepMin" data-d="5" aria-label="5 minutes more">${ICON.plus}</button></div>
       <div class="qgrid" role="group" aria-label="Quick times">${quick}</div></div>
-    <div class="field"><label for="fNote">Notes for this class</label><textarea class="inp" id="fNote" name="note" rows="2" placeholder="e.g. Heian Shodan turns only">${esc(it.note)}</textarea></div>
+    <fieldset class="field"><legend>Notes for this class</legend>${pointsEditor("note",it.note,"e.g. Heian Shodan turns only")}</fieldset>
     ${lib?`<fieldset class="field"><legend>Save a new time to…</legend>
       <label class="opt"><input type="radio" name="scope" value="class" checked><span><b>This class only</b><span>The library keeps ${lib.minutes} min</span></span></label>
       <label class="opt"><input type="radio" name="scope" value="lib"><span><b>Also update the library</b><span>Future plans start at the new time</span></span></label></fieldset>`:""}
@@ -662,7 +683,7 @@ function pickListHTML(s){
   const p=planById(s.plan);if(!p)return"";
   const q=(s.q||"").trim().toLowerCase();
   const inPlan=new Set(secItems(p,s.sec).map(i=>i.exercise).filter(Boolean));
-  const list=S.exercises.filter(e=>(s.all||eqi(e.section,s.sec))&&(!q||(e.name+" "+e.description).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name));
+  const list=S.exercises.filter(e=>(s.all||eqi(e.section,s.sec))&&(!q||(e.name+" "+e.description+" "+e.notes).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name));
   if(!list.length)return`<p class="small" style="margin:8px 4px 14px">${S.exercises.some(e=>eqi(e.section,s.sec))||s.all?"Nothing matches.":"No "+esc(s.sec)+" exercises in the library yet."}</p>`;
   return list.map(e=>{const c=secColour(e.section);return`<button type="button" class="pickrow" data-act="addEx" data-id="${esc(e.id)}">
     <span class="nm">${esc(e.name)}${s.all&&!eqi(e.section,s.sec)?`<br><span class="tag" style="color:${c};background:${tint(c)};margin-top:4px">${esc(e.section)}</span>`:""}</span>
@@ -684,7 +705,8 @@ function sheetEx(s){
     <div class="field"><label for="eName">Name</label><input class="inp" id="eName" name="name" type="text" maxlength="80" required value="${esc(e?e.name:"")}" data-focus></div>
     <div class="field"><label for="eSec">Section</label><select class="inp" id="eSec" name="section">${secs.map(x=>`<option${eqi(x,sec)?" selected":""}>${esc(x)}</option>`).join("")}</select></div>
     <div class="field"><label for="eMin">Usual minutes</label><input class="inp" id="eMin" name="minutes" type="number" inputmode="numeric" min="1" max="240" required value="${e?e.minutes:10}"></div>
-    <div class="field"><label for="eDesc">Description</label><textarea class="inp" id="eDesc" name="description" rows="3" placeholder="How it runs, what to watch for">${esc(e?e.description:"")}</textarea></div>
+    <div class="field"><label for="eDesc">Instructions</label><textarea class="inp" id="eDesc" name="description" rows="4" placeholder="How it runs, step by step">${esc(e?e.description:"")}</textarea></div>
+    <fieldset class="field"><legend>Notes</legend>${pointsEditor("notes",e?e.notes:"","e.g. Watch for dropped hands")}</fieldset>
     <div class="btnrow">${e?`<button type="button" class="btn danger" data-act="askDelEx" data-id="${esc(e.id)}">Delete</button>`:(s.back?`<button type="button" class="btn outline" data-act="backToPick">Back</button>`:"")}<button type="submit" class="btn primary" style="flex:2">${e?"Save":s.addTo?"Save and add":"Save"}</button></div>
   </form>`;
 }
@@ -783,6 +805,10 @@ document.addEventListener("click",e=>{
     case"quickAdd":{const ex=exById(t.dataset.id);if(!ex)break;if(!p){toast("Open a class plan first, then add exercises to it.");break;}
       const sec=ex.section||planSections(p)[0];const id=addItem(p,sec,ex);
       toast(`Added to ${planTitle(p)}`,[{label:"Undo",fn:()=>{store.del("items",id);}}]);break;}
+    case"addPoint":{const box=$(`#sheetBody .points[data-name="${t.dataset.name}"]`);if(box)addPointAfter(box,null);break;}
+    case"delPoint":{const row=t.closest(".ptrow"),box=row&&row.parentElement;if(!box)break;
+      if(box.children.length>1){const prev=row.previousElementSibling||row.nextElementSibling;row.remove();prev.querySelector("input").focus();}
+      else{const i=row.querySelector("input");i.value="";i.focus();}break;}
     case"toggleFirst":if(draft){draft.showFirst=!draft.showFirst;t.setAttribute("aria-pressed",draft.showFirst);updateProfilePreview();}break;
   }
 });
@@ -819,13 +845,13 @@ document.addEventListener("submit",e=>{
     else{toast("Saved. You’re shown as "+who());history.back();}
     return;}
   if(id==="itemForm"){const it=itemById(f.dataset.id);if(!it){closeSheet();return;}
-    const m=Math.max(1,Math.min(240,parseInt(val("minutes"),10)||it.minutes||1));const data={note:val("note")};
+    const m=Math.max(1,Math.min(240,parseInt(val("minutes"),10)||it.minutes||1));const data={note:fromPoints(readPoints(f,"note"))};
     if(m!==it.minutes){data.minutes=m;data.editedBy=who();}
     store.update("items",it.id,data);
     const lib=exById(it.exercise);if(val("scope")==="lib"&&lib&&lib.minutes!==m)store.update("exercises",lib.id,{minutes:m,editedBy:who()});
     touchPlan(it.plan);closeSheet();toast("Saved");return;}
   if(id==="exForm"){const s=sheet;if(!s)return;
-    const data={name:val("name").slice(0,80),section:val("section"),minutes:Math.max(1,Math.min(240,parseInt(val("minutes"),10)||10)),description:val("description")};
+    const data={name:val("name").slice(0,80),section:val("section"),minutes:Math.max(1,Math.min(240,parseInt(val("minutes"),10)||10)),description:val("description"),notes:fromPoints(readPoints(f,"notes"))};
     if(!data.name)return;
     if(s.id){store.update("exercises",s.id,Object.assign(data,{editedBy:who()}));closeSheet();toast("Saved to the library");return;}
     const exId=store.add("exercises",Object.assign(data,{addedBy:who(),editedBy:""}));
@@ -846,7 +872,13 @@ document.addEventListener("submit",e=>{
     if(p&&l>0)store.update("plans",p.id,{length:Math.min(600,l),editedBy:who(),updated:Date.now()});closeSheet();return;}
   if(id==="secForm"){const p=planById(PLAN);if(p)addSection(p,val("name"));closeSheet();return;}
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheet)closeSheet();});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&sheet)closeSheet();
+  const t=e.target;if(!t.classList||!t.classList.contains("pt"))return;
+  const row=t.closest(".ptrow"),box=row.parentElement;
+  if(e.key==="Enter"){e.preventDefault();if(t.value.trim())addPointAfter(box,row);}
+  if(e.key==="Backspace"&&!t.value&&box.children.length>1){e.preventDefault();const prev=row.previousElementSibling||row.nextElementSibling;row.remove();const pi=prev.querySelector("input");pi.focus();pi.setSelectionRange(pi.value.length,pi.value.length);}
+});
 
 function boot(){
   readLinkParams();
