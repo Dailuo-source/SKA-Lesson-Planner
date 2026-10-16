@@ -138,6 +138,8 @@ details.libref h3{margin:10px 0 4px;font-size:13px;font-weight:800;color:var(--m
 .tag{padding:2px 8px;border-radius:8px;font-size:12px;font-weight:800;display:inline-block}
 .tag.dark{background:var(--ink);color:#fff}
 .tag.red{background:var(--red);color:#fff}
+.tag.creator{background:var(--ink);color:#fff;display:inline-flex;align-items:center;gap:4px}
+.tag.creator svg{width:12px;height:12px}
 
 .plan{display:flex;align-items:center;gap:8px;padding:14px 8px 14px 16px}
 .plan.next{border-color:var(--red)}
@@ -243,7 +245,7 @@ const ICON={
   more:svg('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',1.4),
   copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
-  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
+  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
 };
 
 /* ---------- dates and times ---------- */
@@ -548,12 +550,12 @@ function exListHTML(){
   if(!list.length)return`<div class="card empty"><p>${S.exercises.length?"Nothing matches.":"The library is empty. Add the exercises you use so everyone can slot them into plans."}</p><button type="button" class="btn primary small" data-act="newEx">${ICON.plus}New exercise</button></div>`;
   return list.map(e=>{
     const col=secColour(e.section),n=use[e.id]?use[e.id].size:0;
-    const meta=e.editedBy&&e.editedBy!==e.addedBy?`by ${esc(e.addedBy||"—")} · edited by ${esc(e.editedBy)}`:`by ${esc(e.addedBy||"—")} · in ${n} ${n===1?"plan":"plans"}`;
+    const meta=`in ${n} ${n===1?"plan":"plans"}`+(e.editedBy&&e.editedBy!==e.addedBy?` · edited by ${esc(e.editedBy)}`:"");
     return`<div class="card excard" style="margin-bottom:10px">
       <button type="button" class="body" data-act="editEx" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)} in the library">
         <span class="row" style="gap:8px;align-items:baseline"><span class="nm grow">${esc(e.name)}</span><span style="font-size:14px;font-weight:800;color:${col}">${e.minutes} min</span></span>
         ${e.description?`<span class="ds clamp">${esc(stepsText(e.description))}</span>`:""}${toPoints(e.notes).length?`<span class="ds" style="color:var(--muted);font-weight:700">${toPoints(e.notes).length} ${toPoints(e.notes).length===1?"note":"notes"}</span>`:""}
-        <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span><span>${meta}</span></span>
+        <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span>${e.addedBy?`<span class="tag creator" title="Created by ${esc(e.addedBy)}">${ICON.user}${esc(e.addedBy)}</span>`:""}<span>${meta}</span></span>
       </button>
       <button type="button" class="iconbtn" data-act="quickAdd" data-id="${esc(e.id)}" aria-label="Add ${esc(e.name)} to the open class" style="background:${tint(col)};color:${col}">${ICON.plus}</button>
     </div>`;
@@ -765,7 +767,7 @@ function sheetItem(s){
   const quick=[5,10,15,20,30].map(n=>`<button type="button" class="chip" data-act="setMin" data-v="${n}">${n}</button>`).join("");
   return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
   `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
-  ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.description?`<h3>Instructions</h3>${stepsHTML(lib.description)}`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
+  ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.addedBy?`<p style="margin:8px 0 0"><span class="tag creator">${ICON.user}${esc(lib.addedBy)}</span></p>`:""}${lib.description?`<h3>Instructions</h3>${stepsHTML(lib.description)}`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
   <form id="itemForm" data-id="${esc(it.id)}">
     <div class="field"><label for="fMin">Minutes for this class</label>
       <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
@@ -805,10 +807,12 @@ function sheetEx(s){
   const e=s.id?exById(s.id):null;
   const sec=e?e.section:(s.sec||allSections()[0]||"");
   const secs=allSections();if(sec&&!secs.some(x=>eqi(x,sec)))secs.push(sec);
-  return sheetHead(e?"Edit exercise":"New exercise",e?`<div class="small">Added by ${esc(e.addedBy||"—")}${e.editedBy?" · last edited by "+esc(e.editedBy):""}</div>`:(s.addTo?`<div class="small">Also adds it to this class</div>`:""))+
+  const names=[...new Set([who()].concat(S.exercises.map(x=>x.addedBy),S.exercises.map(x=>x.editedBy),S.items.map(x=>x.addedBy)).filter(Boolean))];
+  return sheetHead(e?"Edit exercise":"New exercise",e?(e.editedBy?`<div class="small">Last edited by ${esc(e.editedBy)}</div>`:""):(s.addTo?`<div class="small">Also adds it to this class</div>`:""))+
   `<form id="exForm">
     <div class="field"><label for="eName">Name</label><input class="inp" id="eName" name="name" type="text" maxlength="80" required value="${esc(e?e.name:"")}" data-focus></div>
     <div class="field"><label for="eSec">Section</label><select class="inp" id="eSec" name="section">${secs.map(x=>`<option${eqi(x,sec)?" selected":""}>${esc(x)}</option>`).join("")}</select></div>
+    <div class="field"><label for="eBy">Created by</label><input class="inp" id="eBy" name="creator" type="text" maxlength="60" list="eByList" autocomplete="off" value="${esc(e?(e.addedBy||""):who())}"><datalist id="eByList">${names.map(n=>`<option value="${esc(n)}">`).join("")}</datalist><span class="small">Who came up with this exercise. Shown as a label in the library.</span></div>
     <div class="field"><label for="eMin">Usual minutes</label><input class="inp" id="eMin" name="minutes" type="number" inputmode="numeric" min="1" max="240" required value="${e?e.minutes:10}"></div>
     <fieldset class="field"><legend>Instructions</legend>${pointsEditor("steps",e?e.description:"","e.g. Line up in rows",true)}</fieldset>
     <fieldset class="field"><legend>Notes</legend>${pointsEditor("notes",e?e.notes:"","e.g. Watch for dropped hands")}</fieldset>
@@ -975,8 +979,9 @@ document.addEventListener("submit",e=>{
   if(id==="exForm"){const s=sheet;if(!s)return;
     const data={name:val("name").slice(0,80),section:val("section"),minutes:Math.max(1,Math.min(240,parseInt(val("minutes"),10)||10)),description:fromSteps(readPoints(f,"steps")),notes:fromPoints(readPoints(f,"notes"))};
     if(!data.name)return;
-    if(s.id){store.update("exercises",s.id,Object.assign(data,{editedBy:who()}));closeSheet();toast("Saved to the library");return;}
-    const exId=store.add("exercises",Object.assign(data,{addedBy:who(),editedBy:""}));
+    const creator=val("creator").slice(0,60)||who();
+    if(s.id){store.update("exercises",s.id,Object.assign(data,{addedBy:creator,editedBy:who()}));closeSheet();toast("Saved to the library");return;}
+    const exId=store.add("exercises",Object.assign(data,{addedBy:creator,editedBy:""}));
     if(s.addTo){const pp=planById(s.addTo);if(pp)addItem(pp,data.section,Object.assign({id:exId},data));
       if(s.back){swapSheet(Object.assign({},s.back,{sec:s.back.sec}));toast(`Added ${data.name}`);return;}}
     closeSheet();toast(`Added ${data.name} to the library`);return;}
