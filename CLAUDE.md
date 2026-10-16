@@ -7,8 +7,8 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 | Piece | Location |
 | --- | --- |
 | Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main` of `Dailuo-source/SKA-Lesson-Planner`). Never put Gary's full name in a web address |
-| Database | Google Sheet **SKA Lesson Planner** (id: see below once set up). Tabs: Plans, Plan items, Exercises, Lists |
-| Backend | Apps Script bound to the sheet; source is `Code.gs` here |
+| Database | Google Sheet **SKA Lesson Planner** in garyluo.gs@gmail.com's Drive, id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists |
+| Backend | Apps Script project **SKA Lesson Planner** bound to the sheet; source is `Code.gs` here. Web app deployment version 1 is live (Execute as Gary, access Anyone) |
 | Connecting a phone | Sheet menu **SKA Lesson Planner → Show app key and phone link** gives `https://ska-lesson-planner.pages.dev/#api=<exec>&key=<key>`; the app stores both in localStorage (`skal.api`, `skal.key`). `APP_SITE` in Code.gs builds that link |
 | Setup guide | `SETUP.md` |
 
@@ -31,6 +31,8 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 - Planned time shows as hours and minutes ("1h 40m of 1h 45m planned"); exercise and section times stay in minutes.
 
 ## Changing things
+
+- Browser: Gary has several Chrome instances connected. The one signed in to garyluo.gs@gmail.com, GitHub (Dailuo-source) and Cloudflare is named **GARYMAIN**; select it before doing setup work.
 
 - App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v1`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Through Claude in Chrome: open the sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
