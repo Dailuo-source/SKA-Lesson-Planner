@@ -16,7 +16,7 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 
 - **Plans**: Date, Focus, Class type (Regular / Kids / Advanced), Length (min), Sections (in order, comma list), Skipped sections, Added by, Last edited by, Updated.
 - **Plan items**: Plan ID, Section, Order, Exercise, Minutes, Note (point form, "• point" lines), Library ID, Added by, Time changed by, Updated. Items are copies of library exercises, so they survive library edits/deletes.
-- **Exercises** (the library): Section, Exercise, Minutes, Instructions (numbered steps, stored as "1. step" lines; shown as Step 1, Step 2…; older header Description still matches; lines without numbers are read as steps too), Notes (one point per line, stored as "• point" lines), Added by, Last edited by, Updated. Seeded with Kata Teiiru and Demonstrations (Kata / Kigu, 10 min), the only exercises Gary has named so far.
+- **Exercises** (the library): Section, Exercise, Minutes, Instructions (numbered steps, stored as "1. step" lines; shown as 1. 2. 3. (no "Step" word, Gary's choice); older header Description still matches; lines without numbers are read as steps too), Notes (one point per line, stored as "• point" lines), Added by, Last edited by, Updated. Seeded with Kata Teiiru and Demonstrations (Kata / Kigu, 10 min), the only exercises Gary has named so far.
 - **Lists** (List / Value / Colour / In every new plan): Section (5 defaults with colours, In every new plan = Yes), Class type, Class length (minutes: 90, 105, 120), Attendance link (`https://my.musterhall.app/today`). Extra sections added in the app are saved here without a colour; the app picks a colour from a spare palette.
 - Section names can't contain commas (they're stored as a comma list); the app swaps commas for " /".
 
@@ -34,7 +34,7 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 
 - Browser: Gary has several Chrome instances connected. The one signed in to garyluo.gs@gmail.com, GitHub (Dailuo-source) and Cloudflare is named **GARYMAIN**; select it before doing setup work.
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v4`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v5`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Through Claude in Chrome: open the sheet → Extensions → Apps Script, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email.
 - Testing: a Node mock of SpreadsheetApp plus Playwright (route `script.google.com` to `api()`) covers the main flows end to end.

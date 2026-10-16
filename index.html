@@ -89,10 +89,10 @@ ul.pts li{margin:1px 0}
 .points{display:flex;flex-direction:column;gap:8px}
 .ptrow{display:flex;align-items:center;gap:6px}
 .ptrow .dot{width:14px;text-align:center;font-weight:800;color:var(--red);flex:none}
-.ptrow .dot.num{width:auto;min-width:50px;text-align:left;font-size:13px;white-space:nowrap}
+.ptrow .dot.num{width:auto;min-width:24px;text-align:left;font-size:15px;white-space:nowrap}
 ol.steps{list-style:none;counter-reset:st;margin:0 8px 6px 0;padding:0;font-size:14px;color:var(--ink2)}
 ol.steps li{counter-increment:st;margin:3px 0}
-ol.steps li::before{content:"Step " counter(st) ". ";font-weight:800;color:var(--ink)}
+ol.steps li::before{content:counter(st) ". ";font-weight:800;color:var(--ink)}
 .ptrow .inp{flex:1;min-width:0;height:44px}
 .clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 details.libref{background:var(--sunk);border-radius:14px;padding:12px 14px;margin:0 0 16px}
@@ -288,11 +288,11 @@ const ptsHTML=s=>{const p=toPoints(s);return p.length?`<ul class="pts">${p.map(x
 const toSteps=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*(?:[•\-*·]\s*)+/,"").replace(/^\s*(?:step\s*)?\d+\s*[.):-]\s*/i,"").trim()).filter(Boolean);
 const fromSteps=a=>a.map(p=>String(p).replace(/\r?\n/g," ").trim()).filter(Boolean).map((p,i)=>(i+1)+". "+p).join("\n");
 const stepsHTML=s=>{const p=toSteps(s);return p.length?`<ol class="steps">${p.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:"";};
-const stepsText=s=>toSteps(s).map((p,i)=>"Step "+(i+1)+". "+p).join("\n");
-const ptRow=(name,v,ph,num)=>`<div class="ptrow">${num?`<span class="dot num">Step ${num}</span>`:`<span class="dot" aria-hidden="true">•</span>`}<input class="inp pt" type="text" value="${esc(v)}" placeholder="${esc(ph||(num?"Add a step":"Add a point"))}" aria-label="${num?"Step "+num:"Point"}" enterkeyhint="next" autocomplete="off"><button type="button" class="iconbtn" data-act="delPoint" aria-label="Remove this ${num?"step":"point"}">${ICON.x}</button></div>`;
+const stepsText=s=>toSteps(s).map((p,i)=>(i+1)+". "+p).join("\n");
+const ptRow=(name,v,ph,num)=>`<div class="ptrow">${num?`<span class="dot num" aria-hidden="true">${num}.</span>`:`<span class="dot" aria-hidden="true">•</span>`}<input class="inp pt" type="text" value="${esc(v)}" placeholder="${esc(ph||(num?"Add a step":"Add a point"))}" aria-label="${num?"Step "+num:"Point"}" enterkeyhint="next" autocomplete="off"><button type="button" class="iconbtn" data-act="delPoint" aria-label="Remove this ${num?"step":"point"}">${ICON.x}</button></div>`;
 function pointsEditor(name,s,ph,numbered){const p=numbered?toSteps(s):toPoints(s);if(!p.length)p.push("");
   return`<div class="points" data-name="${name}"${numbered?' data-num="1"':""}>${p.map((x,i)=>ptRow(name,x,i?"":ph,numbered?i+1:0)).join("")}</div><button type="button" class="btn ghost small" data-act="addPoint" data-name="${name}" style="align-self:flex-start">${ICON.plus}${numbered?"Add a step":"Add a point"}</button>`;}
-function renumber(box){if(!box.dataset.num)return;box.querySelectorAll(".ptrow").forEach((r,i)=>{r.querySelector(".num").textContent="Step "+(i+1);r.querySelector("input").setAttribute("aria-label","Step "+(i+1));r.querySelector("[data-act=delPoint]").setAttribute("aria-label","Remove step "+(i+1));});}
+function renumber(box){if(!box.dataset.num)return;box.querySelectorAll(".ptrow").forEach((r,i)=>{r.querySelector(".num").textContent=(i+1)+".";r.querySelector("input").setAttribute("aria-label","Step "+(i+1));r.querySelector("[data-act=delPoint]").setAttribute("aria-label","Remove step "+(i+1));});}
 const readPoints=(form,name)=>[...form.querySelectorAll(`.points[data-name="${name}"] .pt`)].map(i=>i.value.trim()).filter(Boolean);
 function addPointAfter(box,row){const tmp=document.createElement("div");tmp.innerHTML=ptRow(box.dataset.name,"","",box.dataset.num?1:0);const nr=tmp.firstElementChild;
   if(row&&row.nextSibling)box.insertBefore(nr,row.nextSibling);else box.appendChild(nr);renumber(box);nr.querySelector("input").focus();}
