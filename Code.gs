@@ -5,11 +5,16 @@
  *   Plans       — one row per class plan (date, focus, class type, length, sections)
  *   Plan items  — the exercises slotted into each plan, with their own minutes and notes
  *   Exercises   — the shared exercise library every instructor adds to
- *   Lists       — sections (with colours), class types, class lengths, the attendance link.
+ *   Lists       — sections (with colours), class types, class lengths, regular timeslots, the attendance link.
  *                 Edit these and the app picks them up on its next sync.
  *
  *   Instructors — one row per instructor account (sign-in details and how their name shows).
  *                 Password hashes are kept in hidden columns; never share this tab.
+ *                 Role: Admin or Instructor. Admins can also edit plans and exercises shared with them.
+ *
+ * Sharing: every plan and exercise has an Owner (email) and Shared with ("Only me", "Everyone",
+ * or a comma list of instructor emails). Each instructor is only sent what they may see, and
+ * changes they aren't allowed to make are ignored.
  *
  * - doPost is the JSON API the app calls (it's hosted on Cloudflare Pages)
  * - Instructors sign in with email + password or with Google. New accounts need the dojo code
@@ -21,7 +26,9 @@ const APP_NAME = 'SKA Lesson Planner';
 const APP_SITE = 'https://ska-lesson-planner.pages.dev/';
 
 const CLASS_TYPES = ['Regular', 'Kids', 'Advanced'];
-const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Attendance link'];
+const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Timeslot', 'Attendance link'];
+const ROLES = ['Admin', 'Instructor'];
+const SHARE_ME = 'Only me', SHARE_ALL = 'Everyone';
 const TOKEN_DAYS = 400; // how long a sign-in lasts on a phone before asking again
 
 // Instructor accounts live in their own tab and are never sent to the app as data.
@@ -34,6 +41,7 @@ const INSTR = {
     ['first', 'First name', 'text', 120],
     ['last', 'Last name', 'text', 130],
     ['showFirst', 'Show first name', 'text', 120],
+    ['role', 'Role (Admin/Instructor)', 'role', 150],
     ['google', 'Google sign-in', 'text', 110],
     ['hash', 'Password (hashed, clear to reset)', 'secret', 120],
     ['salt', 'Salt', 'secret', 90],
@@ -49,12 +57,15 @@ const SCHEMA = {
     cols: [
       ['id', 'ID', 'id', 90],
       ['date', 'Date', 'date', 120],
+      ['time', 'Time (24h, e.g. 18:00-19:30)', 'text', 150],
       ['focus', 'Focus', 'text', 180],
       ['type', 'Class type', 'classtype', 100],
       ['length', 'Length (min)', 'num', 95],
       ['sections', 'Sections (in order)', 'list', 380],
       ['skipped', 'Skipped sections', 'list', 200],
       ['review', 'After-class notes', 'text', 280],
+      ['owner', 'Owner (email)', 'text', 200],
+      ['share', 'Shared with', 'share', 220],
       ['addedBy', 'Added by', 'text', 120],
       ['editedBy', 'Last edited by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
@@ -87,6 +98,8 @@ const SCHEMA = {
       // Older sheets called this column Description; that header still works
       ['description', 'Instructions', 'text', 320, ['Description']],
       ['notes', 'Notes (one point per line)', 'text', 300],
+      ['owner', 'Owner (email)', 'text', 200],
+      ['share', 'Shared with', 'share', 220],
       ['addedBy', 'Added by', 'text', 120],
       ['editedBy', 'Last edited by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
@@ -160,9 +173,13 @@ function api(body) {
         me = r.me;
       }
     }
-    (req.ops || []).forEach(applyOp_);
-    SpreadsheetApp.flush();
-    return { ok: true, token: token, me: me_(me), state: readAll_(), sheetUrl: ss_().getUrl() };
+    const people = instrRows_();
+    if (req.ops && req.ops.length) {
+      const acc = access_(me, people, readRaw_());
+      req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });
+      SpreadsheetApp.flush();
+    }
+    return { ok: true, token: token, me: me_(me, people), state: stateFor_(me, people), sheetUrl: ss_().getUrl() };
   } catch (err) {
     return { ok: false, error: 'server', message: String((err && err.message) || err) };
   } finally {
@@ -241,10 +258,22 @@ function cleanProfile_(p) {
   return { title: /^ms/i.test(p.title) ? 'Ms.' : 'Mr.', first: s(p.first), last: s(p.last), showFirst: p.showFirst ? 'Yes' : '' };
 }
 
-function me_(o) {
+function me_(o, people) {
   return { id: o.id, email: o.email, title: o.title || 'Mr.', first: o.first || '', last: o.last || '',
-    showFirst: /^y/i.test(String(o.showFirst || '')), google: !!o.google, password: !!o.hash };
+    showFirst: /^y/i.test(String(o.showFirst || '')), google: !!o.google, password: !!o.hash,
+    admin: isAdmin_(o, people || instrRows_()) };
 }
+
+/** Admins are marked in the Role column. Until someone is, the first instructor to join is the admin. */
+function isAdmin_(o, people) {
+  if (!o) return false;
+  const anyAdmin = people.some(function (p) { return /^admin/i.test(String(p.role || '')); });
+  if (anyAdmin) return /^admin/i.test(String(o.role || ''));
+  const first = people.slice().sort(function (a, b) { return (a.joined || 0) - (b.joined || 0); })[0];
+  return !!first && normEmail_(first.email) === normEmail_(o.email);
+}
+
+const nameOf_ = function (p) { return (p.title || 'Mr.') + ' ' + (/^y/i.test(String(p.showFirst || '')) && p.first ? p.first + ' ' : '') + (p.last || ''); };
 
 function updateProfile_(me, p) {
   const c = cleanProfile_(p);
@@ -427,7 +456,7 @@ function newId_() {
   return 'r' + Utilities.getUuid().replace(/-/g, '').slice(0, 10);
 }
 
-function readAll_() {
+function readRaw_() {
   const ss = ss_();
   const out = {};
   Object.keys(SCHEMA).forEach(function (coll) {
@@ -458,6 +487,114 @@ function readAll_() {
     fixes.forEach(function (f) { sh.getRange(f[0], f[1]).setValue(f[2]); });
   });
   return out;
+}
+
+/* ------------------------------------------------------------------ */
+/* Sharing                                                             */
+/* ------------------------------------------------------------------ */
+
+/** Read a "Shared with" cell: 'all', 'me' or a list of emails. A blank cell means Everyone. */
+function shareOf_(v) {
+  const s = String(v == null ? '' : v).trim();
+  if (!s || /^every/i.test(s)) return 'all';
+  if (/^only me$/i.test(s) || /^private$/i.test(s)) return 'me';
+  return s.split(/[,;\s]+/).map(normEmail_).filter(function (e) { return /@/.test(e); });
+}
+
+/** What one instructor may see and change, worked out from the whole sheet. */
+function access_(me, people, raw) {
+  const acc = { me: me, email: normEmail_(me.email), admin: isAdmin_(me, people), people: people, plans: {}, exercises: {}, items: {} };
+  raw.plans.forEach(function (p) { acc.plans[p.id] = { owner: normEmail_(p.owner), share: shareOf_(p.share) }; });
+  raw.exercises.forEach(function (e) { acc.exercises[e.id] = { owner: normEmail_(e.owner), share: shareOf_(e.share) }; });
+  raw.items.forEach(function (i) { acc.items[i.id] = i.plan; });
+  return acc;
+}
+function sees_(acc, r) {
+  if (!r) return false;
+  if (r.owner && r.owner === acc.email) return true;
+  if (r.share === 'all') return true;
+  if (r.share === 'me') return false;
+  return r.share.indexOf(acc.email) >= 0;
+}
+function canEdit_(acc, r) { return !!r && ((r.owner && r.owner === acc.email) || (acc.admin && sees_(acc, r))); }
+function canShare_(acc, r) { return !!r && ((r.owner && r.owner === acc.email) || (!r.owner && acc.admin)); }
+
+/** The app sends 'me', 'all' or instructor IDs; the sheet keeps Only me / Everyone / emails. */
+function shareCell_(acc, v) {
+  if (v === 'all') return SHARE_ALL;
+  if (!Array.isArray(v)) return SHARE_ME;
+  const byId = {};
+  acc.people.forEach(function (p) { byId[p.id] = normEmail_(p.email); });
+  const emails = v.map(function (id) { return byId[id]; }).filter(function (e) { return e && e !== acc.email; });
+  return emails.length ? emails.filter(function (e, i) { return emails.indexOf(e) === i; }).join(', ') : SHARE_ME;
+}
+
+/** Returns the op to apply (possibly trimmed), or null when this instructor isn't allowed to make it. */
+function allowOp_(acc, op) {
+  if (!op || !SCHEMA[op.coll]) return null;
+  const data = Object.assign({}, op.data || {});
+  delete data.owner;
+  const out = { op: op.op, coll: op.coll, id: op.id, data: data };
+  if (op.coll === 'lists') {
+    if (op.op === 'del' || /^timeslot$/i.test(String(data.list || ''))) return acc.admin ? out : null;
+    return out;
+  }
+  if (op.coll === 'plans' || op.coll === 'exercises') {
+    const map = acc[op.coll], r = map[op.id];
+    if (op.op === 'add' && !r) {
+      data.owner = acc.email;
+      data.share = shareCell_(acc, 'share' in data ? data.share : 'me');
+      map[op.id] = { owner: acc.email, share: shareOf_(data.share) };
+      return out;
+    }
+    if (!canEdit_(acc, r)) return null;
+    if (op.op === 'del') return out;
+    out.op = 'update';
+    if ('share' in data) {
+      if (canShare_(acc, r)) { data.share = shareCell_(acc, data.share); r.share = shareOf_(data.share); }
+      else delete data.share;
+    }
+    return out;
+  }
+  if (op.coll === 'items') {
+    const pid = acc.items[op.id] || data.plan;
+    if (!canEdit_(acc, acc.plans[pid])) return null;
+    if (op.op === 'add') acc.items[op.id] = pid;
+    if (op.op !== 'add') delete data.plan; // items stay in their plan
+    return out;
+  }
+  return null;
+}
+
+/** Everything this instructor may see, with sharing turned into app terms (IDs, never emails). */
+function stateFor_(me, people) {
+  const raw = readRaw_();
+  const acc = access_(me, people, raw);
+  const idOf = {};
+  people.forEach(function (p) { idOf[normEmail_(p.email)] = p.id; });
+  const dress = function (rows, map) {
+    return rows.filter(function (r) { return sees_(acc, map[r.id]); }).map(function (r) {
+      const a = map[r.id];
+      const o = Object.assign({}, r);
+      delete o.owner;
+      o.ownerId = a.owner ? (idOf[a.owner] || '') : '';
+      o.share = a.share === 'all' || a.share === 'me' ? a.share : a.share.map(function (e) { return idOf[e]; }).filter(String);
+      o.mine = !!a.owner && a.owner === acc.email;
+      o.canEdit = canEdit_(acc, a);
+      o.canShare = canShare_(acc, a);
+      return o;
+    });
+  };
+  const plans = dress(raw.plans, acc.plans);
+  const seen = {};
+  plans.forEach(function (p) { seen[p.id] = true; });
+  return {
+    plans: plans,
+    items: raw.items.filter(function (i) { return seen[i.plan]; }),
+    exercises: dress(raw.exercises, acc.exercises),
+    lists: raw.lists,
+    people: people.map(function (p) { return { id: p.id, name: nameOf_(p), admin: isAdmin_(p, people) }; }),
+  };
 }
 
 function applyOp_(op) {
@@ -534,6 +671,7 @@ function setup() {
   seedLists_(ss);
   seedExercises_(ss);
   paintAllSwatches_(ss);
+  claimOwners_();
 
   let code = props.getProperty('DOJO_CODE');
   if (!code) {
@@ -666,6 +804,9 @@ function buildTab_(ss, sch) {
     const rng = sh.getRange(2, col, body, 1);
     if (type === 'classtype') rng.setDataValidation(pick(CLASS_TYPES));
     if (type === 'listname') rng.setDataValidation(pick(LIST_NAMES));
+    if (type === 'role') rng.setDataValidation(pick(ROLES));
+    if (type === 'share') rng.setDataValidation(pick([SHARE_ME, SHARE_ALL]));
+    if (field === 'time') rng.setNumberFormat('@');
     if (type === 'date') rng.setNumberFormat('ddd mmm d, yyyy');
     if (type === 'datetime') rng.setNumberFormat('mmm d, yyyy h:mm am/pm');
     if (field === 'value') rng.setNumberFormat('@');
@@ -694,6 +835,42 @@ function paintAllSwatches_(ss) {
   if (t.cols.colour == null) return;
   const vals = sh.getRange(2, t.cols.colour + 1, sh.getLastRow() - 1, 1).getValues();
   vals.forEach(function (v, i) { paintSwatch_(sh, i + 2, t.cols, v[0]); });
+}
+
+/**
+ * Sharing arrived after the first plans and exercises were made. Those get the first admin as their
+ * owner and stay shared with everyone, and the first instructor becomes Admin if nobody is yet.
+ */
+function claimOwners_() {
+  const people = instrRows_();
+  if (!people.length) return;
+  let admin = people.filter(function (p) { return /^admin/i.test(String(p.role || '')); })[0];
+  if (!admin) {
+    admin = people.slice().sort(function (a, b) { return (a.joined || 0) - (b.joined || 0); })[0];
+    applyTo_(INSTR, { op: 'update', id: admin.id, data: { role: 'Admin' } });
+  }
+  const ss = ss_();
+  ['plans', 'exercises'].forEach(function (coll) {
+    const sch = SCHEMA[coll];
+    const sh = ss.getSheetByName(sch.sheet);
+    if (!sh || sh.getLastRow() < 2) return;
+    const t = table_(sh, sch);
+    if (t.cols.owner == null || t.cols.share == null) return;
+    const n = sh.getLastRow() - 1;
+    const key = sh.getRange(2, t.cols[sch.key] + 1, n, 1).getValues();
+    const own = sh.getRange(2, t.cols.owner + 1, n, 1).getValues();
+    const shr = sh.getRange(2, t.cols.share + 1, n, 1).getValues();
+    let changed = false;
+    for (let i = 0; i < n; i++) {
+      if (String(key[i][0]).trim() === '') continue;
+      if (!String(own[i][0]).trim()) { own[i][0] = admin.email; changed = true; }
+      if (!String(shr[i][0]).trim()) { shr[i][0] = SHARE_ALL; changed = true; }
+    }
+    if (changed) {
+      sh.getRange(2, t.cols.owner + 1, n, 1).setValues(own);
+      sh.getRange(2, t.cols.share + 1, n, 1).setValues(shr);
+    }
+  });
 }
 
 function seedLists_(ss) {
