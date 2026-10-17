@@ -288,7 +288,7 @@ ul.vpts.mine{color:var(--red-d)}
    ===================================================================== */
 const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3Ytobt2dnCbeo6BhRW-J7bCeBOZ4rSlz1wmpt3g8Tpe5f/exec";
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
-const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker web app
+const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -480,7 +480,8 @@ const kataGroup=k=>String(k.learnedAt||k.belt||"").trim();         // e.g. "Gree
 const kataBelt=k=>kataGroup(k).split(/[\/,]/)[0].trim();            // its first belt
 const kataWhen=k=>k.learnedAt?"Learned at "+k.learnedAt:(k.belt?k.belt+" belt kata":"");
 const kataNeed=k=>`${k.need} ${k.need===1?"student still needs":"students still need"} it`;
-const kataLink=name=>KATA_URL+"?kata="+encodeURIComponent(name)+"&from=planner";
+const KATA_SITE="https://ska-kata-tracker.pages.dev/"; // the Kata Tracker app (its data feed is KATA_URL)
+const kataLink=name=>KATA_SITE+"?kata="+encodeURIComponent(name)+"&from=planner";
 function usage(){const m={};S.items.forEach(i=>{if(!i.exercise)return;(m[i.exercise]=m[i.exercise]||new Set()).add(i.plan);});return m;}
 
 /* =====================================================================
