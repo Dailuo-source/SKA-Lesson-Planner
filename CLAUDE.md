@@ -33,22 +33,15 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 
 ## Link to the SKA Kata Tracker
 
-- `KATA_URL` in `index.html` is the Kata Tracker's web app. `?api=summary` returns every dojo kata with its rank belt, handbook **Learned at** belt and how many active members still need it (counts only, no names).
+- The Kata Tracker is its own app: https://dailuo-source.github.io/SKA-Kata-Tracker/ (repo `Dailuo-source/SKA-Kata-Tracker`, see its CLAUDE.md). `KATA_URL` in `index.html` is its Apps Script web app; `?api=summary` returns every dojo kata with its rank belt, handbook **Learned at** belt and how many active members still need it (counts only, no names). `KATA_SITE` is the app's address.
 - In a section whose name contains "kata", **Add from library** has two tabs: **Exercises** and **Dojo kata**. Dojo kata default to the handbook ones (those with a Learned at belt), sorted by how many students still need them; tapping one adds it as a one-off 10-min item named after the kata (tap again to remove). The summary is cached in `skal.kata` and refreshed on open and whenever the app comes back to the foreground.
-- Review mode shows **Update kata progress** for every dojo kata in the plan (matched by name). It opens the tracker at `?kata=<name>&from=planner`, which goes straight to that kata, asks for the instructor password if needed, and lists the students who still need it; its back button closes the tab.
-
-## Kata Tracker source (`kata-tracker/`)
-
-The Kata Tracker has no hosting of its own: it's an Apps Script web app bound to the Google Sheet **S.A. Karate Kata Tracker** (id `1QYVdiW5kZ5j-EvSQzZJ-GE12ZqwY2OUgTsSIzIloiHk`; script project "Karate Kata List", id `111lCaHWu0gtPF8-jiEXuhYeEqizKrjg1Kh4eybj7NU7gigJ48_1eN8xD`). Its source lives here so it's versioned; `.assetsignore` keeps it off the planner's website.
-- `Code.gs` (server) and `Index.src.html` (page). Run `python3 kata-tracker/build.py` to make `Index.html` (logo inlined); paste `Code.gs` and `Index.html` into the script project (Monaco models 0 and 1), Ctrl+S, then **Deploy → Manage deployments → pencil → New version** so the same /exec link keeps working (it's embedded in the dojo's Wix site).
-- Sheet tabs: Kata (Order, Kata, English Translation, Category, Belt = rank, Notes, **Learned at** = handbook belt, "Blue/Purple" for the shared list), Members, Progress (member × kata statuses), Log, Settings (dojo name, instructor password in B3, statuses in D, belts with colours from row 7).
-- Gary's rules: members (locked) see everyone's kata; **Ready to grade**, the "to go"/"Ready for" badges and "Still needs" are instructor-only. A member is ready for the next belt when every kata whose Learned at belt is at or below theirs is Knows/Proficient (Empi Yonin Dori is ranked Purple but learned at Green). Status changes ask "are you sure", then show Undo. Light grey page (#ECECEA), white cards, same red/black look as the planner; no dark mode. The page shows the last loaded copy straight away (`kt.data`), and "Stay unlocked on this device" keeps the password in `kt.pin`.
+- Review mode shows **Update kata progress** for every dojo kata in the plan (matched by name). It opens `KATA_SITE?kata=<name>&from=planner` in a new tab, which goes straight to that kata, asks for the instructor password if needed, and lists the students who still need it; its back button closes the tab.
 
 ## Changing things
 
 - Browser: Gary has several Chrome instances connected. The one signed in to garyluo.gs@gmail.com, GitHub (Dailuo-source) and Cloudflare is named **GARYMAIN**; select it before doing setup work.
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v13`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v14`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Through Claude in Chrome: open the script project (script.google.com/home → SKA Lesson Planner; the sheet's Extensions → Apps Script opens outside the tab group), set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email.
 - Testing: a Node mock of SpreadsheetApp plus Playwright (route `script.google.com` to `api()`) covers the main flows end to end.
