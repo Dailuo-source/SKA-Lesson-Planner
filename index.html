@@ -201,6 +201,17 @@ select.inp{appearance:auto}
 .pickrow .nm{flex:1;min-width:0;font-size:15px;font-weight:800;overflow-wrap:anywhere}
 .pickrow .m{font-size:14px;font-weight:800}
 .pickrow>svg{width:20px;height:20px;color:var(--ink2)}
+.segtabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;background:var(--sunk);border-radius:22px;padding:4px;margin:0 0 12px}
+.segtabs button{height:44px;border:0;border-radius:18px;background:transparent;font-size:15px;font-weight:800;color:var(--ink2)}
+.kmeta{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:3px}
+.kdot{width:12px;height:12px;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.28);flex:none;display:inline-block}
+.kneed{display:block;font-size:13px;font-weight:800;color:#8E0B21;margin-top:2px}
+.kupd{padding:16px;border:2px solid var(--red);background:var(--red-tint)}
+.kupd h2{margin:0 0 2px;font-family:var(--f-d);font-size:18px;font-weight:800}
+.kgo{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;margin-top:10px;padding:6px 14px;border:0;border-radius:16px;background:var(--red);color:#fff;text-align:left}
+.kgo b{display:block;font-size:16px;font-weight:800}
+.kgo .grow>span{display:block;font-size:12.5px;font-weight:700;color:#FFE3E7}
+.kgo svg{width:20px;height:20px}
 .pickrow .ok{font-size:12px;font-weight:800;color:#0F5E54;background:#DDF3EF;padding:2px 8px;border-radius:8px}
 .menu .btn{margin-bottom:10px}
 .msg{min-height:20px;font-size:13px;font-weight:700;color:var(--muted);margin:8px 0 0}
@@ -292,6 +303,7 @@ ul.vpts.mine{color:var(--red-d)}
    ===================================================================== */
 const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3Ytobt2dnCbeo6BhRW-J7bCeBOZ4rSlz1wmpt3g8Tpe5f/exec";
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
+const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -305,7 +317,7 @@ const ICON={
   list:svg('<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>'),
   book:svg('<path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h10"/>'),
   clip:svg('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 13l2 2 4-4"/>'),
-  back:svg('<path d="M15 5l-7 7 7 7"/>',2.5), x:svg('<path d="M6 6l12 12M18 6L6 18"/>',2.4),
+  back:svg('<path d="M15 5l-7 7 7 7"/>',2.5), go:svg('<path d="M9 5l7 7-7 7"/>',2.6), x:svg('<path d="M6 6l12 12M18 6L6 18"/>',2.4),
   more:svg('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',1.4),
   copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
@@ -465,7 +477,7 @@ async function flush(){
     if(res.me){ME=res.me;LS.set("me",JSON.stringify(ME));const mb=$("#me");if(mb)mb.textContent=initialsOf(ME);}
     S=normalize(res.state);queue.forEach(applyLocal);
     const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
-    if(first)render();else onData();
+    if(first){render();loadKata();}else onData();
     if(queue.length){clearTimeout(flushT);flushT=setTimeout(flush,350);}
     return;
   }
@@ -509,6 +521,27 @@ function addItem(p,sec,ex,extra){
   const id=store.add("items",Object.assign({plan:p.id,section:sec,order,name:ex.name,minutes:ex.minutes||10,note:"",exercise:ex.id||"",addedBy:who(),editedBy:""},extra||{}));
   touchPlan(p.id);return id;
 }
+/* ---------- dojo kata, read from the SKA Kata Tracker (names, belts, how many students still need each) ---------- */
+let KATA=null;try{KATA=JSON.parse(LS.get("kata","null"));}catch(e){KATA=null;}
+let kataLoading=false;
+function loadKata(){
+  if(kataLoading)return;kataLoading=true;
+  fetch(KATA_URL+"?api=summary",{redirect:"follow"}).then(r=>r.json()).then(j=>{
+    if(!j||!j.ok||!Array.isArray(j.kata))return;
+    KATA=j.kata;LS.set("kata",JSON.stringify(KATA));
+    if(sheet&&sheet.type==="pick"&&$("#pickList"))$("#pickList").innerHTML=pickListHTML(sheet);else onData();
+  }).catch(()=>{}).finally(()=>{kataLoading=false;});
+}
+const isKataSec=sec=>/kata/i.test(String(sec||""));
+const dojoKata=name=>KATA?KATA.find(k=>eqi(k.name,name))||null:null;
+const BELTS=["White","Yellow","Green","Blue","Purple","Brown","Black"];
+const BELT_COL={White:"#FFFFFF",Yellow:"#FFD600",Green:"#2E9E48",Blue:"#1E7FD6",Purple:"#8E2CB0",Brown:"#8A4B1C",Black:"#1A1A1A"};
+const kataGroup=k=>String(k.learnedAt||k.belt||"").trim();         // e.g. "Green", "Blue/Purple"
+const kataBelt=k=>kataGroup(k).split(/[\/,]/)[0].trim();            // its first belt
+const kataWhen=k=>k.learnedAt?"Learned at "+k.learnedAt:(k.belt?k.belt+" belt kata":"");
+const kataNeed=k=>`${k.need} ${k.need===1?"student still needs":"students still need"} it`;
+const KATA_SITE="https://dailuo-source.github.io/SKA-Kata-Tracker/"; // the Kata Tracker app (its data feed is KATA_URL)
+const kataLink=name=>KATA_SITE+"?kata="+encodeURIComponent(name)+"&from=planner";
 function usage(){const m={};S.items.forEach(i=>{if(!i.exercise)return;(m[i.exercise]=m[i.exercise]||new Set()).add(i.plan);});return m;}
 
 /* =====================================================================
@@ -691,7 +724,7 @@ function viewTeach(p){
       const steps=lib?toSteps(lib.description):[],libNotes=lib?toPoints(lib.notes):[],mine=toPoints(it.note),qn=qnLines(it.live);
       return`<article class="card vex${lib&&lib.addedBy?" cornered":""}">${ctagHTML(lib?lib.addedBy:"")}
         <div class="vex-top"><span class="vtime" style="background:${tint(col)};color:${col}" title="Starts ${clock(from)} into class">${clock(from)}</span><h3>${esc(it.name)}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span></div>
-        ${steps.length?`<div class="vlabel">Instructions</div><ol class="steps vsteps">${steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:(lib?"":`<p class="small" style="margin:6px 0 0">One-off for this class.</p>`)}
+        ${steps.length?`<div class="vlabel">Instructions</div><ol class="steps vsteps">${steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:(lib?"":(dk=>dk?`<p class="kmeta" style="margin:6px 0 0"><span class="kdot" style="background:${BELT_COL[kataBelt(dk)]||"#CCC"}"></span>Dojo kata · ${esc(kataWhen(dk))}</p>`:`<p class="small" style="margin:6px 0 0">One-off for this class.</p>`)(dojoKata(it.name)))}
         ${libNotes.length?`<div class="vlabel">Notes</div><ul class="pts vpts">${libNotes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
         ${mine.length?`<div class="vlabel">For this class</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
         ${qn.length||canEditR(p)?`<div class="vlabel">Quick notes</div>`:""}
@@ -753,9 +786,20 @@ function viewReview(p){
       ${rv.length?`<ul class="rvlist">${rv.map((x,i)=>`<li><span class="grow">${esc(x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delRv" data-i="${i}" aria-label="Delete this note">${ICON.x}</button>`:""}</li>`).join("")}</ul>`:(ed?"":`<p class="small" style="margin:8px 0 0">No after-class notes.</p>`)}
       ${ed?`<form class="rform qform" data-id="${esc(p.id)}" style="margin-top:10px"><label for="rv-${esc(p.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add an after-class note</label><input class="inp keepval" id="rv-${esc(p.id)}" name="q" type="text" placeholder="e.g. Kids need more kumite time" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add after-class note">${ICON.plus}</button></form>`:""}
     </section>
+    ${kataUpdateHTML(p)}
     <button type="button" class="btn primary block" data-act="shareNotes">${ICON.share}Share or copy all notes</button>
     ${secs||`<div class="card empty"><p>No exercises in this plan.</p></div>`}
   </div>`;
+}
+/* After class: jump straight to the Kata Tracker for each dojo kata taught, to mark who has improved */
+function kataUpdateHTML(p){
+  const names=[];itemsOf(p.id).forEach(it=>{if(isSkipped(p,it.section))return;const k=dojoKata(it.name);if(k&&!names.includes(k.name))names.push(k.name);});
+  if(!names.length)return"";
+  return`<section class="card kupd">
+    <h2>Update kata progress</h2>
+    <p class="small" style="margin:0;color:var(--ink2)">You taught ${names.length===1?"1 dojo kata":names.length+" dojo kata"}. Mark who’s improved while it’s fresh.</p>
+    ${names.map(n=>{const k=dojoKata(n);return`<button type="button" class="kgo" data-act="openKata" data-name="${esc(k.name)}"><span class="grow"><b>${esc(k.name)}</b><span>${esc(kataNeed(k))}</span></span>${ICON.go}</button>`;}).join("")}
+  </section>`;
 }
 function notesText(p){
   const out=[`SKA class review: ${planTitle(p)}`,`${whenLine(p)}${p.type?" · "+p.type:""}`];
@@ -1026,7 +1070,23 @@ function sheetItem(s){
     <p class="small" style="text-align:center;margin:10px 0 0">Changes show as “${esc(who())} changed to …”</p>
   </form>`;
 }
+function kataPickHTML(s){
+  if(!KATA)return`<p class="small" style="margin:8px 4px 14px">Loading the dojo’s kata from the Kata Tracker…</p>`;
+  const p=planById(s.plan);if(!p)return"";
+  const col=secColour(s.sec);
+  const have=new Set(secItems(p,s.sec).map(i=>i.name.toLowerCase()));
+  const q=(s.q||"").trim().toLowerCase();
+  const f=s.belt||"Handbook";
+  const list=KATA.filter(k=>(f==="Handbook"?!!k.learnedAt:f==="Other"?!k.learnedAt:String(k.learnedAt).trim()===f)&&(!q||(k.name+" "+(k.meaning||"")).toLowerCase().includes(q)))
+    .sort((a,b)=>(b.need-a.need)||a.name.localeCompare(b.name));
+  if(!list.length)return`<p class="small" style="margin:8px 4px 14px">Nothing matches.</p>`;
+  return list.map(k=>{const on=have.has(k.name.toLowerCase());
+    return`<button type="button" class="pickrow" data-act="addKata" data-name="${esc(k.name)}" aria-pressed="${on}"${on?` style="border-color:${col};background:${tint(col,.93)}"`:""}>
+    <span class="nm">${esc(k.name)}<span class="kmeta"><span class="kdot" style="background:${BELT_COL[kataBelt(k)]||"#CCC"}"></span>${esc(kataWhen(k))}</span><span class="kneed">${esc(kataNeed(k))}${k.learning?" · "+k.learning+" learning":""}</span></span>
+    ${on?`<span class="ok">In plan</span>`:`<span class="m" style="color:${col}">10 min</span>`}${on?ICON.check:ICON.plus}</button>`;}).join("");
+}
 function pickListHTML(s){
+  if(s.mode==="kata")return kataPickHTML(s);
   const p=planById(s.plan);if(!p)return"";
   const q=(s.q||"").trim().toLowerCase();
   const inPlan=new Set(secItems(p,s.sec).map(i=>i.exercise).filter(Boolean));
@@ -1037,7 +1097,23 @@ function pickListHTML(s){
     ${inPlan.has(e.id)?`<span class="ok">In plan</span>`:""}<span class="m" style="color:${c}">${e.minutes} min</span>${ICON.plus}</button>`;}).join("");
 }
 function sheetPick(s){
-  return sheetHead("Add to "+esc(s.sec),`<div class="small">From the library</div>`)+
+  const kataSec=isKataSec(s.sec),col=secColour(s.sec);
+  if(kataSec)loadKata();
+  const tabs=kataSec?`<div class="segtabs" role="tablist" aria-label="What to add">${[["ex","Exercises"],["kata","Dojo kata"]].map(([m,l])=>{const on=(s.mode||"ex")===m;
+    return`<button type="button" role="tab" aria-selected="${on}" data-act="pickMode" data-m="${m}"${on?` style="background:${col};color:#fff"`:""}>${l}</button>`;}).join("")}</div>`:"";
+  if(kataSec&&s.mode==="kata"){
+    // Handbook kata (the ones with a "Learned at" belt) come first; everything else is under "Other kata".
+    const groups=KATA?[...new Set(KATA.map(k=>String(k.learnedAt||"").trim()).filter(Boolean))].sort((a,b)=>BELTS.indexOf(a.split("/")[0].trim())-BELTS.indexOf(b.split("/")[0].trim())):[];
+    const label={Handbook:"Handbook kata",Other:"Other kata"};
+    const chips=["Handbook"].concat(groups,["Other"]).map(g=>{const on=(s.belt||"Handbook")===g;return`<button type="button" class="chip sm" data-act="pickBelt" data-v="${esc(g)}" aria-pressed="${on}"${on?` style="background:${col};border-color:${col}"`:""}>${esc(label[g]||g)}</button>`;}).join("");
+    return sheetHead("Add to "+esc(s.sec),`<div class="small">From the dojo’s kata list</div>`)+tabs+
+    `<div class="search" style="margin-bottom:10px">${ICON.search}<input id="pickSearch" type="search" placeholder="Search kata" aria-label="Search the dojo’s kata" value="${esc(s.q||"")}" autocomplete="off"></div>
+    <div class="chips" style="margin-bottom:8px">${chips}</div>
+    <p class="small" style="margin:0 4px 12px">Sorted by how many students still need each kata${(s.belt||"Handbook")==="Handbook"?" (the ones the handbook lists for grading)":""}.</p>
+    <div id="pickList">${pickListHTML(s)}</div>
+    <div class="btnrow" style="margin-top:6px"><button type="button" class="btn primary" data-act="closeSheet">Done</button></div>`;
+  }
+  return sheetHead("Add to "+esc(s.sec),`<div class="small">From the library</div>`)+tabs+
   `<div class="search" style="margin-bottom:10px">${ICON.search}<input id="pickSearch" type="search" placeholder="Search" aria-label="Search the library" value="${esc(s.q||"")}" autocomplete="off"></div>
   <div class="chips" style="margin-bottom:12px"><button type="button" class="chip sm" data-act="pickAll" aria-pressed="${!!s.all}">Show all sections</button></div>
   <div id="pickList">${pickListHTML(s)}</div>
@@ -1238,6 +1314,14 @@ document.addEventListener("click",e=>{
     case"pickAll":if(sheet&&sheet.type==="pick"){sheet.all=!sheet.all;t.setAttribute("aria-pressed",sheet.all);$("#pickList").innerHTML=pickListHTML(sheet);}break;
     case"addEx":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),ex=exById(t.dataset.id);if(!pp||!ex)break;
       addItem(pp,sheet.sec,ex);$("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-id="${ex.id}"]`);if(b)b.focus({preventScroll:true});break;}
+    case"pickMode":if(sheet&&sheet.type==="pick"){sheet.mode=t.dataset.m;sheet.q="";renderSheet();}break;
+    case"pickBelt":if(sheet&&sheet.type==="pick"){sheet.belt=t.dataset.v;renderSheet();}break;
+    case"addKata":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),k=dojoKata(t.dataset.name);if(!pp||!k)break;
+      const there=secItems(pp,sheet.sec).filter(i=>eqi(i.name,k.name));
+      if(there.length){const it=there[there.length-1];store.del("items",it.id);touchPlan(pp.id);}
+      else addItem(pp,sheet.sec,{id:"",name:k.name,minutes:10});
+      $("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-name="${CSS.escape(k.name)}"]`);if(b)b.focus({preventScroll:true});break;}
+    case"openKata":window.open(kataLink(t.dataset.name),"_blank","noopener");break;
     case"newExFor":if(sheet&&sheet.type==="pick")swapSheet({type:"ex",sec:sheet.sec,addTo:sheet.plan,back:Object.assign({},sheet)});break;
     case"backToPick":if(sheet&&sheet.back)swapSheet(sheet.back);break;
     case"newEx":openSheet({type:"ex",sec:libFilter!=="All"?libFilter:""});break;
@@ -1382,6 +1466,9 @@ function boot(){
   render();
   if(signedIn())flush();
   fetchConfig();
+  if(signedIn())loadKata();
+  // Coming back from the Kata Tracker: refresh the "still need it" counts
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&signedIn())loadKata();});
 }
 boot();
 })();

@@ -31,11 +31,17 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 - Theme (Gary's choice): red #C8102E base, white background, black secondary; each section keeps its own colour. Header and icons use the dojo logo (grey background turned white), not a kawaii icon.
 - Planned time shows as hours and minutes ("1h 40m of 1h 45m planned"); exercise and section times stay in minutes.
 
+## Link to the SKA Kata Tracker
+
+- The Kata Tracker is its own app: https://dailuo-source.github.io/SKA-Kata-Tracker/ (repo `Dailuo-source/SKA-Kata-Tracker`, see its CLAUDE.md). `KATA_URL` in `index.html` is its Apps Script web app; `?api=summary` returns every dojo kata with its rank belt, handbook **Learned at** belt and how many active members still need it (counts only, no names). `KATA_SITE` is the app's address.
+- In a section whose name contains "kata", **Add from library** has two tabs: **Exercises** and **Dojo kata**. Dojo kata default to the handbook ones (those with a Learned at belt), sorted by how many students still need them; tapping one adds it as a one-off 10-min item named after the kata (tap again to remove). The summary is cached in `skal.kata` and refreshed on open and whenever the app comes back to the foreground.
+- Review mode shows **Update kata progress** for every dojo kata in the plan (matched by name). It opens `KATA_SITE?kata=<name>&from=planner` in a new tab, which goes straight to that kata, asks for the instructor password if needed, and lists the students who still need it; its back button closes the tab.
+
 ## Changing things
 
 - Browser: Gary has several Chrome instances connected. The one signed in to garyluo.gs@gmail.com, GitHub (Dailuo-source) and Cloudflare is named **GARYMAIN**; select it before doing setup work.
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v12`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v14`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Through Claude in Chrome: open the script project (script.google.com/home → SKA Lesson Planner; the sheet's Extensions → Apps Script opens outside the tab group), set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email.
 - Testing: a Node mock of SpreadsheetApp plus Playwright (route `script.google.com` to `api()`) covers the main flows end to end.
