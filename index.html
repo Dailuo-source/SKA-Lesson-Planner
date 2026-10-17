@@ -247,6 +247,21 @@ ul.vpts.mine{color:var(--red-d)}
 .rex.quiet{padding-top:10px;padding-bottom:10px}
 .rvlist{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:4px}
 .rvlist li{display:flex;align-items:center;gap:8px;background:var(--red-tint);border-radius:10px;padding:2px 2px 2px 12px;font-size:15px;overflow-wrap:anywhere}
+.tag.lock{background:var(--sunk);color:var(--ink);display:inline-flex;align-items:center;gap:4px}
+.tag.lock svg,.tag.by svg{width:12px;height:12px}
+.tag.by{background:#FFF7E0;color:#7A5A00;display:inline-flex;align-items:center;gap:4px}
+.sharebox .opt b svg{width:18px;height:18px;flex:none}
+.sharebox>.opt{align-items:center}
+.ppl{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.ppl .opt{padding:10px 12px;align-items:center}
+.ppl .opt b{font-size:15px}
+.adm{font-size:11px;font-weight:800;background:var(--ink);color:#fff;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.timein{display:flex;align-items:center;gap:8px}
+.timein .inp{flex:1;min-width:0}
+.viewonly{display:flex;align-items:center;gap:8px;background:#FFF7E0;border:1.5px solid #F0DDA0;color:#5E4500;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:700}
+.viewonly svg{width:18px;height:18px;flex:none}
+.slotday{font-size:13px;font-weight:800;color:var(--muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+.slotrow{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 14px;border:1.5px solid var(--line);border-radius:14px;margin-bottom:6px;font-weight:700}
 .lead{margin:0;font-weight:600;color:var(--ink2)}
 .gwrap{display:flex;justify-content:center;min-height:44px}
 .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-weight:700;font-size:13px}
@@ -294,7 +309,7 @@ const ICON={
   more:svg('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',1.4),
   copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
-  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
+  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), lock:svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), people:svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c2.2.6 3.5 2.4 3.5 5.4"/>'), globe:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'), clock:svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
 };
 
 /* ---------- dates and times ---------- */
@@ -337,6 +352,50 @@ function classTypes(){const t=[...new Set(listRows("Class type").map(r=>r.value)
 function classLengths(){const l=[...new Set(listRows("Class length").map(r=>parseInt(r.value,10)).filter(n=>n>0))];return l.length?l:[90,105,120];}
 function attendUrl(){const r=listRows("Attendance link")[0];return r&&/^https:\/\//.test(r.value)?r.value:ATTEND_URL;}
 const cleanSec=s=>String(s||"").replace(/,/g," /").replace(/\s+/g," ").trim().slice(0,60);
+
+/* ---------- sharing: each plan and exercise is Only me, Everyone, or chosen instructors ---------- */
+const isAdmin=()=>!!(ME&&ME.admin);
+const canEditR=r=>!!r&&r.canEdit!==false;     // older data without the flag stays editable
+const canShareR=r=>!!r&&r.canShare!==false;
+const isMineR=r=>!!r&&r.mine!==false;
+const personName=id=>{const p=S.people.find(x=>x.id===id);return p?p.name:"";};
+const others=()=>S.people.filter(p=>!ME||p.id!==ME.id);
+const shareMode=v=>v==="all"?"all":Array.isArray(v)&&v.length?"some":"me";
+function shareLabel(v){const m=shareMode(v);if(m==="all")return"Everyone";if(m==="me")return"Only me";
+  const n=v.map(personName).filter(Boolean);return n.length<=2?n.join(" and ")||"Chosen people":n.length+" people";}
+function shareTag(r){if(!r)return"";const m=shareMode(r.share);
+  return`<span class="tag lock">${m==="me"?ICON.lock:m==="all"?ICON.globe:ICON.people}${esc(shareLabel(r.share))}</span>`;}
+const ownerTag=r=>r&&!isMineR(r)&&r.ownerId?`<span class="tag by">${ICON.user}${esc(personName(r.ownerId)||"Another instructor")}’s</span>`:"";
+const ownFlags=()=>({mine:true,canEdit:true,canShare:true,ownerId:ME?ME.id:""});
+function shareField(name,v,what){
+  const m=shareMode(v),pick=Array.isArray(v)?v:[],ppl=others();
+  const opt=(val,label,sub,ic)=>`<label class="opt"><input type="radio" name="${name}Mode" value="${val}"${m===val?" checked":""}><span><b style="display:flex;align-items:center;gap:6px">${ic}${label}</b><span>${sub}</span></span></label>`;
+  return`<fieldset class="field sharebox" data-name="${name}"><legend>Who can see ${what}</legend>
+    ${opt("me","Only me","Private. No one else sees it.",ICON.lock)}
+    ${opt("all","Everyone","Every instructor can see and copy it.",ICON.globe)}
+    ${opt("some","Choose people","Only the instructors you tick.",ICON.people)}
+    <div class="ppl"${m==="some"?"":" hidden"}>${ppl.length?ppl.map(p=>`<label class="opt"><input type="checkbox" name="${name}P" value="${esc(p.id)}"${pick.includes(p.id)?" checked":""}><span><b>${esc(p.name)}${p.admin?`<span class="adm">Admin</span>`:""}</b></span></label>`).join(""):`<p class="small" style="margin:0">No other instructors have joined yet.</p>`}</div>
+    <p class="small" style="margin:0">They can view and copy it. Admins can also edit it.</p></fieldset>`;}
+function readShare(form,name){const fd=new FormData(form);const m=fd.get(name+"Mode")||"me";
+  if(m==="all")return"all";if(m==="some"){const ids=fd.getAll(name+"P").map(String);return ids.length?ids:"me";}return"me";}
+
+/* ---------- timeslots: regular classes from the Lists tab ("Mon 18:00-19:30 Kids") ---------- */
+const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const DAY_ORDER=[1,2,3,4,5,6,0];
+const toMin=t=>{const m=/^(\d{1,2}):(\d{2})$/.exec(String(t||"").trim());return m?(+m[1])*60+(+m[2]):null;};
+const fromMin=n=>pad(Math.floor(n/60))+":"+pad(n%60);
+function parseTime(v){const m=/^(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})$/.exec(String(v||"").trim());if(!m)return null;
+  const a=toMin(m[1]),b=toMin(m[2]);return a==null||b==null||b<=a?null:{start:fromMin(a),end:fromMin(b),mins:b-a,key:fromMin(a)+"-"+fromMin(b)};}
+const clock12=t=>{const n=toMin(t);if(n==null)return"";const h=Math.floor(n/60),mm=n%60;return((h+11)%12+1)+":"+pad(mm)+(h<12?" a.m.":" p.m.");};
+function fmtTime(v){const t=parseTime(v);if(!t)return"";const a=clock12(t.start),b=clock12(t.end);
+  return a.slice(-4)===b.slice(-4)?a.slice(0,-5)+"–"+b:a+"–"+b;}
+function slots(){return listRows("Timeslot").map(r=>{const m=/^\s*([a-z]{3})[a-z]*\.?\s+(\d{1,2}:\d{2}\s*[-–]\s*\d{1,2}:\d{2})\s*(.*)$/i.exec(r.value);if(!m)return null;
+  const day=DAYS.findIndex(d=>d.slice(0,3).toLowerCase()===m[1].toLowerCase());const t=parseTime(m[2]);
+  return day<0||!t?null:Object.assign({id:r.id,day,label:m[3].trim()},t);}).filter(Boolean)
+  .sort((a,b)=>(DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day))||(toMin(a.start)-toMin(b.start)));}
+const slotsOn=k=>{const d=new Date(keyMs(k)).getDay();return slots().filter(x=>x.day===d);};
+const dayName=k=>DAYS[new Date(keyMs(k)).getDay()];
+const whenLine=p=>fmtLongDay(p.date)+(parseTime(p.time)?" · "+fmtTime(p.time):"");
 /* ---------- point-form notes: stored in the sheet as "• point" lines ---------- */
 const toPoints=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*(?:[•\-*·]\s*)+/,"").trim()).filter(Boolean);
 const fromPoints=a=>a.map(p=>String(p).replace(/\r?\n/g," ").trim()).filter(Boolean).map(p=>"• "+p).join("\n");
@@ -361,7 +420,7 @@ function addPointAfter(box,row){const tmp=document.createElement("div");tmp.inne
    SYNC — the Google Sheet is the source of truth.
    Changes show on screen right away, then go to the sheet in batches.
    ===================================================================== */
-let S={plans:[],items:[],exercises:[],lists:[]};
+let S={plans:[],items:[],exercises:[],lists:[],people:[]};
 let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
@@ -378,7 +437,7 @@ const uid=()=>("x"+Date.now().toString(36)+Math.random().toString(36).slice(2,9)
 function applyLocal(o){const arr=S[o.coll];if(o.op==="add"){const rec=Object.assign({id:o.id},o.data);const i=arr.findIndex(d=>d.id===o.id);if(i>=0)arr[i]=rec;else arr.push(rec);}else if(o.op==="update"){const x=arr.find(d=>d.id===o.id);if(x)Object.assign(x,o.data);}else S[o.coll]=arr.filter(d=>d.id!==o.id);}
 function enqueue(o){queue.push(o);applyLocal(o);onData();clearTimeout(flushT);flushT=setTimeout(flush,350);}
 const store={
-  add(c,data){const id=uid();enqueue({op:"add",coll:c,id,data});return id;},
+  add(c,data){const id=uid();if(c==="plans"||c==="exercises")data=Object.assign({share:"me"},data,ownFlags());enqueue({op:"add",coll:c,id,data});return id;},
   update(c,id,data){enqueue({op:"update",coll:c,id,data});},
   del(c,id){enqueue({op:"del",coll:c,id});}
 };
@@ -387,8 +446,9 @@ function normalize(st){
   st=st||{};const str=v=>String(v==null?"":v).trim();const num=(v,d)=>v==null||v===""||isNaN(+v)?d:+v;
   return{
     lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),inNew:str(r.inNew)})),
-    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
+    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
     items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy)})),
+    people:(st.people||[]).map(r=>({id:str(r.id),name:str(r.name),admin:!!r.admin})).filter(r=>r.id),
     exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),notes:str(r.notes),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
   };
 }
@@ -524,7 +584,8 @@ function planCard(p,next){
   return`<div class="card plan${next?" next":""}">
     <button type="button" class="body" data-act="openPlan" data-id="${esc(p.id)}">
       <span class="row" style="gap:8px;flex-wrap:wrap"><span class="t">${esc(planTitle(p))}</span>${p.type?`<span class="tag dark">${esc(p.type)}</span>`:""}${next?`<span class="tag red">Next class</span>`:""}</span>
-      <span class="l">${esc(fmtDay(p.date))} · ${fmtHM(tot)} of ${fmtHM(len)}${notes}${edited}</span>
+      <span class="l">${esc(fmtDay(p.date))}${parseTime(p.time)?" · "+esc(fmtTime(p.time)):""} · ${fmtHM(tot)} of ${fmtHM(len)}${notes}${edited}</span>
+      <span class="tagline">${ownerTag(p)}${shareTag(p)}</span>
       <span class="bar thin" style="margin-top:4px">${segs}</span>
     </button>
     <button type="button" class="iconbtn round" data-act="copyPlan" data-id="${esc(p.id)}" aria-label="Copy ${esc(planTitle(p))} to a new date">${ICON.copy}</button>
@@ -534,8 +595,9 @@ function viewPlans(){
   const types=classTypes();if(plansFilter!=="All"&&!types.includes(plansFilter))plansFilter="All";
   const list=S.plans.filter(p=>plansFilter==="All"||eqi(p.type,plansFilter));
   const t0=keyMs(todayKey())-12*3600e3;
-  const up=list.filter(p=>p.date>=t0).sort((a,b)=>a.date-b.date);
-  const past=list.filter(p=>p.date<t0).sort((a,b)=>b.date-a.date);
+  const byWhen=(a,b)=>(a.date-b.date)||((toMin((parseTime(a.time)||{}).start)||0)-(toMin((parseTime(b.time)||{}).start)||0));
+  const up=list.filter(p=>p.date>=t0).sort(byWhen);
+  const past=list.filter(p=>p.date<t0).sort((a,b)=>byWhen(b,a));
   const chips=["All"].concat(types).map(t=>`<button type="button" class="chip sm" data-act="pfilter" data-v="${esc(t)}" aria-pressed="${plansFilter===t}">${esc(t)}</button>`).join("");
   let body="";
   if(!S.plans.length)body=`<div class="card empty"><p>No plans yet. Start your first class plan. It begins with the ${defaultSections().length} usual sections.</p><button type="button" class="btn primary" data-act="newPlan">${ICON.plus}New plan</button></div>`;
@@ -547,7 +609,7 @@ function viewPlans(){
   return`<div class="stack">
     <h1>Lesson plans</h1>
     <div class="btnrow"><button type="button" class="btn primary square" data-act="newPlan">${ICON.plus}New plan</button><button type="button" class="btn outline square" data-act="copyPick">${ICON.copy}Copy a plan</button></div>
-    <p class="small" style="margin:0 4px">New plans start with the ${defaultSections().length} usual sections. Skip or add sections inside the plan.</p>
+    <p class="small" style="margin:0 4px">New plans start with the ${defaultSections().length} usual sections. Skip or add sections inside the plan. <button type="button" class="textbtn" data-act="slots" style="padding:0;min-height:0;display:inline;font-size:inherit">Class timeslots</button></p>
     <div class="chips" role="group" aria-label="Class type">${chips}</div>
     ${body}
   </div>`;
@@ -570,7 +632,7 @@ function itemHTML(p,it,col){
 function viewPlan(){
   const p=planById(PLAN);
   if(p&&planMode==="review")return viewReview(p);
-  if(p&&planMode!=="edit")return viewTeach(p);
+  if(p&&(planMode!=="edit"||!canEditR(p)))return viewTeach(p);
   if(!p)return`<div class="stack"><h1>This class</h1><div class="card empty"><p>No class open. Pick one from your plans or start a new one.</p><div class="btnrow"><button type="button" class="btn outline" data-act="tab" data-tab="plans">See plans</button><button type="button" class="btn primary" data-act="newPlan">${ICON.plus}New plan</button></div></div></div>`;
   const len=p.length||105,tot=planTotal(p),diff=len-tot,scale=Math.max(len,tot)||1;
   const secs=planSections(p);
@@ -595,9 +657,11 @@ function viewPlan(){
   return`<div class="stack">
     <div class="editbanner">${ICON.edit}<span>Editing. Changes save as you go; tap <b>Save plan</b> when you’re done.</span></div>
     <div class="row" style="align-items:flex-start">
-      <div class="grow"><div class="kicker">${esc(fmtLongDay(p.date))}</div><h1>${esc(planTitle(p))}</h1>${edited?`<div class="small" style="margin-top:2px">${edited}</div>`:""}</div>
-      <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: date, focus, copy, delete">${ICON.more}</button>
+      <div class="grow"><div class="kicker">${esc(whenLine(p))}</div><h1>${esc(planTitle(p))}</h1>${edited?`<div class="small" style="margin-top:2px">${edited}</div>`:""}</div>
+      <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: date, time, focus, sharing, copy, delete">${ICON.more}</button>
     </div>
+    <button type="button" class="pickrow" data-act="planInfo" style="margin:0"><span class="nm" style="font-weight:700">${parseTime(p.time)?`<b>${esc(fmtTime(p.time))}</b>`:"No set time"} · <span style="color:var(--muted)">change date or time</span></span>${ICON.clock}</button>
+    ${canShareR(p)?`<button type="button" class="pickrow" data-act="sharePlan" style="margin:0"><span class="nm" style="font-weight:700">Who can see it: <b>${esc(shareLabel(p.share))}</b></span>${shareMode(p.share)==="me"?ICON.lock:shareMode(p.share)==="all"?ICON.globe:ICON.people}</button>`:""}
     <div><span class="label">Class type</span><div class="chips">${typeChips}</div></div>
     <div><span class="label">Class length</span><div class="chips">${lenChips}</div></div>
     <div class="card timecard">
@@ -614,6 +678,8 @@ function viewPlan(){
 const clock=m=>Math.floor(m/60)+":"+pad(m%60);
 const qnLines=ptLines;
 const splitQn=x=>{const m=x.match(/^(\d{1,2}:\d{2}\s*[ap]\.?m\.?)\s*[·-]\s*(.*)$/i);return m?{t:m[1],x:m[2]}:{t:"",x:x};};
+function viewOnlyNote(p){if(canEditR(p))return"";
+  return`<div class="viewonly">${ICON.eye}<span>${esc(personName(p.ownerId)||"Another instructor")}’s plan, shared with you to view. To change it, use ⋯ → <b>Copy to a new date</b>.</span></div>`;}
 function viewTeach(p){
   const len=p.length||105,tot=planTotal(p);
   let at=0,any=false;
@@ -628,10 +694,10 @@ function viewTeach(p){
         ${steps.length?`<div class="vlabel">Instructions</div><ol class="steps vsteps">${steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:(lib?"":`<p class="small" style="margin:6px 0 0">One-off for this class.</p>`)}
         ${libNotes.length?`<div class="vlabel">Notes</div><ul class="pts vpts">${libNotes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
         ${mine.length?`<div class="vlabel">For this class</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
-        <div class="vlabel">Quick notes</div>
+        ${qn.length||canEditR(p)?`<div class="vlabel">Quick notes</div>`:""}
         ${qn.length?`<ul class="qnlist">${qn.map((x,i)=>{const m=x.match(/^(\d{1,2}:\d{2}\s*[ap]\.?m\.?)\s*[·-]\s*(.*)$/i);
-          return`<li>${m?`<span class="qtime">${esc(m[1])}</span>`:""}<span class="grow">${esc(m?m[2]:x)}</span><button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button></li>`;}).join("")}</ul>`:""}
-        <form class="qform" data-id="${esc(it.id)}"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Quick note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Jot a quick note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Save quick note for ${esc(it.name)}">${ICON.plus}</button></form>
+          return`<li>${m?`<span class="qtime">${esc(m[1])}</span>`:""}<span class="grow">${esc(m?m[2]:x)}</span>${canEditR(p)?`<button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>`:""}</li>`;}).join("")}</ul>`:""}
+        ${canEditR(p)?`<form class="qform" data-id="${esc(it.id)}"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Quick note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Jot a quick note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Save quick note for ${esc(it.name)}">${ICON.plus}</button></form>`:""}
       </article>`;
     }).join("");
     return`<section class="vsec">
@@ -641,12 +707,13 @@ function viewTeach(p){
   }).join("");
   const diff=len-tot;
   return`<div class="stack">
+    ${viewOnlyNote(p)}
     <div class="row" style="align-items:flex-start">
-      <div class="grow"><div class="kicker">${esc(fmtLongDay(p.date))}</div><h1>${esc(planTitle(p))}</h1>
+      <div class="grow"><div class="kicker">${esc(whenLine(p))}</div><h1>${esc(planTitle(p))}</h1>
         <div class="small" style="margin-top:4px">${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}</div></div>
       <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: edit, date, focus, copy, delete">${ICON.more}</button>
     </div>
-    ${any?secs+`<button type="button" class="btn outline block" data-act="setMode" data-m="review">${ICON.review}Class done? Review the notes</button>`:`<div class="card empty"><p>Nothing planned yet.</p><button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button></div>`}
+    ${any?secs+`<button type="button" class="btn outline block" data-act="setMode" data-m="review">${ICON.review}Class done? Review the notes</button>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
   </div>`;
 }
 
@@ -657,14 +724,14 @@ function viewReview(p){
     const col=secColour(s),its=secItems(p,s);if(!its.length)return"";
     const cards=its.map(it=>{
       const lib=exById(it.exercise),mine=toPoints(it.note),qn=qnLines(it.live);qnTotal+=qn.length;if(qn.length)withNotes++;
-      const inLib=new Set(lib?toPoints(lib.notes).map(x=>x.toLowerCase()):[]);
+      const inLib=new Set(lib?toPoints(lib.notes).map(x=>x.toLowerCase()):[]);const ed=canEditR(p),libEd=ed&&lib&&canEditR(lib);
       return`<article class="card rex${qn.length||mine.length?"":" quiet"}" style="border-left-color:${col}">
         <div class="vex-top"><h3>${esc(it.name)}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span></div>
         ${mine.length?`<div class="vlabel">Planned notes</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
         ${qn.length?`<div class="vlabel">Quick notes</div><ul class="qnlist">${qn.map((x,i)=>{const q=splitQn(x),there=inLib.has(q.x.toLowerCase());
-          return`<li class="${lib?"wrap":""}">${q.t?`<span class="qtime">${esc(q.t)}</span>`:""}<span class="grow">${esc(q.x)}</span><button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>
-            ${lib?`<span class="qacts">${there?`<span class="qlib done">${ICON.check}In the library notes</span>`:`<button type="button" class="qlib" data-act="qnToLib" data-id="${esc(it.id)}" data-i="${i}">${ICON.book}Add to library notes</button>`}</span>`:""}</li>`;}).join("")}</ul>`:""}
-        <form class="qform" data-id="${esc(it.id)}" style="margin-top:8px"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add a note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Add a note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add a note for ${esc(it.name)}">${ICON.plus}</button></form>
+          return`<li class="${libEd?"wrap":""}">${q.t?`<span class="qtime">${esc(q.t)}</span>`:""}<span class="grow">${esc(q.x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>`:""}
+            ${libEd?`<span class="qacts">${there?`<span class="qlib done">${ICON.check}In the library notes</span>`:`<button type="button" class="qlib" data-act="qnToLib" data-id="${esc(it.id)}" data-i="${i}">${ICON.book}Add to library notes</button>`}</span>`:""}</li>`;}).join("")}</ul>`:""}
+        ${ed?`<form class="qform" data-id="${esc(it.id)}" style="margin-top:8px"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add a note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Add a note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add a note for ${esc(it.name)}">${ICON.plus}</button></form>`:""}
       </article>`;}).join("");
     return`<section class="vsec">
       <div class="vsec-h" style="border-color:${col}"><div class="badge" style="background:${col}">${si+1}</div><h2 class="grow">${esc(s)}</h2></div>
@@ -672,24 +739,26 @@ function viewReview(p){
     </section>`;
   }).join("");
   const sum=[`<span class="${qnTotal?"on":""}">${qnTotal} quick ${qnTotal===1?"note":"notes"}</span>`,`<span>${withNotes} of ${itemsOf(p.id).length} exercises noted</span>`,`<span class="${rv.length?"on":""}">${rv.length} after-class ${rv.length===1?"note":"notes"}</span>`].join("");
+  const ed=canEditR(p);
   return`<div class="stack">
+    ${viewOnlyNote(p)}
     <div class="row" style="align-items:flex-start">
-      <div class="grow"><div class="kicker">Class review · ${esc(fmtLongDay(p.date))}</div><h1>${esc(planTitle(p))}</h1>
+      <div class="grow"><div class="kicker">Class review · ${esc(whenLine(p))}</div><h1>${esc(planTitle(p))}</h1>
         <div class="small" style="margin-top:4px">${p.type?esc(p.type)+" · ":""}${fmtHM(planTotal(p))} planned</div></div>
       <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: teaching view, edit, copy, delete">${ICON.more}</button>
     </div>
     <div class="rvsum">${sum}</div>
     <section class="card rvhead">
       <h2>After class</h2><p class="small" style="margin:0">How it went, and what to change next time.</p>
-      ${rv.length?`<ul class="rvlist">${rv.map((x,i)=>`<li><span class="grow">${esc(x)}</span><button type="button" class="iconbtn" data-act="delRv" data-i="${i}" aria-label="Delete this note">${ICON.x}</button></li>`).join("")}</ul>`:""}
-      <form class="rform qform" data-id="${esc(p.id)}" style="margin-top:10px"><label for="rv-${esc(p.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add an after-class note</label><input class="inp keepval" id="rv-${esc(p.id)}" name="q" type="text" placeholder="e.g. Kids need more kumite time" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add after-class note">${ICON.plus}</button></form>
+      ${rv.length?`<ul class="rvlist">${rv.map((x,i)=>`<li><span class="grow">${esc(x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delRv" data-i="${i}" aria-label="Delete this note">${ICON.x}</button>`:""}</li>`).join("")}</ul>`:(ed?"":`<p class="small" style="margin:8px 0 0">No after-class notes.</p>`)}
+      ${ed?`<form class="rform qform" data-id="${esc(p.id)}" style="margin-top:10px"><label for="rv-${esc(p.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add an after-class note</label><input class="inp keepval" id="rv-${esc(p.id)}" name="q" type="text" placeholder="e.g. Kids need more kumite time" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add after-class note">${ICON.plus}</button></form>`:""}
     </section>
     <button type="button" class="btn primary block" data-act="shareNotes">${ICON.share}Share or copy all notes</button>
     ${secs||`<div class="card empty"><p>No exercises in this plan.</p></div>`}
   </div>`;
 }
 function notesText(p){
-  const out=[`SKA class review: ${planTitle(p)}`,`${fmtLongDay(p.date)}${p.type?" · "+p.type:""}`];
+  const out=[`SKA class review: ${planTitle(p)}`,`${whenLine(p)}${p.type?" · "+p.type:""}`];
   const rv=ptLines(p.review);if(rv.length){out.push("","After class");rv.forEach(x=>out.push("• "+x));}
   planSections(p).filter(s=>!isSkipped(p,s)).forEach(s=>{
     const its=secItems(p,s).filter(it=>qnLines(it.live).length||toPoints(it.note).length);if(!its.length)return;
@@ -711,10 +780,10 @@ function exListHTML(){
     const col=secColour(e.section),n=use[e.id]?use[e.id].size:0;
     const meta=`in ${n} ${n===1?"plan":"plans"}`+(e.editedBy&&e.editedBy!==e.addedBy?` · edited by ${esc(e.editedBy)}`:"");
     return`<div class="card excard${e.addedBy?" cornered":""}" style="margin-bottom:10px">${ctagHTML(e.addedBy)}
-      <button type="button" class="body" data-act="editEx" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)} in the library">
+      <button type="button" class="body" data-act="editEx" data-id="${esc(e.id)}" aria-label="${canEditR(e)?"Edit":"View"} ${esc(e.name)}">
         <span class="row" style="gap:8px;align-items:baseline"><span class="nm grow">${esc(e.name)}</span><span style="font-size:14px;font-weight:800;color:${col}">${e.minutes} min</span></span>
         ${e.description?`<span class="ds clamp">${esc(stepsText(e.description))}</span>`:""}${toPoints(e.notes).length?`<span class="ds" style="color:var(--muted);font-weight:700">${toPoints(e.notes).length} ${toPoints(e.notes).length===1?"note":"notes"}</span>`:""}
-        <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span><span>${meta}</span></span>
+        <span class="tagline"><span class="tag" style="color:${col};background:${tint(col)}">${esc(e.section||"No section")}</span>${shareMode(e.share)!=="all"||!isMineR(e)?ownerTag(e)+shareTag(e):""}<span>${meta}</span></span>
       </button>
       <button type="button" class="iconbtn" data-act="quickAdd" data-id="${esc(e.id)}" aria-label="Add ${esc(e.name)} to the open class" style="background:${tint(col)};color:${col}">${ICON.plus}</button>
     </div>`;
@@ -890,6 +959,10 @@ function renderSheet(){
         <div class="btnrow"><button type="button" class="btn outline" data-act="closeSheet" data-focus>Keep</button><button type="button" class="btn primary" data-act="${s.act}" data-id="${esc(s.id)}">${esc(s.yes)}</button></div>`;break;
     case"notesText":{const p=planById(PLAN);if(!p)break;
       h=sheetHead("All notes")+`<p class="small" style="margin:-6px 0 10px">Select all and copy, then paste wherever you keep notes.</p><textarea class="inp" id="notesBox" readonly style="width:100%;min-height:50vh;padding:12px;line-height:1.45;font-size:14px" data-focus>${esc(notesText(p))}</textarea>`;break;}
+    case"share":{const r=s.coll==="plans"?planById(s.id):exById(s.id);if(!r)break;
+      h=sheetHead("Who can see it",`<div class="small">${esc(s.coll==="plans"?planTitle(r):r.name)}</div>`)+`<form id="shareForm" data-coll="${s.coll}" data-id="${esc(r.id)}">${shareField("sh",r.share,s.coll==="plans"?"this plan":"this exercise")}<button class="btn primary block" type="submit">Save</button></form>`;break;}
+    case"slots":h=sheetSlots();break;
+    case"exView":h=sheetExView(s);break;
     case"item":h=sheetItem(s);break;
     case"pick":h=sheetPick(s);break;
     case"ex":h=sheetEx(s);break;
@@ -897,15 +970,18 @@ function renderSheet(){
     case"copyPick":h=sheetCopyPick();break;
     case"copy":h=sheetCopy(s);break;
     case"planMenu":{const p=planById(PLAN);if(!p){h=sheetHead("Plan");break;}
-      h=sheetHead(esc(planTitle(p)),`<div class="small">${esc(fmtLongDay(p.date))}</div>`)+`<div class="menu">
-        ${planMode==="edit"?`<button type="button" class="btn primary block" data-act="savePlan" data-focus>${ICON.check}Save plan</button>`:`<button type="button" class="btn primary block" data-act="editPlan" data-focus>${ICON.edit}Edit plan</button>`}
+      const ed=canEditR(p);
+      h=sheetHead(esc(planTitle(p)),`<div class="small">${esc(whenLine(p))}</div>`)+`<div class="menu">
+        ${!ed?`<button type="button" class="btn primary block" data-act="copyPlan" data-id="${esc(p.id)}" data-focus>${ICON.copy}Copy to a new date</button>`:planMode==="edit"?`<button type="button" class="btn primary block" data-act="savePlan" data-focus>${ICON.check}Save plan</button>`:`<button type="button" class="btn primary block" data-act="editPlan" data-focus>${ICON.edit}Edit plan</button>`}
         ${planMode==="review"?`<button type="button" class="btn ghost block" data-act="setMode" data-m="view">${ICON.list}Teaching view</button>`:planMode==="view"?`<button type="button" class="btn ghost block" data-act="setMode" data-m="review">${ICON.review}Review class</button>`:""}
-        <button type="button" class="btn ghost block" data-act="planInfo">${ICON.cal}Change date or focus</button>
-        <button type="button" class="btn ghost block" data-act="copyPlan" data-id="${esc(p.id)}">${ICON.copy}Copy to a new date</button>
-        <button type="button" class="btn danger block" data-act="askDelPlan">${ICON.trash}Delete this plan</button></div>`;break;}
+        ${ed?`<button type="button" class="btn ghost block" data-act="planInfo">${ICON.cal}Change date, time or focus</button>`:""}
+        ${canShareR(p)?`<button type="button" class="btn ghost block" data-act="sharePlan">${ICON.people}Who can see it: ${esc(shareLabel(p.share))}</button>`:`<p class="small" style="margin:0 0 10px;text-align:center">${esc(personName(p.ownerId)||"Another instructor")}’s plan · shared with ${esc(shareMode(p.share)==="all"?"everyone":"you")}</p>`}
+        ${ed?`<button type="button" class="btn ghost block" data-act="copyPlan" data-id="${esc(p.id)}">${ICON.copy}Copy to a new date</button>
+        <button type="button" class="btn danger block" data-act="askDelPlan">${ICON.trash}Delete this plan</button>`:""}</div>`;break;}
     case"planInfo":{const p=planById(PLAN);if(!p)break;
-      h=sheetHead("Date and focus")+`<form id="infoForm">
+      h=sheetHead("Date, time and focus")+`<form id="infoForm" class="planform">
         <div class="field"><label for="iDate">Date</label><input class="inp" id="iDate" name="date" type="date" value="${p.date?dayKey(p.date):todayKey()}" required data-focus></div>
+        ${timeField(p.date?dayKey(p.date):todayKey(),p.time)}
         <div class="field"><label for="iFocus">Focus</label><input class="inp" id="iFocus" name="focus" type="text" maxlength="60" placeholder="e.g. Kumite focus" value="${esc(p.focus)}"></div>
         <button class="btn primary block" type="submit">Save</button></form>`;break;}
     case"length":{const p=planById(PLAN);if(!p)break;const l=p.length||105;
@@ -939,7 +1015,7 @@ function sheetItem(s){
       <button type="button" data-act="stepMin" data-d="5" aria-label="5 minutes more">${ICON.plus}</button></div>
       <div class="qgrid" role="group" aria-label="Quick times">${quick}</div></div>
     <fieldset class="field"><legend>Notes for this class</legend>${pointsEditor("note",it.note,"e.g. Heian Shodan turns only")}</fieldset>
-    ${lib?`<fieldset class="field"><legend>Save a new time to…</legend>
+    ${lib&&canEditR(lib)?`<fieldset class="field"><legend>Save a new time to…</legend>
       <label class="opt"><input type="radio" name="scope" value="class" checked><span><b>This class only</b><span>The library keeps ${lib.minutes} min</span></span></label>
       <label class="opt"><input type="radio" name="scope" value="lib"><span><b>Also update the library</b><span>Future plans start at the new time</span></span></label></fieldset>`:""}
     <div class="field"><span class="label" style="margin:0">Order in ${esc(it.section)}</span><div class="btnrow">
@@ -980,34 +1056,99 @@ function sheetEx(s){
     <div class="field"><label for="eMin">Usual minutes</label><input class="inp" id="eMin" name="minutes" type="number" inputmode="numeric" min="1" max="240" required value="${e?e.minutes:10}"></div>
     <fieldset class="field"><legend>Instructions</legend>${pointsEditor("steps",e?e.description:"","e.g. Line up in rows",true)}</fieldset>
     <fieldset class="field"><legend>Notes</legend>${pointsEditor("notes",e?e.notes:"","e.g. Watch for dropped hands")}</fieldset>
+    ${!e||canShareR(e)?shareField("sh",e?e.share:"me","this exercise"):`<p class="small">${esc(personName(e.ownerId)||"Another instructor")}’s exercise · ${esc(shareLabel(e.share))}</p>`}
     <div class="btnrow">${e?`<button type="button" class="btn danger" data-act="askDelEx" data-id="${esc(e.id)}">Delete</button>`:(s.back?`<button type="button" class="btn outline" data-act="backToPick">Back</button>`:"")}<button type="submit" class="btn primary" style="flex:2">${e?"Save":s.addTo?"Save and add":"Save"}</button></div>
   </form>`;
 }
 function typeLenFields(type,len){
-  const types=classTypes(),lens=classLengths();if(len&&!lens.includes(len))lens.push(len);
+  const types=classTypes(),lens=classLengths(),other=!!len&&!lens.includes(len);
   return`<fieldset class="field"><legend>Class type</legend><div class="chips">${types.map(t=>`<label class="chip rchip"><input type="radio" name="type" value="${esc(t)}"${eqi(t,type)?" checked":""} required>${esc(t)}</label>`).join("")}</div></fieldset>
-  <fieldset class="field"><legend>Class length</legend><div class="chips">${lens.map(l=>`<label class="chip rchip"><input type="radio" name="length" value="${l}"${l===len?" checked":""}>${fmtLen(l)}</label>`).join("")}</div></fieldset>`;
+  <fieldset class="field lenbox"><legend>Class length</legend><div class="chips">${lens.map(l=>`<label class="chip rchip"><input type="radio" name="length" value="${l}"${l===len?" checked":""}>${fmtLen(l)}</label>`).join("")}<label class="chip rchip"><input type="radio" name="length" value="other"${other?" checked":""}>Other</label></div>
+    <div class="row lenother" style="gap:10px"${other?"":" hidden"}><div class="field grow" style="margin:0"><label for="oH">Hours</label><input class="inp" id="oH" name="oh" type="number" inputmode="numeric" min="0" max="9" value="${other?Math.floor(len/60):1}"></div>
+      <div class="field grow" style="margin:0"><label for="oM">Minutes</label><input class="inp" id="oM" name="om" type="number" inputmode="numeric" min="0" max="59" step="5" value="${other?len%60:0}"></div></div></fieldset>`;
 }
+const readLength=(fd,def)=>{const v=String(fd.get("length")||"");if(v==="other"){const l=(parseInt(fd.get("oh"),10)||0)*60+(parseInt(fd.get("om"),10)||0);return l>0?Math.min(600,l):def;}return parseInt(v,10)||def;};
+function slotChips(k,time){
+  const list=slotsOn(k),t=parseTime(time),hit=t&&list.find(x=>x.key===t.key);
+  const mode=hit?hit.key:t?"custom":"none";
+  const chip=(v,label,sub)=>`<label class="chip rchip" style="height:auto;min-height:44px;padding:6px 14px;flex-direction:column;line-height:1.15"><input type="radio" name="slot" value="${esc(v)}"${mode===v?" checked":""}>${esc(label)}${sub?`<span style="font-size:11px;font-weight:700;opacity:.8">${esc(sub)}</span>`:""}</label>`;
+  return list.map(x=>chip(x.key,fmtTime(x.key),x.label)).join("")+chip("custom","Custom")+chip("none","No set time");
+}
+function timeField(k,time){
+  const t=parseTime(time),list=slotsOn(k),hit=t&&list.some(x=>x.key===t.key),custom=!!t&&!hit;
+  return`<fieldset class="field timebox"><legend>Time</legend>
+    <div class="chips slotchips">${slotChips(k,time)}</div>
+    <div class="timein"${custom?"":" hidden"}><label class="vh" for="tS" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Start time</label><input class="inp" id="tS" name="tStart" type="time" step="300" value="${custom?t.start:""}"><span>to</span><label class="vh" for="tE" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">End time</label><input class="inp" id="tE" name="tEnd" type="time" step="300" value="${custom?t.end:""}"></div>
+    ${isAdmin()?`<label class="opt saveslot"${custom?"":" hidden"}><input type="checkbox" name="saveSlot"><span><b>Save as a regular ${esc(dayName(k))} timeslot</b><span>It shows as a choice on every ${esc(dayName(k))}</span></span></label>`:""}
+    <p class="small slotnote" style="margin:0">${list.length?"":`No regular classes on ${esc(dayName(k))}s. Set a custom time for a special event.`}</p></fieldset>`;
+}
+function readTime(fd){const v=String(fd.get("slot")||"none");if(v==="none")return"";
+  if(v==="custom"){const a=toMin(fd.get("tStart")),b=toMin(fd.get("tEnd"));return a!=null&&b!=null&&b>a?fromMin(a)+"-"+fromMin(b):"";}
+  const t=parseTime(v);return t?t.key:"";}
+function saveSlotIf(fd,time){if(!isAdmin()||!fd.get("saveSlot")||String(fd.get("slot"))!=="custom")return;const t=parseTime(time);if(!t)return;
+  const k=String(fd.get("date")||todayKey());const d=new Date(keyMs(k)).getDay();if(slotsOn(k).some(x=>x.key===t.key))return;
+  store.add("lists",{list:"Timeslot",value:DAYS[d].slice(0,3)+" "+t.key,colour:"",inNew:""});}
+function slotTypeFor(fd){const v=String(fd.get("slot")||"");const k=String(fd.get("date")||"");const x=slotsOn(k).find(s=>s.key===v);return x&&classTypes().find(t=>eqi(t,x.label))||"";}
+function setFormLength(f,mins){if(!mins||!f.querySelector(".lenbox"))return;
+  const r=f.querySelector(`input[name=length][value="${mins}"]`);
+  if(r)r.checked=true;else{const o=f.querySelector("input[name=length][value=other]");o.checked=true;f.oh.value=Math.floor(mins/60);f.om.value=mins%60;}
+  f.querySelector(".lenother").hidden=!f.querySelector("input[name=length][value=other]").checked;}
+function planFormChange(f,t){
+  if(t.name==="date"){const k=t.value||todayKey();const cur=readTime(new FormData(f));f.querySelector(".slotchips").innerHTML=slotChips(k,cur);
+    const list=slotsOn(k);f.querySelector(".slotnote").textContent=list.length?"":`No regular classes on ${dayName(k)}s. Set a custom time for a special event.`;
+    const ss=f.querySelector(".saveslot b");if(ss)ss.textContent=`Save as a regular ${dayName(k)} timeslot`;
+    const ss2=f.querySelector(".saveslot span span");if(ss2)ss2.textContent=`It shows as a choice on every ${dayName(k)}`;
+    t={name:"slot"};}
+  if(t.name==="slot"){const fd=new FormData(f);const v=String(fd.get("slot")||"none");
+    f.querySelector(".timein").hidden=v!=="custom";const ss=f.querySelector(".saveslot");if(ss)ss.hidden=v!=="custom";
+    const tm=parseTime(v);if(tm)setFormLength(f,tm.mins);
+    const ty=slotTypeFor(fd);if(ty){const r=[...f.querySelectorAll("input[name=type]")].find(i=>eqi(i.value,ty));if(r)r.checked=true;}}
+  if(t.name==="tStart"||t.name==="tEnd"){const tm=parseTime(readTime(new FormData(f)));if(tm)setFormLength(f,tm.mins);}
+  if(t.name==="length")f.querySelector(".lenother").hidden=t.value!=="other";
+}
+function sheetSlots(){
+  const list=slots();const adm=isAdmin();
+  let body=DAY_ORDER.map(d=>{const its=list.filter(x=>x.day===d);if(!its.length)return"";
+    return`<div class="slotday">${DAYS[d]}</div>`+its.map(x=>`<div class="slotrow"><span class="grow">${esc(fmtTime(x.key))}${x.label?` · <span style="color:var(--muted)">${esc(x.label)}</span>`:""}</span>${adm?`<button type="button" class="iconbtn" data-act="delSlot" data-id="${esc(x.id)}" aria-label="Remove ${esc(DAYS[d])} ${esc(fmtTime(x.key))}">${ICON.x}</button>`:""}</div>`).join("");}).join("");
+  if(!body)body=`<p class="small">No regular timeslots yet.${adm?" Add your class times below.":" An admin can add them."}</p>`;
+  const types=classTypes();
+  return sheetHead("Class timeslots",`<div class="small">Regular classes, by day</div>`)+body+(adm?`<form id="slotForm" class="mt">
+    <div class="slotday" style="margin-top:18px">Add a timeslot</div>
+    <div class="field"><label for="slDay">Day</label><select class="inp" id="slDay" name="day">${DAY_ORDER.map(d=>`<option value="${d}">${DAYS[d]}</option>`).join("")}</select></div>
+    <div class="field"><span class="label" style="margin:0">Time</span><div class="timein"><input class="inp" name="tStart" type="time" step="300" required aria-label="Start time"><span>to</span><input class="inp" name="tEnd" type="time" step="300" required aria-label="End time"></div></div>
+    <div class="field"><label for="slType">Class (optional)</label><select class="inp" id="slType" name="label"><option value="">Any class</option>${types.map(t=>`<option>${esc(t)}</option>`).join("")}</select></div>
+    <p class="msg" id="slotMsg" aria-live="polite"></p>
+    <button class="btn primary block" type="submit">Add timeslot</button></form>`:"");
+}
+function sheetExView(s){const e=exById(s.id);if(!e)return sheetHead("Not found");
+  return sheetHead(esc(e.name),secChip(e.section)+"<br>")+`<p class="small" style="margin:-6px 0 12px">${esc(personName(e.ownerId)||"Another instructor")}’s exercise · ${e.minutes} min · shared with ${esc(shareMode(e.share)==="all"?"everyone":"you")}</p>
+    ${e.addedBy?`<p style="margin:0 0 8px"><span class="tag creator">${ICON.user}${esc(e.addedBy)}</span></p>`:""}
+    ${e.description?`<h3 class="vlabel">Instructions</h3>${stepsHTML(e.description)}`:""}${toPoints(e.notes).length?`<h3 class="vlabel">Notes</h3>${ptsHTML(e.notes)}`:""}
+    <div class="btnrow" style="margin-top:14px"><button type="button" class="btn outline" data-act="closeSheet">Close</button><button type="button" class="btn primary" data-act="copyEx" data-id="${esc(e.id)}">${ICON.copy}Copy to edit</button></div>`;}
 function sheetNewPlan(){
   const lens=classLengths();const def=lens.includes(105)?105:lens[0];
   return sheetHead("New plan",`<div class="small">Starts with: ${esc(defaultSections().join(" · "))}</div>`)+
-  `<form id="newPlanForm">
+  `<form id="newPlanForm" class="planform">
     <div class="field"><label for="nDate">Date</label><input class="inp" id="nDate" name="date" type="date" value="${todayKey()}" required></div>
+    ${timeField(todayKey(),"")}
     ${typeLenFields(classTypes()[0],def)}
-    <div class="field"><label for="nFocus">Focus (optional)</label><input class="inp" id="nFocus" name="focus" type="text" maxlength="60" placeholder="e.g. Kumite focus"></div>
+    <div class="field"><label for="nFocus">Focus or event name (optional)</label><input class="inp" id="nFocus" name="focus" type="text" maxlength="60" placeholder="e.g. Kumite focus, Grading day"></div>
+    ${shareField("sh","me","this plan")}
     <button class="btn primary block" type="submit">Create plan</button></form>`;
 }
 function sheetCopyPick(){
   const list=S.plans.slice().sort((a,b)=>b.date-a.date);
-  return sheetHead("Copy a past plan")+(list.length?list.map(p=>`<button type="button" class="pickrow" data-act="copyPlan" data-id="${esc(p.id)}"><span class="nm">${esc(planTitle(p))}<br><span class="small">${esc(fmtDay(p.date))}${p.type?" · "+esc(p.type):""} · ${fmtHM(planTotal(p))}</span></span>${ICON.copy}</button>`).join(""):`<p>No plans to copy yet.</p>`);
+  return sheetHead("Copy a past plan")+(list.length?list.map(p=>`<button type="button" class="pickrow" data-act="copyPlan" data-id="${esc(p.id)}"><span class="nm">${esc(planTitle(p))}<br><span class="small">${esc(fmtDay(p.date))}${parseTime(p.time)?" · "+esc(fmtTime(p.time)):""}${p.type?" · "+esc(p.type):""} · ${fmtHM(planTotal(p))}${!isMineR(p)&&p.ownerId?" · "+esc(personName(p.ownerId)):""}</span></span>${ICON.copy}</button>`).join(""):`<p>No plans to copy yet.</p>`);
 }
 function sheetCopy(s){
   const p=planById(s.id);if(!p)return sheetHead("Not found");
   return sheetHead("Copy “"+esc(planTitle(p))+"”",`<div class="small">${itemsOf(p.id).length} exercises, same sections, times and notes</div>`)+
-  `<form id="copyForm" data-id="${esc(p.id)}">
+  `<form id="copyForm" class="planform" data-id="${esc(p.id)}">
     <div class="field"><label for="cDate">New date</label><input class="inp" id="cDate" name="date" type="date" value="${todayKey()}" required data-focus></div>
+    ${timeField(todayKey(),"")}
     ${typeLenFields(p.type||classTypes()[0],p.length||105)}
-    <div class="field"><label for="cFocus">Focus</label><input class="inp" id="cFocus" name="focus" type="text" maxlength="60" value="${esc(p.focus)}"></div>
+    <div class="field"><label for="cFocus">Focus or event name</label><input class="inp" id="cFocus" name="focus" type="text" maxlength="60" value="${esc(p.focus)}"></div>
+    ${shareField("sh","me","the copy")}
     <button class="btn primary block" type="submit">Make the copy</button></form>`;
 }
 
@@ -1040,7 +1181,7 @@ document.addEventListener("click",e=>{
     case"lfilter":libFilter=t.dataset.v;renderView();break;
     case"openPlan":{editFromView=false;const op=planById(t.dataset.id);go("plan",t.dataset.id,op&&isPast(op)?"review":"view");break;}
     case"setMode":{const m=t.dataset.m;if(sheet){hideSheet();planMode=m;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}else go("plan",undefined,m);break;}
-    case"qnToLib":{const it=itemById(t.dataset.id);const lib=it&&exById(it.exercise);if(!lib)break;const q=qnLines(it.live)[+t.dataset.i];if(q==null)break;
+    case"qnToLib":{const it=itemById(t.dataset.id);const lib=it&&exById(it.exercise);if(!lib||!canEditR(lib))break;const q=qnLines(it.live)[+t.dataset.i];if(q==null)break;
       const txt=splitQn(q).x,before=lib.notes;const pts=toPoints(lib.notes);if(!pts.some(x=>eqi(x,txt)))pts.push(txt);
       store.update("exercises",lib.id,{notes:fromPoints(pts),editedBy:who(),updated:Date.now()});
       toast(`Added to ${lib.name}’s notes in the library`,[{label:"Undo",fn:()=>{store.update("exercises",lib.id,{notes:before});}}]);break;}
@@ -1054,7 +1195,13 @@ document.addEventListener("click",e=>{
     case"copyPick":openSheet({type:"copyPick"});break;
     case"copyPlan":if(sheet)swapSheet({type:"copy",id:t.dataset.id});else openSheet({type:"copy",id:t.dataset.id});break;
     case"planMenu":openSheet({type:"planMenu"});break;
-    case"editPlan":if(sheet){hideSheet();planMode="edit";editFromView=true;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}
+    case"sharePlan":if(p&&canShareR(p)){if(sheet)swapSheet({type:"share",coll:"plans",id:p.id});else openSheet({type:"share",coll:"plans",id:p.id});}break;
+    case"slots":openSheet({type:"slots"});break;
+    case"delSlot":{const r=S.lists.find(x=>x.id===t.dataset.id);if(!r||!isAdmin())break;const copy={list:r.list,value:r.value,colour:r.colour||"",inNew:r.inNew||""};store.del("lists",r.id);renderSheet();
+      toast("Timeslot removed",[{label:"Undo",fn:()=>{store.add("lists",copy);if(sheet&&sheet.type==="slots")renderSheet();}}]);break;}
+    case"copyEx":{const ex=exById(t.dataset.id);if(!ex)break;const id=store.add("exercises",{section:ex.section,name:ex.name,minutes:ex.minutes,description:ex.description,notes:ex.notes,addedBy:ex.addedBy||who(),editedBy:"",share:"me"});
+      swapSheet({type:"ex",id});toast("Copied to your library. Only you can see the copy.");break;}
+    case"editPlan":if(p&&!canEditR(p))break;if(sheet){hideSheet();planMode="edit";editFromView=true;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}
       else{editFromView=true;go("plan",undefined,"edit");render();window.scrollTo(0,0);}break;
     case"savePlan":{if(sheet)hideSheet();clearTimeout(flushT);if(queue.length)flush();
       if(editFromView){editFromView=false;planMode="view";history.back();}
@@ -1063,7 +1210,7 @@ document.addEventListener("click",e=>{
     case"delQn":{const it=itemById(t.dataset.id);if(!it)break;const lines=qnLines(it.live);const i=+t.dataset.i;const gone=lines[i];if(gone==null)break;
       lines.splice(i,1);store.update("items",it.id,{live:lines.map(l=>"• "+l).join("\n")});
       toast("Quick note deleted",[{label:"Undo",fn:()=>{const cur=qnLines((itemById(it.id)||{}).live);cur.splice(i,0,gone);store.update("items",it.id,{live:cur.map(l=>"• "+l).join("\n")});}}]);break;}
-    case"planInfo":swapSheet({type:"planInfo"});break;
+    case"planInfo":if(sheet)swapSheet({type:"planInfo"});else openSheet({type:"planInfo"});break;
     case"askDelPlan":if(p)swapSheet({type:"confirm",center:true,title:"Delete this plan?",text:`“${planTitle(p)}” on ${fmtDay(p.date)} and its ${itemsOf(p.id).length} exercises will be removed for everyone. The library isn’t affected.`,yes:"Delete",act:"delPlan",id:p.id});break;
     case"delPlan":{const pp=planById(t.dataset.id);if(!pp)break;itemsOf(pp.id).forEach(i=>store.del("items",i.id));store.del("plans",pp.id);finishSheet("plans","");toast("Plan deleted");break;}
     case"setType":if(p&&!eqi(p.type,t.dataset.v)){store.update("plans",p.id,{type:t.dataset.v,editedBy:who(),updated:Date.now()});}break;
@@ -1094,10 +1241,11 @@ document.addEventListener("click",e=>{
     case"newExFor":if(sheet&&sheet.type==="pick")swapSheet({type:"ex",sec:sheet.sec,addTo:sheet.plan,back:Object.assign({},sheet)});break;
     case"backToPick":if(sheet&&sheet.back)swapSheet(sheet.back);break;
     case"newEx":openSheet({type:"ex",sec:libFilter!=="All"?libFilter:""});break;
-    case"editEx":openSheet({type:"ex",id:t.dataset.id});break;
+    case"editEx":{const ex=exById(t.dataset.id);if(!ex)break;openSheet(canEditR(ex)?{type:"ex",id:ex.id}:{type:"exView",id:ex.id});break;}
     case"askDelEx":{const ex=exById(t.dataset.id);if(ex)swapSheet({type:"confirm",center:true,title:`Delete ${ex.name}?`,text:"It’s removed from the library for everyone. Plans that already use it keep it.",yes:"Delete",act:"delEx",id:ex.id});break;}
     case"delEx":{const ex=exById(t.dataset.id);if(!ex)break;store.del("exercises",ex.id);closeSheet();toast(`Deleted ${ex.name} from the library`);break;}
     case"quickAdd":{const ex=exById(t.dataset.id);if(!ex)break;if(!p){toast("Open a class plan first, then add exercises to it.");break;}
+      if(!canEditR(p)){toast("The open plan is shared with you to view, so you can’t add to it. Copy it first.");break;}
       const sec=ex.section||planSections(p)[0];const id=addItem(p,sec,ex);
       toast(`Added to ${planTitle(p)}`,[{label:"Undo",fn:()=>{store.del("items",id);}}]);break;}
     case"addPoint":{const box=$(`#sheetBody .points[data-name="${t.dataset.name}"]`);if(box)addPointAfter(box,null);break;}
@@ -1134,6 +1282,9 @@ document.addEventListener("input",e=>{
   if(e.target.form&&/^(profile|signup)Form$/.test(e.target.form.id)&&draft&&e.target.name!=="code"&&e.target.form.first){const f=e.target.form;draft.first=f.first.value;draft.last=f.last.value;const r=f.querySelector("input[name=title]:checked");if(r)draft.title=r.value;updateProfilePreview();}
 });
 document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.form&&t.form.classList.contains("planform"))planFormChange(t.form,t);
+  if(t.name&&/Mode$/.test(t.name)){const box=t.closest(".sharebox");if(box)box.querySelector(".ppl").hidden=t.value!=="some";}
   if(e.target.form&&/^(profile|signup)Form$/.test(e.target.form.id)&&draft&&e.target.name==="title"){draft.title=e.target.value;updateProfilePreview();}
 });
 document.addEventListener("submit",e=>{
@@ -1182,21 +1333,36 @@ document.addEventListener("submit",e=>{
     const data={name:val("name").slice(0,80),section:val("section"),minutes:Math.max(1,Math.min(240,parseInt(val("minutes"),10)||10)),description:fromSteps(readPoints(f,"steps")),notes:fromPoints(readPoints(f,"notes"))};
     if(!data.name)return;
     const creator=val("creator").slice(0,60)||who();
-    if(s.id){store.update("exercises",s.id,Object.assign(data,{addedBy:creator,editedBy:who()}));closeSheet();toast("Saved to the library");return;}
+    if(f.querySelector(".sharebox"))data.share=readShare(f,"sh");
+    if(s.id){const ex=exById(s.id);if(ex&&!canShareR(ex))delete data.share;store.update("exercises",s.id,Object.assign(data,{addedBy:creator,editedBy:who()}));closeSheet();toast("Saved to the library");return;}
     const exId=store.add("exercises",Object.assign(data,{addedBy:creator,editedBy:""}));
     if(s.addTo){const pp=planById(s.addTo);if(pp)addItem(pp,data.section,Object.assign({id:exId},data));
       if(s.back){swapSheet(Object.assign({},s.back,{sec:s.back.sec}));toast(`Added ${data.name}`);return;}}
     closeSheet();toast(`Added ${data.name} to the library`);return;}
   if(id==="newPlanForm"){
-    const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),focus:val("focus").slice(0,60),type:val("type")||classTypes()[0],length:parseInt(val("length"),10)||105,
-      sections:defaultSections(),skipped:[],addedBy:who(),editedBy:who(),updated:Date.now()});
+    const time=readTime(fd);if(String(fd.get("slot"))==="custom"&&!time){toast("Set a start and end time, with the end after the start.");return;}
+    saveSlotIf(fd,time);
+    const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),time,focus:val("focus").slice(0,60),type:val("type")||classTypes()[0],length:readLength(fd,105),
+      sections:defaultSections(),skipped:[],share:readShare(f,"sh"),addedBy:who(),editedBy:who(),updated:Date.now()});
     editFromView=false;finishSheet("plan",pid,"edit");toast("Plan created. Tap Save plan when you’re done.");return;}
   if(id==="copyForm"){const src=planById(f.dataset.id);if(!src){closeSheet();return;}
-    const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),focus:val("focus").slice(0,60),type:val("type")||src.type,length:parseInt(val("length"),10)||src.length,
-      sections:planSections(src),skipped:src.skipped.slice(),addedBy:who(),editedBy:who(),updated:Date.now()});
+    const time=readTime(fd);if(String(fd.get("slot"))==="custom"&&!time){toast("Set a start and end time, with the end after the start.");return;}
+    saveSlotIf(fd,time);
+    const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),time,focus:val("focus").slice(0,60),type:val("type")||src.type,length:readLength(fd,src.length||105),
+      sections:planSections(src),skipped:src.skipped.slice(),share:readShare(f,"sh"),addedBy:who(),editedBy:who(),updated:Date.now()});
     itemsOf(src.id).forEach(i=>store.add("items",{plan:pid,section:i.section,order:i.order,name:i.name,minutes:i.minutes,note:i.note,exercise:i.exercise,addedBy:i.addedBy,editedBy:i.editedBy}));
     editFromView=false;finishSheet("plan",pid,"edit");toast("Copied. Make any changes, then tap Save plan.");return;}
-  if(id==="infoForm"){const p=planById(PLAN);if(p)store.update("plans",p.id,{date:keyMs(val("date")||todayKey()),focus:val("focus").slice(0,60),editedBy:who(),updated:Date.now()});closeSheet();return;}
+  if(id==="infoForm"){const p=planById(PLAN);if(!p){closeSheet();return;}
+    const time=readTime(fd);if(String(fd.get("slot"))==="custom"&&!time){toast("Set a start and end time, with the end after the start.");return;}
+    saveSlotIf(fd,time);
+    const data={date:keyMs(val("date")||todayKey()),time,focus:val("focus").slice(0,60),editedBy:who(),updated:Date.now()};
+    const tm=parseTime(time);if(tm&&time!==p.time)data.length=tm.mins;
+    store.update("plans",p.id,data);closeSheet();return;}
+  if(id==="shareForm"){const coll=f.dataset.coll;const r=coll==="plans"?planById(f.dataset.id):exById(f.dataset.id);if(!r||!canShareR(r)){closeSheet();return;}
+    const sh=readShare(f,"sh");store.update(coll,r.id,{share:sh});closeSheet();toast("Now visible to: "+shareLabel(sh));return;}
+  if(id==="slotForm"){if(!isAdmin())return;const d=+val("day");const a=toMin(val("tStart")),b=toMin(val("tEnd"));
+    if(a==null||b==null||b<=a){$("#slotMsg").textContent="The end time has to be after the start.";return;}
+    store.add("lists",{list:"Timeslot",value:(DAYS[d].slice(0,3)+" "+fromMin(a)+"-"+fromMin(b)+" "+val("label")).trim(),colour:"",inNew:""});renderSheet();toast("Timeslot added");return;}
   if(id==="lengthForm"){const p=planById(PLAN);const l=(parseInt(val("h"),10)||0)*60+(parseInt(val("m"),10)||0);
     if(p&&l>0)store.update("plans",p.id,{length:Math.min(600,l),editedBy:who(),updated:Date.now()});closeSheet();return;}
   if(id==="secForm"){const p=planById(PLAN);if(p)addSection(p,val("name"));closeSheet();return;}
