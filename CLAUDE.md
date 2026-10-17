@@ -42,7 +42,7 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 
 - Browser: Gary has several Chrome instances connected. The one signed in to garyluo.gs@gmail.com, GitHub (Dailuo-source) and Cloudflare is named **GARYMAIN**; select it before doing setup work.
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v14`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v15`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Through Claude in Chrome: open the script project (script.google.com/home → SKA Lesson Planner; the sheet's Extensions → Apps Script opens outside the tab group), set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email.
 - Testing: a Node mock of SpreadsheetApp plus Playwright (route `script.google.com` to `api()`) covers the main flows end to end; a second suite covers two instructors (private/shared/admin, refused edits), timeslots and custom lengths.
