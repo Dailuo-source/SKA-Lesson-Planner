@@ -33,7 +33,7 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 
 ## Link to the SKA Kata Tracker
 
-- The Kata Tracker is its own app: https://ska-kata-tracker.pages.dev/ (repo `Dailuo-source/SKA-Kata-Tracker`, see its CLAUDE.md). `KATA_URL` in `index.html` is its Apps Script web app; `?api=summary` returns every dojo kata with its rank belt, handbook **Learned at** belt and how many active members still need it (counts only, no names). `KATA_SITE` is the app's address.
+- The Kata Tracker is its own app: https://dailuo-source.github.io/SKA-Kata-Tracker/ (repo `Dailuo-source/SKA-Kata-Tracker`, see its CLAUDE.md). `KATA_URL` in `index.html` is its Apps Script web app; `?api=summary` returns every dojo kata with its rank belt, handbook **Learned at** belt and how many active members still need it (counts only, no names). `KATA_SITE` is the app's address.
 - In a section whose name contains "kata", **Add from library** has two tabs: **Exercises** and **Dojo kata**. Dojo kata default to the handbook ones (those with a Learned at belt), sorted by how many students still need them; tapping one adds it as a one-off 10-min item named after the kata (tap again to remove). The summary is cached in `skal.kata` and refreshed on open and whenever the app comes back to the foreground.
 - Review mode shows **Update kata progress** for every dojo kata in the plan (matched by name). It opens `KATA_SITE?kata=<name>&from=planner` in a new tab, which goes straight to that kata, asks for the instructor password if needed, and lists the students who still need it; its back button closes the tab.
 

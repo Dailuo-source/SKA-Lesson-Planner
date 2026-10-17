@@ -480,7 +480,7 @@ const kataGroup=k=>String(k.learnedAt||k.belt||"").trim();         // e.g. "Gree
 const kataBelt=k=>kataGroup(k).split(/[\/,]/)[0].trim();            // its first belt
 const kataWhen=k=>k.learnedAt?"Learned at "+k.learnedAt:(k.belt?k.belt+" belt kata":"");
 const kataNeed=k=>`${k.need} ${k.need===1?"student still needs":"students still need"} it`;
-const KATA_SITE="https://ska-kata-tracker.pages.dev/"; // the Kata Tracker app (its data feed is KATA_URL)
+const KATA_SITE="https://dailuo-source.github.io/SKA-Kata-Tracker/"; // the Kata Tracker app (its data feed is KATA_URL)
 const kataLink=name=>KATA_SITE+"?kata="+encodeURIComponent(name)+"&from=planner";
 function usage(){const m={};S.items.forEach(i=>{if(!i.exercise)return;(m[i.exercise]=m[i.exercise]||new Set()).add(i.plan);});return m;}
 
