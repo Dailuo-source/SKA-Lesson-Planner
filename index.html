@@ -232,6 +232,21 @@ ul.vpts.mine{color:var(--red-d)}
 .qtime{font-size:12px;font-weight:800;color:#7A5A00;flex:none}
 .qform{display:flex;gap:8px;align-items:center}
 .qform .inp{height:44px;flex:1;min-width:0}
+.qnlist li .qacts{flex-basis:100%;display:flex;gap:6px;padding:0 0 4px}
+.qnlist li.wrap{flex-wrap:wrap}
+.qlib{border:0;background:#fff;border-radius:10px;min-height:34px;padding:0 10px;font-size:13px;font-weight:800;color:var(--ink);display:inline-flex;align-items:center;gap:6px;box-shadow:inset 0 0 0 1.5px var(--line2)}
+.qlib svg{width:16px;height:16px}
+.qlib.done{box-shadow:none;background:#DDF3EF;color:#0F5E54}
+.rvhead{padding:16px}
+.rvhead h2{margin:0 0 2px;font-family:var(--f-d);font-size:18px;font-weight:800}
+.rvsum{display:flex;gap:8px;flex-wrap:wrap}
+.rvsum span{font-size:13px;font-weight:800;padding:6px 10px;border-radius:12px;background:var(--sunk);color:var(--ink)}
+.rvsum span.on{background:var(--red-tint);color:var(--red-d)}
+.rex{padding:12px 14px;border-left:5px solid}
+.rex .vex-top h3{font-size:16px}
+.rex.quiet{padding-top:10px;padding-bottom:10px}
+.rvlist{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.rvlist li{display:flex;align-items:center;gap:8px;background:var(--red-tint);border-radius:10px;padding:2px 2px 2px 12px;font-size:15px;overflow-wrap:anywhere}
 .lead{margin:0;font-weight:600;color:var(--ink2)}
 .gwrap{display:flex;justify-content:center;min-height:44px}
 .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-weight:700;font-size:13px}
@@ -279,7 +294,7 @@ const ICON={
   more:svg('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',1.4),
   copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
-  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
+  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
 };
 
 /* ---------- dates and times ---------- */
@@ -372,7 +387,7 @@ function normalize(st){
   st=st||{};const str=v=>String(v==null?"":v).trim();const num=(v,d)=>v==null||v===""||isNaN(+v)?d:+v;
   return{
     lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),inNew:str(r.inNew)})),
-    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
+    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
     items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy)})),
     exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),notes:str(r.notes),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
   };
@@ -420,6 +435,10 @@ const secItems=(p,sec)=>itemsOf(p.id).filter(i=>eqi(i.section,sec));
 const secTotal=(p,sec)=>isSkipped(p,sec)?0:secItems(p,sec).reduce((a,i)=>a+(i.minutes||0),0);
 const planTotal=p=>planSections(p).reduce((a,s)=>a+secTotal(p,s),0);
 const planTitle=p=>p.focus||(p.type?p.type+" class":"Class plan");
+const isPast=p=>!!p.date&&p.date<keyMs(todayKey())-12*3600e3;
+const ptLines=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*•\s*/,"").trim()).filter(Boolean);
+const ptJoin=a=>a.map(l=>"• "+l).join("\n");
+const noteCount=p=>itemsOf(p.id).reduce((a,i)=>a+ptLines(i.live).length,0)+ptLines(p.review).length;
 function touchPlan(pid){if(planById(pid))store.update("plans",pid,{editedBy:who(),updated:Date.now()});}
 function addItem(p,sec,ex,extra){
   const sections=planSections(p);const data={};
@@ -438,7 +457,8 @@ function usage(){const m={};S.items.forEach(i=>{if(!i.exercise)return;(m[i.exerc
    On the home screen, back once shows "Press back again to exit".
    ===================================================================== */
 let needGuard=true;
-/* A plan is either being taught from (view) or changed (edit). New and copied plans open in edit mode. */
+/* A plan is taught from (view), changed (edit) or looked back on after class (review).
+   New and copied plans open in edit mode; past classes open in review. */
 let planMode="view",editFromView=false;
 const stateNow=()=>({t:tab,p:PLAN,m:planMode});
 function go(t,plan,mode){
@@ -454,7 +474,7 @@ window.addEventListener("popstate",e=>{
   if(sheet&&!s.sheet)hideSheet();
   if(!sheet&&s.sheet){history.replaceState(Object.assign({},s,{sheet:0}),"");}
   if(s.p!==undefined&&s.p!==PLAN){PLAN=s.p;LS.set("plan",PLAN);}
-  const modeChanged=!!s.m&&s.m!==planMode;if(s.m)planMode=s.m;if(planMode==="view")editFromView=false;
+  const modeChanged=!!s.m&&s.m!==planMode;if(s.m)planMode=s.m;if(planMode!=="edit")editFromView=false;
   const changed=(s.t&&s.t!==tab)||(modeChanged&&tab==="plan");
   if(s.t)tab=s.t;
   if(s.root){needGuard=true;if(!hadSheet)toast("Press back again to exit");}
@@ -500,10 +520,11 @@ function planCard(p,next){
   const len=p.length||105,tot=planTotal(p),scale=Math.max(len,tot)||1;
   const segs=planSections(p).map(s=>{const m=secTotal(p,s);return m?`<span style="width:${(m/scale*100).toFixed(2)}%;background:${secColour(s)}"></span>`:"";}).join("");
   const edited=p.editedBy?` · last edited by ${esc(p.editedBy)}`:"";
+  const nc=noteCount(p),notes=nc?` · ${nc} ${nc===1?"note":"notes"}`:"";
   return`<div class="card plan${next?" next":""}">
     <button type="button" class="body" data-act="openPlan" data-id="${esc(p.id)}">
       <span class="row" style="gap:8px;flex-wrap:wrap"><span class="t">${esc(planTitle(p))}</span>${p.type?`<span class="tag dark">${esc(p.type)}</span>`:""}${next?`<span class="tag red">Next class</span>`:""}</span>
-      <span class="l">${esc(fmtDay(p.date))} · ${fmtHM(tot)} of ${fmtHM(len)}${edited}</span>
+      <span class="l">${esc(fmtDay(p.date))} · ${fmtHM(tot)} of ${fmtHM(len)}${notes}${edited}</span>
       <span class="bar thin" style="margin-top:4px">${segs}</span>
     </button>
     <button type="button" class="iconbtn round" data-act="copyPlan" data-id="${esc(p.id)}" aria-label="Copy ${esc(planTitle(p))} to a new date">${ICON.copy}</button>
@@ -548,6 +569,7 @@ function itemHTML(p,it,col){
 }
 function viewPlan(){
   const p=planById(PLAN);
+  if(p&&planMode==="review")return viewReview(p);
   if(p&&planMode!=="edit")return viewTeach(p);
   if(!p)return`<div class="stack"><h1>This class</h1><div class="card empty"><p>No class open. Pick one from your plans or start a new one.</p><div class="btnrow"><button type="button" class="btn outline" data-act="tab" data-tab="plans">See plans</button><button type="button" class="btn primary" data-act="newPlan">${ICON.plus}New plan</button></div></div></div>`;
   const len=p.length||105,tot=planTotal(p),diff=len-tot,scale=Math.max(len,tot)||1;
@@ -590,7 +612,8 @@ function viewPlan(){
 
 /* ---------- Teaching view: everything needed while running the class ---------- */
 const clock=m=>Math.floor(m/60)+":"+pad(m%60);
-const qnLines=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*•\s*/,"").trim()).filter(Boolean);
+const qnLines=ptLines;
+const splitQn=x=>{const m=x.match(/^(\d{1,2}:\d{2}\s*[ap]\.?m\.?)\s*[·-]\s*(.*)$/i);return m?{t:m[1],x:m[2]}:{t:"",x:x};};
 function viewTeach(p){
   const len=p.length||105,tot=planTotal(p);
   let at=0,any=false;
@@ -623,8 +646,58 @@ function viewTeach(p){
         <div class="small" style="margin-top:4px">${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}</div></div>
       <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: edit, date, focus, copy, delete">${ICON.more}</button>
     </div>
-    ${any?secs:`<div class="card empty"><p>Nothing planned yet.</p><button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button></div>`}
+    ${any?secs+`<button type="button" class="btn outline block" data-act="setMode" data-m="review">${ICON.review}Class done? Review the notes</button>`:`<div class="card empty"><p>Nothing planned yet.</p><button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button></div>`}
   </div>`;
+}
+
+/* ---------- Review: after class, every note from the class in one place ---------- */
+function viewReview(p){
+  const rv=ptLines(p.review);let qnTotal=0,withNotes=0;
+  const secs=planSections(p).filter(s=>!isSkipped(p,s)).map((s,si)=>{
+    const col=secColour(s),its=secItems(p,s);if(!its.length)return"";
+    const cards=its.map(it=>{
+      const lib=exById(it.exercise),mine=toPoints(it.note),qn=qnLines(it.live);qnTotal+=qn.length;if(qn.length)withNotes++;
+      const inLib=new Set(lib?toPoints(lib.notes).map(x=>x.toLowerCase()):[]);
+      return`<article class="card rex${qn.length||mine.length?"":" quiet"}" style="border-left-color:${col}">
+        <div class="vex-top"><h3>${esc(it.name)}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span></div>
+        ${mine.length?`<div class="vlabel">Planned notes</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+        ${qn.length?`<div class="vlabel">Quick notes</div><ul class="qnlist">${qn.map((x,i)=>{const q=splitQn(x),there=inLib.has(q.x.toLowerCase());
+          return`<li class="${lib?"wrap":""}">${q.t?`<span class="qtime">${esc(q.t)}</span>`:""}<span class="grow">${esc(q.x)}</span><button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>
+            ${lib?`<span class="qacts">${there?`<span class="qlib done">${ICON.check}In the library notes</span>`:`<button type="button" class="qlib" data-act="qnToLib" data-id="${esc(it.id)}" data-i="${i}">${ICON.book}Add to library notes</button>`}</span>`:""}</li>`;}).join("")}</ul>`:""}
+        <form class="qform" data-id="${esc(it.id)}" style="margin-top:8px"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add a note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Add a note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add a note for ${esc(it.name)}">${ICON.plus}</button></form>
+      </article>`;}).join("");
+    return`<section class="vsec">
+      <div class="vsec-h" style="border-color:${col}"><div class="badge" style="background:${col}">${si+1}</div><h2 class="grow">${esc(s)}</h2></div>
+      ${cards}
+    </section>`;
+  }).join("");
+  const sum=[`<span class="${qnTotal?"on":""}">${qnTotal} quick ${qnTotal===1?"note":"notes"}</span>`,`<span>${withNotes} of ${itemsOf(p.id).length} exercises noted</span>`,`<span class="${rv.length?"on":""}">${rv.length} after-class ${rv.length===1?"note":"notes"}</span>`].join("");
+  return`<div class="stack">
+    <div class="row" style="align-items:flex-start">
+      <div class="grow"><div class="kicker">Class review · ${esc(fmtLongDay(p.date))}</div><h1>${esc(planTitle(p))}</h1>
+        <div class="small" style="margin-top:4px">${p.type?esc(p.type)+" · ":""}${fmtHM(planTotal(p))} planned</div></div>
+      <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: teaching view, edit, copy, delete">${ICON.more}</button>
+    </div>
+    <div class="rvsum">${sum}</div>
+    <section class="card rvhead">
+      <h2>After class</h2><p class="small" style="margin:0">How it went, and what to change next time.</p>
+      ${rv.length?`<ul class="rvlist">${rv.map((x,i)=>`<li><span class="grow">${esc(x)}</span><button type="button" class="iconbtn" data-act="delRv" data-i="${i}" aria-label="Delete this note">${ICON.x}</button></li>`).join("")}</ul>`:""}
+      <form class="rform qform" data-id="${esc(p.id)}" style="margin-top:10px"><label for="rv-${esc(p.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add an after-class note</label><input class="inp keepval" id="rv-${esc(p.id)}" name="q" type="text" placeholder="e.g. Kids need more kumite time" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add after-class note">${ICON.plus}</button></form>
+    </section>
+    <button type="button" class="btn primary block" data-act="shareNotes">${ICON.share}Share or copy all notes</button>
+    ${secs||`<div class="card empty"><p>No exercises in this plan.</p></div>`}
+  </div>`;
+}
+function notesText(p){
+  const out=[`SKA class review: ${planTitle(p)}`,`${fmtLongDay(p.date)}${p.type?" · "+p.type:""}`];
+  const rv=ptLines(p.review);if(rv.length){out.push("","After class");rv.forEach(x=>out.push("• "+x));}
+  planSections(p).filter(s=>!isSkipped(p,s)).forEach(s=>{
+    const its=secItems(p,s).filter(it=>qnLines(it.live).length||toPoints(it.note).length);if(!its.length)return;
+    out.push("",s);
+    its.forEach(it=>{out.push(`${it.name} (${it.minutes} min)`);toPoints(it.note).forEach(x=>out.push("  • Planned: "+x));qnLines(it.live).forEach(x=>{const q=splitQn(x);out.push("  • "+(q.t?q.t+" · ":"")+q.x);});});
+  });
+  if(out.length===2)out.push("","No notes yet.");
+  return out.join("\n");
 }
 
 /* ---------- Library ---------- */
@@ -815,6 +888,8 @@ function renderSheet(){
     case"confirm":
       h=`<div class="ring" aria-hidden="true">${ICON.trash}</div><h2 id="sheetTitle">${esc(s.title)}</h2><p>${esc(s.text)}</p>
         <div class="btnrow"><button type="button" class="btn outline" data-act="closeSheet" data-focus>Keep</button><button type="button" class="btn primary" data-act="${s.act}" data-id="${esc(s.id)}">${esc(s.yes)}</button></div>`;break;
+    case"notesText":{const p=planById(PLAN);if(!p)break;
+      h=sheetHead("All notes")+`<p class="small" style="margin:-6px 0 10px">Select all and copy, then paste wherever you keep notes.</p><textarea class="inp" id="notesBox" readonly style="width:100%;min-height:50vh;padding:12px;line-height:1.45;font-size:14px" data-focus>${esc(notesText(p))}</textarea>`;break;}
     case"item":h=sheetItem(s);break;
     case"pick":h=sheetPick(s);break;
     case"ex":h=sheetEx(s);break;
@@ -824,6 +899,7 @@ function renderSheet(){
     case"planMenu":{const p=planById(PLAN);if(!p){h=sheetHead("Plan");break;}
       h=sheetHead(esc(planTitle(p)),`<div class="small">${esc(fmtLongDay(p.date))}</div>`)+`<div class="menu">
         ${planMode==="edit"?`<button type="button" class="btn primary block" data-act="savePlan" data-focus>${ICON.check}Save plan</button>`:`<button type="button" class="btn primary block" data-act="editPlan" data-focus>${ICON.edit}Edit plan</button>`}
+        ${planMode==="review"?`<button type="button" class="btn ghost block" data-act="setMode" data-m="view">${ICON.list}Teaching view</button>`:planMode==="view"?`<button type="button" class="btn ghost block" data-act="setMode" data-m="review">${ICON.review}Review class</button>`:""}
         <button type="button" class="btn ghost block" data-act="planInfo">${ICON.cal}Change date or focus</button>
         <button type="button" class="btn ghost block" data-act="copyPlan" data-id="${esc(p.id)}">${ICON.copy}Copy to a new date</button>
         <button type="button" class="btn danger block" data-act="askDelPlan">${ICON.trash}Delete this plan</button></div>`;break;}
@@ -962,7 +1038,18 @@ document.addEventListener("click",e=>{
     case"toastAct":{const a=toastFns[+t.dataset.i];hideToast();if(a)a.fn();break;}
     case"pfilter":plansFilter=t.dataset.v;LS.set("pfilter",plansFilter);renderView();break;
     case"lfilter":libFilter=t.dataset.v;renderView();break;
-    case"openPlan":editFromView=false;go("plan",t.dataset.id,"view");break;
+    case"openPlan":{editFromView=false;const op=planById(t.dataset.id);go("plan",t.dataset.id,op&&isPast(op)?"review":"view");break;}
+    case"setMode":{const m=t.dataset.m;if(sheet){hideSheet();planMode=m;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}else go("plan",undefined,m);break;}
+    case"qnToLib":{const it=itemById(t.dataset.id);const lib=it&&exById(it.exercise);if(!lib)break;const q=qnLines(it.live)[+t.dataset.i];if(q==null)break;
+      const txt=splitQn(q).x,before=lib.notes;const pts=toPoints(lib.notes);if(!pts.some(x=>eqi(x,txt)))pts.push(txt);
+      store.update("exercises",lib.id,{notes:fromPoints(pts),editedBy:who(),updated:Date.now()});
+      toast(`Added to ${lib.name}’s notes in the library`,[{label:"Undo",fn:()=>{store.update("exercises",lib.id,{notes:before});}}]);break;}
+    case"delRv":{if(!p)break;const lines=ptLines(p.review);const i=+t.dataset.i;const gone=lines[i];if(gone==null)break;
+      lines.splice(i,1);store.update("plans",p.id,{review:ptJoin(lines)});
+      toast("Note deleted",[{label:"Undo",fn:()=>{const pp=planById(p.id);if(!pp)return;const cur=ptLines(pp.review);cur.splice(i,0,gone);store.update("plans",p.id,{review:ptJoin(cur)});}}]);break;}
+    case"shareNotes":{if(!p)break;const text=notesText(p);
+      const fallback=()=>{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(text).then(()=>toast("All notes copied. Paste them wherever you like."),()=>openSheet({type:"notesText"}));else openSheet({type:"notesText"});};
+      if(navigator.share)navigator.share({title:"Class review: "+planTitle(p),text}).catch(err=>{if(!err||err.name!=="AbortError")fallback();});else fallback();break;}
     case"newPlan":openSheet({type:"newPlan"});break;
     case"copyPick":openSheet({type:"copyPick"});break;
     case"copyPlan":if(sheet)swapSheet({type:"copy",id:t.dataset.id});else openSheet({type:"copy",id:t.dataset.id});break;
@@ -1077,6 +1164,9 @@ document.addEventListener("submit",e=>{
       $("#pwMsg").textContent=(res&&res.message)||"Couldn’t save. Try again.";
     }).catch(()=>{btn.disabled=false;$("#pwMsg").textContent="Can’t reach the dojo sheet. Check your connection and try again.";});
     return;}
+  if(f.classList.contains("rform")){const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!p||!txt)return;
+    const lines=ptLines(p.review);lines.push(txt);inp.value="";store.update("plans",p.id,{review:ptJoin(lines)});
+    setTimeout(()=>{const ni=document.getElementById("rv-"+p.id);if(ni)ni.focus({preventScroll:true});},0);return;}
   if(f.classList.contains("qform")){const it=itemById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!it||!txt)return;
     const time=new Date().toLocaleTimeString("en-CA",{hour:"numeric",minute:"2-digit"});
     const lines=qnLines(it.live);lines.push(time+" · "+txt);inp.value="";
