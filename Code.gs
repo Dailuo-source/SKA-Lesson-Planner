@@ -54,6 +54,7 @@ const SCHEMA = {
       ['length', 'Length (min)', 'num', 95],
       ['sections', 'Sections (in order)', 'list', 380],
       ['skipped', 'Skipped sections', 'list', 200],
+      ['review', 'After-class notes', 'text', 280],
       ['addedBy', 'Added by', 'text', 120],
       ['editedBy', 'Last edited by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
@@ -668,7 +669,7 @@ function buildTab_(ss, sch) {
     if (type === 'date') rng.setNumberFormat('ddd mmm d, yyyy');
     if (type === 'datetime') rng.setNumberFormat('mmm d, yyyy h:mm am/pm');
     if (field === 'value') rng.setNumberFormat('@');
-    if (field === 'note' || field === 'notes' || field === 'live' || field === 'description' || field === 'sections') rng.setWrap(true);
+    if (field === 'note' || field === 'notes' || field === 'live' || field === 'review' || field === 'description' || field === 'sections') rng.setWrap(true);
     if (w) sh.setColumnWidth(col, w);
     // The password column stays visible so it can be cleared to reset someone; the salt is hidden.
     if (field === 'id' || field === 'salt') sh.hideColumns(col);
