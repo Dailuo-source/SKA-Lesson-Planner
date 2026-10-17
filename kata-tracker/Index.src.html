@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+/* SKA Kata Tracker. Same look as the SKA Lesson Planner: red header with the dojo logo,
+   black secondary, white cards on a light grey page (Gary's choice), bottom tab bar. */
+:root{
+  --red:#C8102E; --red-d:#A00D25; --red-soft:#FDE7EA; --red-tint:#FDF1F2;
+  --ink:#111111; --ink2:#3A3A3A; --muted:#5E5E5E; --line:#E2E2E2; --line2:#D6D6D6; --sunk:#F5F5F5;
+  --bg:#ECECEA; --card:#FFFFFF;
+  --f-d:"M PLUS Rounded 1c","Avenir Next",system-ui,sans-serif;
+  --f-b:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --tabh:66px; color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--red-d)}
+:focus-visible{outline:3px solid rgba(200,16,46,.5);outline-offset:2px}
+svg{flex:none}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Header */
+.top{position:sticky;top:0;z-index:20;background:var(--red);color:#fff;padding:calc(8px + env(safe-area-inset-top)) 12px 8px 14px}
+.top-in{display:flex;align-items:center;gap:10px;max-width:640px;margin:0 auto}
+.logo{width:46px;height:46px;border-radius:50%;background:#fff;object-fit:contain;padding:2px;flex:none}
+.brand{flex:1;min-width:0}
+.brand b{display:block;font-family:var(--f-d);font-weight:800;font-size:18px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;font-size:12px;font-weight:700;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbtn{height:40px;padding:0 12px;border-radius:20px;border:1.5px solid #fff;background:transparent;color:#fff;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none}
+.hbtn.on{background:#fff;color:var(--red)}
+.hbtn.icon{width:40px;padding:0;justify-content:center}
+.hbtn svg{width:16px;height:16px}
+
+/* Page */
+main{max-width:640px;margin:0 auto;padding:18px 16px calc(var(--tabh) + 40px + env(safe-area-inset-bottom))}
+h1{font-family:var(--f-d);font-weight:800;font-size:26px;line-height:1.2;margin:0}
+.sub{font-size:13px;font-weight:700;color:var(--muted);margin-top:2px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px}
+.pad{padding:16px}
+.search{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-radius:24px;border:1.5px solid var(--line2);background:#fff}
+.search svg{width:20px;height:20px;color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border-radius:22px;border:1.5px solid var(--line2);background:#fff;font-size:14px;font-weight:800;color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--red);border-color:var(--red);color:#fff}
+.chip.dark[aria-pressed=true]{background:var(--ink);border-color:var(--ink)}
+.dot{width:14px;height:14px;border-radius:7px;flex:none;display:inline-block;box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.22)}
+.dot.lg{width:22px;height:22px;border-radius:11px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:12px;white-space:nowrap;background:#fff;border:1.5px solid var(--line2);color:var(--ink)}
+.tag.red{background:var(--red);border-color:var(--red);color:#fff}
+.tag.ink{background:var(--ink);border-color:var(--ink);color:#fff}
+.tag.soft{background:var(--sunk);border-color:var(--sunk);color:var(--ink2);font-weight:700}
+.tag.need{background:var(--red-soft);border-color:var(--red-soft);color:#8E0B21}
+.tag svg{width:14px;height:14px}
+.bar{height:8px;border-radius:4px;background:#EFEFEF;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ink);border-radius:4px}
+.bar.red>i{background:var(--red)}
+.bar.big{height:12px;border-radius:6px}
+
+/* Belt groups and rows */
+.group{overflow:hidden}
+.ghead{width:100%;min-height:56px;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 16px;border:0;background:#FAFAFA;text-align:left}
+.ghead .t{font-family:var(--f-d);font-size:16px;font-weight:800}
+.ghead .s{display:block;font-size:12.5px;font-weight:700;color:var(--muted)}
+.ghead svg.chev{width:20px;height:20px;color:var(--ink2)}
+.ghead.static{cursor:default}
+.mrow{display:flex;flex-direction:column;gap:6px;width:100%;padding:12px 16px;border:0;border-top:1px solid #ECECEC;background:transparent;text-align:left;color:var(--ink)}
+.mrow:active,.krow:active{background:#F7F7F7}
+.mrow .n{flex:1;min-width:0;font-size:16px;font-weight:800}
+.mrow .c{font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.krow{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:8px 12px 8px 16px;border:0;border-top:1px solid #ECECEC;background:transparent;text-align:left;color:var(--ink)}
+.krow .n{font-size:15.5px;font-weight:800}
+.krow .s{display:block;font-size:12.5px;font-weight:700;color:var(--muted)}
+.krow .need{color:#8E0B21}
+.krow svg.go{width:16px;height:16px;color:var(--muted)}
+
+/* Statuses */
+.st{font-size:12.5px;font-weight:800;padding:5px 10px;border-radius:12px;white-space:nowrap;border:1.5px solid transparent;flex:none;line-height:1.3}
+.st-none{background:#fff;color:var(--muted);border:1.5px dashed #9A9A9A}
+.st-0{background:#FCEBDD;color:#8A3F0C;border-color:#FCEBDD}
+.st-1{background:#E3EBFB;color:#1F4BA5;border-color:#E3EBFB}
+.st-2{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.st{min-height:36px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+button.st svg{width:14px;height:14px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.seg button{min-height:44px;border-radius:14px;border:1.5px solid var(--line2);background:#fff;font-size:14px;font-weight:800;color:var(--ink2)}
+.seg button.on0{background:#FCEBDD;color:#8A3F0C;border-color:#E8A877}
+.seg button.on1{background:#E3EBFB;color:#1F4BA5;border-color:#8FAEEA}
+.seg button.on2{background:var(--ink);color:#fff;border-color:var(--ink)}
+.seg button:disabled{opacity:.55}
+.pcard{padding:12px 12px 12px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* Stats */
+.big{font-family:var(--f-d);font-size:34px;font-weight:800;line-height:1}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{border-radius:14px;padding:10px 12px;display:flex;flex-direction:column}
+.tile b{font-family:var(--f-d);font-size:22px;font-weight:800;line-height:1.2}
+.tile span{font-size:12.5px;font-weight:800}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:var(--red-soft);color:#8E0B21;font-size:14px;font-weight:800}
+.alert svg{width:20px;height:20px;margin-top:1px}
+.alert.ok{background:var(--red);color:#fff}
+
+.back{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 2px;margin:-8px 0 -4px -2px;border:0;background:none;font-size:15px;font-weight:800;color:var(--ink);align-self:flex-start}
+.back svg{width:20px;height:20px}
+.textbtn{border:0;background:none;font-weight:800;color:var(--ink2);min-height:44px;padding:0 10px}
+.empty{text-align:center;color:var(--muted);padding:28px 16px;font-weight:700}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12.5px;font-weight:700;color:var(--muted);margin-top:8px}
+.linkbtn{border:0;background:none;padding:8px 0;font-weight:800;color:var(--ink2);text-decoration:underline;font-size:12.5px}
+.err{background:var(--red-soft);color:var(--red-d);border-radius:14px;padding:12px 14px;font-weight:700}
+.skel{height:64px;border-radius:20px;background:linear-gradient(90deg,#E2E2E0 25%,#EFEFED 50%,#E2E2E0 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.hint{font-size:12.5px;font-weight:700;color:var(--muted);margin:0 4px}
+
+/* Bottom tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+.tabs-in{display:grid;gap:4px;max-width:640px;margin:0 auto}
+.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:16px;font-size:12px;font-weight:700;color:var(--ink2);min-height:52px}
+.tabs button[aria-current=page]{background:var(--red);color:#fff;font-weight:800}
+.tabs svg{width:22px;height:22px}
+
+/* Sheets, confirm and toast */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:12px 18px calc(22px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+@media (min-width:600px){.scrim{align-items:center}.sheet{border-radius:24px}}
+.grab{width:44px;height:5px;border-radius:3px;background:#E2DCEA;margin:0 auto 12px}
+.sheet h2{margin:0;font-family:var(--f-d);font-size:22px;font-weight:800;line-height:1.25}
+.sheet p{margin:6px 0 14px;color:var(--ink2);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-size:13px;font-weight:800;color:var(--muted)}
+.inp{height:48px;padding:0 14px;border:1.5px solid var(--line2);border-radius:14px;font-size:16px;background:#fff}
+.check{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;font-weight:700}
+.check input{width:20px;height:20px;accent-color:var(--red)}
+.btnrow{display:flex;gap:10px}
+.btn{flex:1;min-height:48px;border-radius:16px;border:1.5px solid var(--line2);background:#fff;font-size:15px;font-weight:800}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn:disabled{opacity:.6}
+.opts{display:flex;flex-direction:column;gap:8px;margin:14px 0 4px}
+.opt{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;border-radius:16px;border:1.5px solid #EEE8F3;background:#fff;text-align:left;font-size:16px;font-weight:800}
+.opt.cur{border:3px solid var(--ink)}
+.opt .sw{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.opt .cur-l{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.ferr{color:var(--red-d);font-size:13px;font-weight:700;min-height:18px;margin:4px 0 8px}
+.float{position:fixed;left:12px;right:12px;bottom:calc(var(--tabh) + 22px + env(safe-area-inset-bottom));z-index:45;max-width:616px;margin:0 auto;background:var(--ink);color:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.confirm{padding:16px;display:flex;flex-direction:column;gap:12px}
+.confirm .q{font-size:15px;font-weight:800;line-height:1.35}
+.confirm .btn{border-color:#5E5E5E;background:transparent;color:#fff}
+.confirm .btn.primary{background:var(--red);border-color:var(--red)}
+.toast{padding:6px 6px 6px 16px;display:flex;align-items:center;gap:10px;min-height:56px}
+.toast .m{flex:1;font-size:14px;font-weight:800}
+.toast .ok{width:20px;height:20px;color:#7FD98F}
+.toast .undo{min-height:44px;padding:0 16px;border-radius:14px;border:0;background:#fff;color:var(--red);font-size:15px;font-weight:800}
+.toast.bad{background:var(--red)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <img class="logo" alt="Scarborough Academy of Karate" src="__LOGO__">
+    <div class="brand"><b>SKA Kata Tracker</b><small id="dojoName">Loading…</small></div>
+    <button class="hbtn" id="lockBtn" type="button"></button>
+  </div>
+</header>
+
+<main id="app">
+  <div class="stack"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+</main>
+
+<nav class="tabs" id="tabs" aria-label="Sections"><div class="tabs-in" id="tabsIn"></div></nav>
+
+<div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div></div>
+<div class="float" id="float" hidden></div>
+
+<script>
+(function () {
+'use strict';
+
+var PLANNER_URL = 'https://ska-lesson-planner.pages.dev/';
+var CATEGORIES = ['All', 'Solo', 'Multi-person', 'Weapon'];
+
+var state = {
+  data: null,
+  tab: 'members',          // members | kata | ready
+  member: null,            // open member's name
+  kata: null,              // open kata's name
+  query: '',
+  category: 'All',
+  showHigher: false,
+  collapsed: {},           // belt name -> true when its group is folded
+  kataView: 'need',        // instructor list on a kata: need | all
+  showNotStarted: false,
+  readyBelt: 'All',
+  fromPlanner: false,
+  pin: null,
+  instructor: '',
+  sheetUrl: null
+};
+var pending = null;        // a status change waiting for "Yes, save"
+var lastSave = null;       // the change the Undo button reverses
+
+var $ = function (id) { return document.getElementById(id); };
+var app = $('app');
+
+/* ---------- icons ---------- */
+function svg(p, w) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+var ICON = {
+  lock: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', 2.4),
+  open: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/>', 2.4),
+  people: svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.6-5.5 6.5-5.5s5.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5c1.6.8 2.6 2.6 3 5.5"/>'),
+  book: svg('<path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h10"/>'),
+  trophy: svg('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/>'),
+  back: svg('<path d="M15 5l-7 7 7 7"/>', 2.4),
+  go: svg('<path d="M9 5l7 7-7 7"/>', 2.4),
+  up: svg('<path d="M6 15l6-6 6 6"/>', 2.4),
+  down: svg('<path d="M6 9l6 6 6-6"/>', 2.4),
+  search: svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'),
+  check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 2.6),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/>', 2.2),
+  sheet: svg('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/>'),
+  arrow: svg('<path d="M5 12h14M13 6l6 6-6 6"/>', 2.6)
+};
+
+/* ---------- server calls ---------- */
+function call(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return new Promise(function (resolve, reject) {
+    var r = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject);
+    r[fn].apply(r, args);
+  });
+}
+function errMsg(e) { return (e && e.message) ? e.message.replace(/^Exception:\s*/, '') : String(e); }
+
+/* ---------- small helpers ---------- */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function store(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+function recall(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function first(name) { return String(name).split(' ')[0]; }
+
+function belts() { return state.data.belts; }
+function beltIndex(name) {
+  var b = belts(), n = String(name || '').trim().toLowerCase();
+  for (var i = 0; i < b.length; i++) if (b[i].name.toLowerCase() === n) return i;
+  return -1;
+}
+/** "Blue/Purple" -> the lowest belt it names. */
+function looseIndex(text) {
+  var best = -1;
+  String(text || '').split(/[\/,&]| or | and /i).forEach(function (p) {
+    var i = beltIndex(p);
+    if (i >= 0 && (best === -1 || i < best)) best = i;
+  });
+  return best;
+}
+function beltColor(name) { var i = beltIndex(name); return i >= 0 ? belts()[i].color : '#CCCCCC'; }
+function dot(name, lg) { return '<span class="dot' + (lg ? ' lg' : '') + '" style="background:' + esc(beltColor(name)) + '"></span>'; }
+function nextBelt(name) { var i = beltIndex(name); return i >= 0 && i < belts().length - 1 ? belts()[i + 1].name : ''; }
+
+function statuses() { return state.data.statuses; }
+function statusIndex(s) { return s ? statuses().indexOf(s) : -1; }
+// The first status is "in progress"; every status after it counts as knowing the kata.
+function isKnown(s) { var i = statusIndex(s); return statuses().length > 1 ? i >= 1 : i >= 0; }
+function statusOf(member, kata) { var p = state.data.progress[member]; return (p && p[kata]) || ''; }
+function stClass(s) { var i = statusIndex(s); return i < 0 ? 'st-none' : 'st-' + Math.min(i, 2); }
+function stPill(s) { return '<span class="st ' + stClass(s) + '">' + esc(s || 'Not started') + '</span>'; }
+
+/** The belt a kata is expected at: its handbook "Learned at" belt, else its rank. */
+function expectedIndex(k) { var l = looseIndex(k.learnedAt); return l >= 0 ? l : beltIndex(k.belt); }
+function learnedIndex(k) { return looseIndex(k.learnedAt); }
+function kataByName(n) { return state.data.kata.filter(function (k) { return k.name === n; })[0]; }
+function memberByName(n) { return state.data.members.filter(function (m) { return m.name === n; })[0]; }
+function inCategory(k) { return state.category === 'All' || k.category === state.category; }
+function matches(q, text) { return !q || String(text).toLowerCase().indexOf(q.toLowerCase()) !== -1; }
+
+/** Kata a member is expected to know by now (at or below their belt). */
+function expectedKata(m) {
+  var bi = beltIndex(m.belt);
+  return state.data.kata.filter(function (k) { var e = expectedIndex(k); return e >= 0 && e <= bi; });
+}
+function knownCount(m, list) { return list.filter(function (k) { return isKnown(statusOf(m.name, k.name)); }).length; }
+
+/**
+ * Belt readiness (instructors only): every kata the handbook lists for the member's belt
+ * and below must be at Knows or better. null when the handbook lists nothing to check.
+ */
+function readiness(m) {
+  var bi = beltIndex(m.belt), next = nextBelt(m.belt);
+  if (bi < 0 || !next) return null;
+  var req = state.data.kata.filter(function (k) { var l = learnedIndex(k); return l >= 0 && l <= bi; });
+  if (!req.length) return null;
+  var missing = req.filter(function (k) { return !isKnown(statusOf(m.name, k.name)); });
+  return { next: next, required: req, have: req.length - missing.length, missing: missing, ready: !missing.length };
+}
+/** Members who should know this kata by now and don't yet. */
+function stillNeed(k) {
+  var from = expectedIndex(k);
+  if (from < 0) return [];
+  return state.data.members.filter(function (m) {
+    return beltIndex(m.belt) >= from && !isKnown(statusOf(m.name, k.name));
+  });
+}
+function byBeltDesc(a, b) { return (beltIndex(b.belt) - beltIndex(a.belt)) || a.name.localeCompare(b.name); }
+
+/* ---------- navigation (the phone's back button steps back through screens) ---------- */
+var hist = (window.google && google.script && google.script.history) ? google.script.history : null;
+function snapshot() { return { tab: state.tab, member: state.member || '', kata: state.kata || '' }; }
+function go(tab, member, kata) {
+  state.tab = tab; state.member = member || null; state.kata = kata || null; state.query = '';
+  state.showNotStarted = false; state.needList = null;
+  if (kata) state.kataView = state.pin && stillNeed(kataByName(kata) || { learnedAt: '', belt: '' }).length ? 'need' : 'all';
+  try { if (hist) hist.push(snapshot()); } catch (e) {}
+  render(); scrollTop();
+}
+if (hist) {
+  try {
+    hist.setChangeHandler(function (e) {
+      var s = (e && e.state) || { tab: 'members' };
+      state.tab = s.tab || 'members'; state.member = s.member || null; state.kata = s.kata || null; state.needList = null;
+      closeSheet(true); render(); scrollTop();
+    });
+  } catch (e) {}
+}
+function scrollTop() { try { window.scrollTo(0, 0); } catch (e) {} }
+
+/* ---------- render ---------- */
+function render() {
+  renderHeader();
+  renderTabs();
+  if (!state.data) return;
+  if (state.tab === 'ready' && !state.pin) state.tab = 'members';
+  var html;
+  if (state.tab === 'members') html = state.member ? memberDetail() : memberList();
+  else if (state.tab === 'kata') html = state.kata ? kataDetail() : kataList();
+  else html = readyView();
+  html += '<div class="foot"><span>Updated ' + esc(new Date(state.data.loadedAt).toLocaleString('en-CA', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })) +
+    (state.stale ? ' · refreshing…' : '') + '</span><span class="row" style="gap:14px">' +
+    (state.pin && state.sheetUrl ? '<a class="linkbtn" href="' + esc(state.sheetUrl) + '" target="_blank" rel="noopener">Open the sheet</a>' : '') +
+    '<button type="button" class="linkbtn" data-act="refresh">Refresh</button></span></div>';
+  app.innerHTML = html;
+  var s = $('search');
+  if (s) s.addEventListener('input', function () {
+    state.query = s.value;
+    $('results').innerHTML = state.tab === 'members' ? memberGroups() : kataGroups();
+  });
+}
+
+function renderHeader() {
+  var b = $('lockBtn');
+  if (state.pin) { b.className = 'hbtn on'; b.innerHTML = ICON.open + 'Instructor'; b.setAttribute('aria-label', 'Instructor mode is on. Tap to lock'); }
+  else { b.className = 'hbtn'; b.innerHTML = ICON.lock + 'Instructor'; b.setAttribute('aria-label', 'Unlock instructor mode'); }
+}
+
+function renderTabs() {
+  var T = [['members', 'Members', ICON.people], ['kata', 'Kata', ICON.book]];
+  if (state.pin) T.push(['ready', 'Ready to grade', ICON.trophy]);
+  var inner = $('tabsIn');
+  inner.style.gridTemplateColumns = 'repeat(' + T.length + ',minmax(0,1fr))';
+  inner.innerHTML = T.map(function (t) {
+    return '<button type="button" data-tab="' + t[0] + '"' + (state.tab === t[0] ? ' aria-current="page"' : '') + '>' + t[2] + '<span>' + t[1] + '</span></button>';
+  }).join('');
+}
+
+function searchBox(ph) {
+  return '<div class="search">' + ICON.search + '<label for="search" class="vh">' + esc(ph) + '</label><input id="search" type="search" placeholder="' + esc(ph) + '" value="' + esc(state.query) + '" autocomplete="off"></div>';
+}
+function catChips() {
+  return '<div class="chips" role="group" aria-label="Kata type">' + CATEGORIES.map(function (c) {
+    return '<button type="button" class="chip dark" data-cat="' + esc(c) + '" aria-pressed="' + (state.category === c) + '">' + esc(c) + '</button>';
+  }).join('') + '</div>';
+}
+
+/* ----- Members ----- */
+function memberList() {
+  var n = state.data.members.length;
+  var sub = n + ' active members';
+  if (state.pin) {
+    var ready = state.data.members.filter(function (m) { var r = readiness(m); return r && r.ready; }).length;
+    sub = n + ' active · ' + ready + ' ready to grade';
+  }
+  return '<div class="stack"><div><h1>Members</h1><div class="sub">' + esc(sub) + '</div></div>' +
+    searchBox('Search members') + '<div class="stack" id="results">' + memberGroups() + '</div></div>';
+}
+
+function memberGroups() {
+  var members = state.data.members.filter(function (m) { return matches(state.query, m.name); });
+  if (!state.data.members.length) return '<div class="card empty">No members yet. Add them on the Members tab of the Google Sheet.</div>';
+  if (!members.length) return '<div class="card empty">No members match “' + esc(state.query) + '”.</div>';
+  var html = '';
+  var list = belts().slice().reverse().concat([{ name: '' }]);
+  list.forEach(function (b) {
+    var group = members.filter(function (m) { return b.name ? m.belt === b.name : beltIndex(m.belt) === -1; });
+    if (!group.length) return;
+    var open = !state.collapsed[b.name] || !!state.query;
+    var next = b.name ? nextBelt(b.name) : '';
+    var readyN = 0, rows = '';
+    group.forEach(function (m) {
+      var r = state.pin ? readiness(m) : null;
+      if (r && r.ready) readyN++;
+      var line, pct, tag = '', barCls = 'bar';
+      if (r) {
+        var left = r.missing.length;
+        pct = Math.round(r.have / r.required.length * 100);
+        line = r.have + ' of ' + r.required.length + ' for ' + r.next;
+        tag = r.ready ? '<span class="tag red">Ready for ' + esc(r.next) + '</span>' : '<span class="tag">' + left + ' to go</span>';
+        if (r.ready) barCls = 'bar red';
+      } else {
+        var exp = expectedKata(m), k = knownCount(m, exp);
+        pct = exp.length ? Math.round(k / exp.length * 100) : 0;
+        line = 'Knows ' + k + ' of ' + exp.length + ' through ' + (m.belt || 'their belt');
+      }
+      rows += '<button type="button" class="mrow" data-member="' + esc(m.name) + '"><span class="row"><span class="n">' + esc(m.name) + '</span>' + tag + '</span>' +
+        '<span class="row"><span class="grow ' + barCls + '"><i style="width:' + pct + '%"></i></span><span class="c">' + esc(line) + '</span></span></button>';
+    });
+    var sub = group.length + (group.length === 1 ? ' member' : ' members');
+    if (state.pin && next) {
+      var probe = readiness(group[0]);
+      if (probe) sub += ' · ' + probe.required.length + ' kata needed for ' + next;
+    }
+    html += '<section class="card group"><button type="button" class="ghead" data-fold="' + esc(b.name) + '" aria-expanded="' + open + '">' +
+      (b.name ? dot(b.name, true) : '') + '<span class="grow"><span class="t">' + (b.name ? esc(b.name) + ' belt' : 'No belt set') + '</span><span class="s">' + esc(sub) + '</span></span>' +
+      (state.pin && readyN ? '<span class="tag red">' + readyN + ' ready</span>' : '') +
+      '<span class="chev">' + (open ? ICON.up : ICON.down).replace('<svg', '<svg class="chev"') + '</span></button>' +
+      (open ? rows : '') + '</section>';
+  });
+  return html;
+}
+
+function memberDetail() {
+  var m = memberByName(state.member);
+  if (!m) { state.member = null; return memberList(); }
+  var bi = beltIndex(m.belt);
+  var exp = expectedKata(m), known = knownCount(m, exp);
+  var html = '<div class="stack"><button type="button" class="back" data-back>' + ICON.back + 'Members</button>' +
+    '<div><h1>' + esc(m.name) + '</h1><div class="row" style="gap:6px;margin-top:4px;font-size:14px;font-weight:800">' + dot(m.belt) + esc(m.belt ? m.belt + ' belt' : 'No belt set') + '</div></div>';
+
+  var r = state.pin ? readiness(m) : null;
+  if (r) {
+    var left = r.missing.length;
+    html += '<div class="card pad stack" style="gap:12px">' +
+      '<div class="row" style="align-items:baseline;gap:8px"><div class="big">' + r.have + '<span style="font-size:20px;color:var(--muted)"> / ' + r.required.length + '</span></div>' +
+      '<div class="grow" style="font-size:15px;font-weight:700;color:var(--muted)">kata needed for ' + esc(r.next) + '</div>' +
+      (r.ready ? '<span class="tag red">Ready for ' + esc(r.next) + '</span>' : '<span class="tag ink">' + left + ' to go</span>') + '</div>' +
+      '<div class="bar big' + (r.ready ? ' red' : '') + '"><i style="width:' + Math.round(r.have / r.required.length * 100) + '%"></i></div>' +
+      (r.ready ? '<div class="alert ok">' + ICON.check + '<span>All ' + r.required.length + ' handbook kata at Knows or better.</span></div>'
+        : '<div class="alert">' + ICON.info + '<span>Still needs: ' + esc(r.missing.map(function (k) { return k.name; }).join(', ')) + '</span></div>') +
+      '</div>';
+  }
+
+  var counts = statuses().map(function (s) {
+    return state.data.kata.filter(function (k) { return statusOf(m.name, k.name) === s; }).length;
+  });
+  var tileStyle = ['background:#FCEBDD;color:#8A3F0C', 'background:#E3EBFB;color:#1F4BA5', 'background:#111;color:#fff'];
+  html += '<div class="card pad stack" style="gap:12px"><div style="font-size:14px;font-weight:700;color:var(--muted)">Knows ' + known + ' of ' + exp.length + ' kata through ' + esc(m.belt || 'their belt') + '</div>' +
+    '<div class="bar big"><i style="width:' + (exp.length ? Math.round(known / exp.length * 100) : 0) + '%"></i></div>' +
+    '<div class="tiles">' + statuses().map(function (s, i) {
+      return '<div class="tile" style="' + tileStyle[Math.min(i, 2)] + '"><b>' + counts[i] + '</b><span>' + esc(s) + '</span></div>';
+    }).join('') + '</div></div>';
+
+  html += catChips();
+  if (bi >= 0 && bi < belts().length - 1) {
+    html += '<div class="chips"><button type="button" class="chip dark" data-higher aria-pressed="' + state.showHigher + '">Show higher-belt kata</button></div>';
+  }
+  if (state.pin) html += '<p class="hint">Tap a status to change it.</p>';
+
+  var reqMissing = {};
+  if (r) r.missing.forEach(function (k) { reqMissing[k.name] = true; });
+  var shown = state.data.kata.filter(function (k) { return inCategory(k) && (state.showHigher || bi < 0 || expectedIndex(k) <= bi); });
+  var order = [];
+  for (var i = (state.showHigher ? belts().length - 1 : bi); i >= 0; i--) order.push(i);
+  if (bi < 0) order = belts().map(function (_, i) { return i; }).reverse();
+  var body = '';
+  order.forEach(function (i) {
+    var b = belts()[i];
+    var group = shown.filter(function (k) { return expectedIndex(k) === i; });
+    if (!group.length) return;
+    var kn = knownCount(m, group);
+    body += '<section class="card group"><div class="ghead static">' + dot(b.name) + '<span class="grow"><span class="t">' + esc(b.name) + ' belt kata</span>' +
+      (i > bi && bi >= 0 ? '<span class="s">Above ' + esc(m.belt) + ' belt</span>' : '') + '</span><span class="tag soft">' + kn + ' / ' + group.length + '</span></div>' +
+      group.map(function (k) { return memberKataRow(m, k, reqMissing[k.name] ? r.next : ''); }).join('') + '</section>';
+  });
+  var other = shown.filter(function (k) { return expectedIndex(k) < 0; });
+  if (other.length) body += '<section class="card group"><div class="ghead static"><span class="grow"><span class="t">No belt set</span></span></div>' +
+    other.map(function (k) { return memberKataRow(m, k, ''); }).join('') + '</section>';
+  html += body || '<div class="card empty">No kata in this category.</div>';
+  return html + '</div>';
+}
+
+function kataSub(k) {
+  var bits = [];
+  if (k.meaning) bits.push(k.meaning);
+  var li = learnedIndex(k), ri = beltIndex(k.belt);
+  if (li >= 0 && ri >= 0 && li !== ri) bits.push(k.belt + ' belt kata');
+  return bits.join(' · ') || k.category;
+}
+
+function memberKataRow(m, k, neededFor) {
+  var s = statusOf(m.name, k.name);
+  var sub = esc(kataSub(k));
+  if (neededFor) sub = '<span class="need">Needed for ' + esc(neededFor) + '</span>' + (sub ? ' · ' + sub : '');
+  if (!state.pin) {
+    return '<div class="krow"><span class="grow"><span class="n">' + esc(k.name) + '</span><span class="s">' + sub + '</span></span>' + stPill(s) + '</div>';
+  }
+  return '<div class="krow"><button type="button" class="grow" data-kata="' + esc(k.name) + '" style="border:0;background:none;padding:0;text-align:left;min-height:44px"><span class="n">' + esc(k.name) + '</span><span class="s">' + sub + '</span></button>' +
+    '<button type="button" class="st ' + stClass(s) + '" data-choose="' + esc(k.name) + '" data-who="' + esc(m.name) + '" aria-label="' + esc(k.name) + ': ' + esc(s || 'Not started') + '. Change">' + esc(s || 'Not started') + ICON.down + '</button></div>';
+}
+
+/* ----- Kata ----- */
+function kataList() {
+  return '<div class="stack"><div><h1>Kata</h1><div class="sub">' + state.data.kata.length + ' kata in the dojo syllabus</div></div>' +
+    searchBox('Search kata') + catChips() + '<div class="stack" id="results">' + kataGroups() + '</div></div>';
+}
+
+function kataGroups() {
+  var list = state.data.kata.filter(function (k) { return inCategory(k) && matches(state.query, k.name + ' ' + k.meaning); });
+  if (!list.length) return '<div class="card empty">No kata match.</div>';
+  var html = '';
+  var idxs = belts().map(function (_, i) { return i; }).concat([-1]);
+  idxs.forEach(function (i) {
+    var group = list.filter(function (k) { return expectedIndex(k) === i; });
+    if (!group.length) return;
+    var name = i >= 0 ? belts()[i].name : '';
+    html += '<section class="card group"><div class="ghead static">' + (name ? dot(name) : '') + '<span class="grow"><span class="t">' + (name ? esc(name) + ' belt' : 'No belt set') + '</span></span><span class="tag soft">' + group.length + ' kata</span></div>' +
+      group.map(function (k) {
+        var know = 0, learning = 0;
+        state.data.members.forEach(function (m) { var s = statusOf(m.name, k.name); if (isKnown(s)) know++; else if (s) learning++; });
+        return '<button type="button" class="krow" data-kata="' + esc(k.name) + '"><span class="grow"><span class="n">' + esc(k.name) + '</span><span class="s">' +
+          esc(kataSub(k)) + ' · ' + know + ' know' + (learning ? ' · ' + learning + ' learning' : '') + '</span></span><span class="go">' + ICON.go.replace('<svg', '<svg class="go"') + '</span></button>';
+      }).join('') + '</section>';
+  });
+  return html;
+}
+
+function kataDetail() {
+  var k = kataByName(state.kata);
+  if (!k) { state.kata = null; return kataList(); }
+  var counts = statuses().map(function (s) {
+    return state.data.members.filter(function (m) { return statusOf(m.name, k.name) === s; }).length;
+  });
+  var tileStyle = ['background:#FCEBDD;color:#8A3F0C', 'background:#E3EBFB;color:#1F4BA5', 'background:#111;color:#fff'];
+  var li = learnedIndex(k);
+  var backBtn = state.fromPlanner
+    ? '<button type="button" class="back" data-planner>' + ICON.back + 'Back to the lesson plan</button>'
+    : '<button type="button" class="back" data-back>' + ICON.back + 'All kata</button>';
+  var html = '<div class="stack">' + backBtn +
+    '<div><h1>' + esc(k.name) + '</h1>' + (k.meaning ? '<div class="sub" style="font-size:14px">' + esc(k.meaning) + '</div>' : '') +
+    '<div class="chips" style="gap:6px;margin-top:8px">' +
+      (state.pin && li >= 0 ? '<span class="tag soft">' + dot(belts()[li].name) + 'Learned at ' + esc(k.learnedAt) + '</span>' : '') +
+      '<span class="tag soft">' + dot(k.belt) + esc(k.belt) + ' belt kata</span>' +
+      '<span class="tag soft">' + esc(k.category) + '</span></div>' +
+    (k.notes ? '<p class="hint" style="margin:8px 0 0">' + esc(k.notes) + '</p>' : '') + '</div>' +
+    '<div class="tiles">' + statuses().map(function (s, i) {
+      return '<div class="tile" style="' + tileStyle[Math.min(i, 2)] + '"><b>' + counts[i] + '</b><span>' + esc(s) + '</span></div>';
+    }).join('') + '</div>';
+
+  if (!state.data.members.length) return html + '<div class="card empty">No members yet.</div></div>';
+
+  if (state.pin) {
+    // The "still need it" list is fixed while the kata stays open, so a row doesn't jump
+    // away under your finger the moment someone is marked Knows.
+    if (!state.needList || state.needList.kata !== k.name) state.needList = { kata: k.name, names: stillNeed(k).map(function (m) { return m.name; }) };
+    var need = state.data.members.filter(function (m) { return state.needList.names.indexOf(m.name) !== -1; }).sort(byBeltDesc);
+    var from = expectedIndex(k);
+    var everyone = state.data.members.slice().sort(byBeltDesc);
+    if (state.kataView === 'need' && !need.length) state.kataView = 'all';
+    html += '<div class="chips"><button type="button" class="chip" data-kview="need" aria-pressed="' + (state.kataView === 'need') + '">Still need it (' + need.length + ')</button>' +
+      '<button type="button" class="chip" data-kview="all" aria-pressed="' + (state.kataView === 'all') + '">Everyone (' + everyone.length + ')</button></div>' +
+      '<p class="hint">' + (state.kataView === 'need' ? (from >= 0 ? belts()[from].name + ' belts and up who don’t know it yet. ' : '') : '') + 'Tap a status to change it; tap it again to clear it.</p>';
+    var list = state.kataView === 'need' ? need : everyone;
+    if (!list.length) html += '<div class="card empty">Everyone who should know this kata knows it.</div>';
+    list.forEach(function (m) {
+      var cur = statusOf(m.name, k.name), ci = statusIndex(cur);
+      html += '<div class="card pcard"><div class="row" style="gap:8px">' + dot(m.belt) + '<span class="grow" style="font-size:16px;font-weight:800">' + esc(m.name) + '</span>' +
+        '<span style="font-size:12.5px;font-weight:700;color:var(--muted)">' + esc(m.belt ? m.belt + ' belt' : '') + '</span></div>' +
+        '<div class="seg">' + statuses().map(function (s, i) {
+          var on = i === ci;
+          return '<button type="button" class="' + (on ? 'on' + Math.min(i, 2) : '') + '" aria-pressed="' + on + '" data-set="' + esc(s) + '" data-who="' + esc(m.name) + '" data-kname="' + esc(k.name) + '">' + esc(s) + '</button>';
+        }).join('') + '</div></div>';
+    });
+    return html + '</div>';
+  }
+
+  // Public view: who knows it, then everyone else folded away.
+  var started = state.data.members.filter(function (m) { return statusOf(m.name, k.name); }).sort(function (a, b) {
+    return (statusIndex(statusOf(b.name, k.name)) - statusIndex(statusOf(a.name, k.name))) || byBeltDesc(a, b);
+  });
+  var notYet = state.data.members.filter(function (m) { return !statusOf(m.name, k.name); }).sort(byBeltDesc);
+  html += '<section class="card group"><div class="ghead static"><span class="grow"><span class="t">Who knows this kata</span></span><span class="tag soft">' + started.length + '</span></div>' +
+    (started.length ? started.map(function (m) {
+      return '<div class="krow">' + dot(m.belt) + '<span class="grow n">' + esc(m.name) + '</span>' + stPill(statusOf(m.name, k.name)) + '</div>';
+    }).join('') : '<div class="krow"><span class="grow s">Nobody has this kata marked yet.</span></div>') + '</section>';
+  if (notYet.length) {
+    html += '<section class="card group"><button type="button" class="ghead" data-notstarted aria-expanded="' + state.showNotStarted + '"><span class="grow"><span class="t">Not started yet</span></span><span class="tag soft">' + notYet.length + '</span>' +
+      (state.showNotStarted ? ICON.up : ICON.down).replace('<svg', '<svg class="chev"') + '</button>' +
+      (state.showNotStarted ? notYet.map(function (m) {
+        return '<div class="krow">' + dot(m.belt) + '<span class="grow n">' + esc(m.name) + '</span>' + stPill('') + '</div>';
+      }).join('') : '') + '</section>';
+  }
+  return html + '</div>';
+}
+
+/* ----- Ready to grade (instructors only) ----- */
+function readyView() {
+  var all = state.data.members.map(function (m) { return { m: m, r: readiness(m) }; }).filter(function (x) { return x.r; });
+  var beltsWith = belts().filter(function (b) { return all.some(function (x) { return x.m.belt === b.name; }); }).map(function (b) { return b.name; });
+  if (state.readyBelt !== 'All' && beltsWith.indexOf(state.readyBelt) === -1) state.readyBelt = 'All';
+  var list = all.filter(function (x) { return state.readyBelt === 'All' || x.m.belt === state.readyBelt; });
+  var html = '<div class="stack"><div><div class="row" style="align-items:center"><h1 class="grow">Ready to grade</h1><span class="tag ink">' + ICON.lock + 'Instructors only</span></div>' +
+    '<div class="sub">Knows or Proficient on every kata the handbook lists for their belt and below</div></div>' +
+    '<div class="chips" role="group" aria-label="Belt">' + ['All'].concat(beltsWith).map(function (b) {
+      return '<button type="button" class="chip" data-rbelt="' + esc(b) + '" aria-pressed="' + (state.readyBelt === b) + '">' + esc(b === 'All' ? 'All belts' : b) + '</button>';
+    }).join('') + '</div>';
+  var bands = [
+    { title: 'Ready now', test: function (x) { return x.r.ready; }, cls: 'red' },
+    { title: 'One kata to go', test: function (x) { return x.r.missing.length === 1; }, cls: 'ink' },
+    { title: 'Two kata to go', test: function (x) { return x.r.missing.length === 2; }, cls: 'soft' }
+  ];
+  var any = false;
+  bands.forEach(function (band) {
+    var people = list.filter(band.test).sort(function (a, b) { return byBeltDesc(a.m, b.m); });
+    if (!people.length) return;
+    any = true;
+    html += '<section class="stack" style="gap:10px"><div class="row"><h2 class="grow" style="margin:0;font-family:var(--f-d);font-size:17px;font-weight:800">' + band.title + '</h2><span class="tag ' + band.cls + '">' + people.length + '</span></div>' +
+      people.map(function (x) {
+        var note = x.r.ready ? 'All ' + x.r.required.length + ' kata at Knows or better' : 'Needs: ' + x.r.missing.map(function (k) { return k.name; }).join(', ');
+        return '<button type="button" class="card mrow" style="border:1.5px solid ' + (x.r.ready ? 'var(--red)' : 'var(--line)') + ';border-radius:18px" data-member="' + esc(x.m.name) + '">' +
+          '<span class="row"><span class="n">' + esc(x.m.name) + '</span><span class="row" style="gap:6px;font-size:13px;font-weight:800;color:var(--ink2)">' + dot(x.m.belt) + ICON.arrow.replace('<svg', '<svg style="width:14px;height:14px"') + dot(x.r.next) + esc(x.r.next) + '</span></span>' +
+          '<span style="font-size:13px;font-weight:700;color:' + (x.r.ready ? 'var(--red)' : 'var(--ink2)') + '">' + esc(note) + '</span></button>';
+      }).join('') + '</section>';
+  });
+  var further = list.filter(function (x) { return x.r.missing.length > 2; }).length;
+  if (!any) html += '<div class="card empty">Nobody is within two kata of their next belt' + (state.readyBelt === 'All' ? '' : ' at ' + esc(state.readyBelt)) + ' yet.</div>';
+  if (further) html += '<p class="hint">' + further + ' more ' + (further === 1 ? 'member is' : 'members are') + ' three or more kata away.</p>';
+  return html + '</div>';
+}
+
+/* ---------- status changes: choose → "are you sure" → save → Undo ---------- */
+function openChooser(member, kata) {
+  var cur = statusOf(member, kata);
+  var sw = [['#fff', '#5E5E5E', '1.5px dashed #9A9A9A'], ['#FCEBDD', '#8A3F0C', '0'], ['#E3EBFB', '#1F4BA5', '0'], ['#111', '#fff', '0']];
+  var opts = [''].concat(statuses()).map(function (s, i) {
+    var c = sw[Math.min(i, 3)], is = s === cur;
+    return '<button type="button" class="opt' + (is ? ' cur' : '') + '" data-pick="' + esc(s) + '"' + (is ? ' aria-current="true"' : '') + '><span class="sw" style="background:' + c[0] + ';color:' + c[1] + ';border:' + c[2] + '">' + (s ? esc(s[0]) : '–') + '</span>' +
+      esc(s || 'Not started') + (is ? '<span class="cur-l">Now</span>' : '') + '</button>';
+  }).join('');
+  openSheet('<div class="grab"></div><h2 id="sheetTitle">' + esc(kata) + '</h2><p>' + esc(member) + '</p><div class="opts" data-for-member="' + esc(member) + '" data-for-kata="' + esc(kata) + '">' + opts + '</div>' +
+    '<div class="btnrow"><button type="button" class="btn" data-close>Cancel</button></div>');
+}
+
+function askChange(member, kata, to) {
+  var from = statusOf(member, kata);
+  if (from === to) return;
+  closeSheet();
+  pending = { member: member, kata: kata, from: from, to: to };
+  var q = to ? 'Mark ' + member + ' as ' + to + ' for ' + kata + '?' : 'Clear ' + member + '’s status for ' + kata + '?';
+  showFloat('<div class="confirm" role="alertdialog" aria-label="Confirm change"><div class="q">' + esc(q) + '</div>' +
+    '<div class="btnrow"><button type="button" class="btn" data-cancel>Cancel</button><button type="button" class="btn primary" data-confirm>Yes, save</button></div></div>');
+  setTimeout(function () { var b = document.querySelector('[data-confirm]'); if (b) b.focus(); }, 30);
+}
+
+function save(change, isUndo) {
+  var member = change.member, kata = change.kata, before = change.from, after = change.to;
+  if (!state.data.progress[member]) state.data.progress[member] = {};
+  state.data.progress[member][kata] = after;
+  cacheData();
+  render();
+  toast(isUndo ? 'Undoing…' : 'Saving…');
+  call('saveStatus', state.pin, member, kata, after, state.instructor)
+    .then(function () {
+      if (isUndo) { lastSave = null; toast('Undone · ' + first(member) + ' back to ' + (after || 'Not started')); }
+      else { lastSave = change; toast('Saved · ' + first(member) + ' → ' + (after || 'Not started'), false, true); }
+    })
+    .catch(function (err) {
+      state.data.progress[member][kata] = before;
+      cacheData();
+      var msg = errMsg(err);
+      if (/PIN|password|locked/i.test(msg)) lock(true);
+      render();
+      toast('Not saved: ' + msg, true);
+    });
+}
+
+/* ---------- sheets, floats, toasts ---------- */
+function openSheet(html) { clearTimeout(toastTimer); if (!pending) hideFloat(); $('sheet').innerHTML = html; $('scrim').hidden = false; document.body.style.overflow = 'hidden';
+  setTimeout(function () { var f = $('sheet').querySelector('[data-focus], input, .opt, button'); if (f) f.focus(); }, 40); }
+function closeSheet(quiet) { $('scrim').hidden = true; document.body.style.overflow = ''; if (!quiet) $('sheet').innerHTML = ''; }
+function showFloat(html, cls) { var f = $('float'); f.className = 'float' + (cls ? ' ' + cls : ''); f.innerHTML = html; f.hidden = false; }
+function hideFloat() { $('float').hidden = true; $('float').innerHTML = ''; }
+var toastTimer;
+function toast(msg, bad, undo) {
+  clearTimeout(toastTimer);
+  pending = null;
+  showFloat('<div class="toast' + (bad ? ' bad' : '') + '" role="status">' + (bad ? '' : ICON.check.replace('<svg', '<svg class="ok"')) +
+    '<div class="m">' + esc(msg) + '</div>' + (undo ? '<button type="button" class="undo" data-undo>Undo</button>' : '') + '</div>', bad ? 'bad' : '');
+  if (!/…$/.test(msg)) toastTimer = setTimeout(function () { hideFloat(); if (undo) lastSave = null; }, undo ? 8000 : bad ? 5000 : 2500);
+}
+
+/* ---------- instructor unlock ---------- */
+function openUnlock(reason) {
+  openSheet('<div class="grab"></div><h2 id="sheetTitle">Instructor mode</h2><p>' + esc(reason || 'Unlock to update kata progress and see who’s ready to grade.') + '</p>' +
+    '<form id="pinForm" autocomplete="off"><div class="field"><label for="instName">Your name (for the change log)</label><input class="inp" id="instName" maxlength="40" placeholder="e.g. Mr. Luo" value="' + esc(recall('kt.instructor') || '') + '"></div>' +
+    '<div class="field"><label for="pinInput">Password</label><input class="inp" id="pinInput" type="password" maxlength="64" autocapitalize="off" autocorrect="off" spellcheck="false" required data-focus></div>' +
+    '<label class="check"><input type="checkbox" id="keep" checked>Stay unlocked on this device</label>' +
+    '<div class="ferr" id="pinErr" aria-live="polite"></div>' +
+    '<div class="btnrow"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary" id="pinOk">Unlock</button></div></form>');
+  setTimeout(function () { var n = $('instName'); ($(n && n.value ? 'pinInput' : 'instName') || n).focus(); }, 60);
+}
+function unlockWith(pin, name, keep) {
+  return call('verifyPin', pin).then(function (res) {
+    state.pin = pin; state.instructor = name;
+    state.sheetUrl = (res && res.sheetUrl) || null;
+    if (name) store('kt.instructor', name);
+    store('kt.pin', keep ? pin : null);
+  });
+}
+function lock(quiet) {
+  state.pin = null; state.sheetUrl = null; store('kt.pin', null);
+  if (state.tab === 'ready') state.tab = 'members';
+  render();
+  if (!quiet) toast('Instructor mode locked');
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button, a');
+  if (!t) { if (e.target === $('scrim')) closeSheet(); return; }
+  var d = t.dataset;
+  if (d.tab) { if (d.tab === state.tab && !state.member && !state.kata) { scrollTop(); return; } state.fromPlanner = false; go(d.tab); }
+  else if (d.member !== undefined && t.classList.contains('mrow')) { go('members', d.member); }
+  else if (d.kata !== undefined && !d.choose) { go('kata', null, d.kata); }
+  else if (d.back !== undefined) { go(state.tab); }
+  else if (d.planner !== undefined) { backToPlanner(); }
+  else if (d.fold !== undefined) { state.collapsed[d.fold] = !state.collapsed[d.fold]; $('results').innerHTML = memberGroups(); }
+  else if (d.cat) { state.category = d.cat; render(); }
+  else if (d.higher !== undefined) { state.showHigher = !state.showHigher; render(); }
+  else if (d.kview) { state.kataView = d.kview; state.needList = null; render(); }
+  else if (d.notstarted !== undefined) { state.showNotStarted = !state.showNotStarted; render(); }
+  else if (d.rbelt) { state.readyBelt = d.rbelt; render(); }
+  else if (d.choose) { openChooser(d.who, d.choose); }
+  else if (d.pick !== undefined) { var box = t.closest('.opts'); askChange(box.dataset.forMember, box.dataset.forKata, d.pick); }
+  else if (d.set !== undefined) { var cur = statusOf(d.who, d.kname); askChange(d.who, d.kname, cur === d.set ? '' : d.set); }
+  else if (d.confirm !== undefined) { var c = pending; pending = null; hideFloat(); if (c) save(c); }
+  else if (d.cancel !== undefined) { pending = null; hideFloat(); }
+  else if (d.undo !== undefined) { var u = lastSave; lastSave = null; if (u) save({ member: u.member, kata: u.kata, from: u.to, to: u.from }, true); }
+  else if (d.close !== undefined) { closeSheet(); }
+  else if (d.act === 'refresh') { load(true); }
+  else if (t.id === 'lockBtn') { if (state.pin) lock(); else openUnlock(); }
+});
+
+document.addEventListener('submit', function (e) {
+  if (e.target.id !== 'pinForm') return;
+  e.preventDefault();
+  var pin = $('pinInput').value.trim(), name = $('instName').value.trim(), keep = $('keep').checked;
+  if (!pin) return;
+  $('pinOk').disabled = true; $('pinErr').textContent = '';
+  unlockWith(pin, name, keep)
+    .then(function () {
+      if (state.kata && stillNeed(kataByName(state.kata) || { learnedAt: '', belt: '' }).length) state.kataView = 'need';
+      closeSheet(); render(); toast('Instructor mode on');
+    })
+    .catch(function (err) { $('pinErr').textContent = errMsg(err); })
+    .then(function () { var b = $('pinOk'); if (b) b.disabled = false; });
+});
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') { if (!$('scrim').hidden) closeSheet(); else if (pending) { pending = null; hideFloat(); } }
+});
+
+function backToPlanner() {
+  try { window.top.close(); } catch (e) {}
+  setTimeout(function () { try { window.open(PLANNER_URL, '_top'); } catch (e) {} }, 400);
+}
+
+/* ---------- load (shows the last copy straight away, then refreshes) ---------- */
+function cacheData() { try { store('kt.data', JSON.stringify(state.data)); } catch (e) {} }
+function load(manual) {
+  if (manual) { state.stale = true; render(); }
+  call('getData')
+    .then(function (data) {
+      state.data = data; state.stale = false; cacheData();
+      $('dojoName').textContent = data.dojoName || 'Dojo';
+      applyLink();
+      render();
+    })
+    .catch(function (err) {
+      state.stale = false;
+      if (state.data) { render(); toast('Couldn’t refresh: ' + errMsg(err), true); return; }
+      app.innerHTML = '<div class="stack"><div class="err">Could not load the tracker: ' + esc(errMsg(err)) + '</div><button type="button" class="btn" data-act="refresh">Try again</button></div>';
+    });
+}
+
+var link = null; // ?kata=…&from=planner, from the Lesson Planner's after-class shortcut
+function applyLink() {
+  if (!link || !state.data) return;
+  var l = link; link = null;
+  if (l.kata && kataByName(l.kata)) {
+    state.fromPlanner = l.from === 'planner';
+    state.tab = 'kata'; state.kata = l.kata; state.member = null;
+    state.kataView = 'need';
+    if (!state.pin) setTimeout(function () { openUnlock('Unlock to mark who has improved on ' + l.kata + '.'); }, 200);
+  }
+}
+
+(function start() {
+  var cached = null;
+  try { cached = JSON.parse(recall('kt.data') || 'null'); } catch (e) {}
+  if (cached && cached.kata && cached.members) { state.data = cached; state.stale = true; $('dojoName').textContent = cached.dojoName || 'Dojo'; }
+  var savedPin = recall('kt.pin');
+  if (savedPin) {
+    state.pin = savedPin; state.instructor = recall('kt.instructor') || '';
+    call('verifyPin', savedPin).then(function (res) { state.sheetUrl = (res && res.sheetUrl) || null; render(); })
+      .catch(function () { lock(true); });
+  }
+  try {
+    google.script.url.getLocation(function (loc) {
+      var p = (loc && loc.parameter) || {};
+      if (p.kata) { link = { kata: p.kata, from: p.from || '' }; applyLink(); render(); }
+    });
+  } catch (e) {}
+  try { if (hist) hist.replace(snapshot()); } catch (e) {}
+  render();
+  load();
+})();
+})();
+</script>
+</body>
+</html>
