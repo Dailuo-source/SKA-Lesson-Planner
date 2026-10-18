@@ -1,4 +1,9 @@
-# SKA Lesson Planner: handoff notes
+# SKA Lesson Planner — Brief
+
+> **Claude: read this first.** Open only the files a change touches, and use the code map below to jump to a function instead of reading whole files.
+> `index.html` is about 131 KB (~34k tokens): don't read it whole; search for a function name (e.g. `grep -n "function render" index.html`) and read just that function.
+> `Code.gs` is about 38 KB (~10k tokens): don't read it whole; search for a function name (e.g. `grep -n "function render" Code.gs`) and read just that function.
+> At the end of a work session, update **Status** and add one line to **Changelog** (keep about 10).
 
 Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. Each class plan is built from sections (Warm-up / Physical training, Technique / Kihon, Kata / Kigu, Kumite, Final activity), filled from a shared exercise library. Slotted exercises keep their own minutes and notes, so changing a time for one class doesn't touch the library unless the instructor chooses "Also update the library". Instructors use it on their own phones (Gary: Samsung Android, Chrome PWA; others may use iPhones).
 
@@ -47,3 +52,38 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email.
 - Testing: a Node mock of SpreadsheetApp plus Playwright (route `script.google.com` to `api()`) covers the main flows end to end; a second suite covers two instructors (private/shared/admin, refused edits), timeslots and custom lengths.
 - 2026-10-17: Gary reported tapping a plan opened the newest one; not reproducible (tests, and his real sheet in Chrome, open the tapped plan every time). Ask for steps if it comes back.
+
+## Code map
+API: op-batched like Pantry Pal, signed with the instructor's token instead of an app key.
+
+| File | Lines | What's in it |
+|---|---|---|
+| `Code.gs` | 902 | `doGet`/`doPost`/`api`; accounts (`auth_`, `me_`, `updateProfile_`, `changePassword_`, `codeOk_`, `makeToken_`, `checkToken_`, `verifyGoogle_`); instructors (`instrRows_`, `findInstr_`, `addInstr_`, `updInstr_`); sharing (`shareOf_`, `sees_`, `canEdit_`, `canShare_`, `allowOp_`, `stateFor_`); data (`readRaw_`, `applyOp_`, `applyTo_`); menu (`onOpen`, `setup`, `showKey`, `setDojoCode`, `setGoogleClientId`, `signEveryoneOut`); setup (`buildTab_`, `claimOwners_`, `seedLists_`, `seedExercises_`) |
+| `index.html` | 1477 | CSS (~18–282), markup (~284–297), one `<script>` (~298–1475) |
+
+Inside the `index.html` script, search for:
+- Sync: `readLinkParams`, `callApi`, `enqueue`, `flush`, `normalize`, `boot`
+- Sections and lists: `listRows`, `secColour`, `allSections`, `classTypes`, `classLengths`, `planSections`, `addSection`
+- Sharing: `shareLabel`, `shareTag`, `shareField`, `readShare`
+- Time and timeslots: `parseTime`, `fmtTime`, `slots`, `slotChips`, `timeField`, `saveSlotIf`, `setFormLength`, `sheetSlots`
+- Point notes: `pointsEditor`, `renumber`, `addPointAfter`, `notesText`
+- Screens: `go`, `render`, `renderView`, `onData`
+- Plans: `viewPlans`, `planCard`, `sheetNewPlan`, `sheetCopyPick`, `sheetCopy`, `planFormChange`
+- This class: `viewPlan` (edit), `viewTeach` (view), `viewReview` (review), `viewOnlyNote`, `itemHTML`, `addItem`
+- Library: `viewLibrary`, `exListHTML`, `sheetEx`, `sheetExView`, `sheetItem`, `sheetPick`
+- Kata Tracker link: `loadKata`, `kataPickHTML`, `kataUpdateHTML`, `usage`
+- Profile and sign-in: `viewProfile`, `viewAuth`, `loadGis`, `mountGis`, `fetchConfig`, `authCall`, `signOut`
+- Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
+
+## Status
+- Working: plans with view / edit / review modes, shared library, private/shared sharing with admins, class timeslots and custom lengths, Kata Tracker link. Web app deployment version 6; cache v15.
+- Watch: Gary once reported tapping a plan opened the newest one (Oct 17, 2026); not reproducible, so ask for steps if it comes back.
+
+## Changelog (latest first, keep about 10 lines)
+- 2026-10-18: Turned the handoff notes into a brief (read-first rules, code map, status, changelog)
+- 2026-10-17: Notes: Kata Tracker now uses moderator sign-in
+- 2026-10-17: Notes: cache is v15
+- 2026-10-17: Notes: sharing, timeslots, deployment v6; cache v15
+- 2026-10-17: Merge the Kata Tracker link
+- 2026-10-17: App: private or shared plans and exercises, admin edits, class timeslots, custom class length
+- 2026-10-17: Backend: private/shared plans and exercises, admin role, class time
