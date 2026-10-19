@@ -40,14 +40,14 @@ Lesson planner for the instructors at **Scarborough Academy of Karate (SKA)**. E
 ## Link to the SKA Kata Tracker
 
 - The Kata Tracker is its own app: https://dailuo-source.github.io/SKA-Kata-Tracker/ (repo `Dailuo-source/SKA-Kata-Tracker`, see its CLAUDE.md). `KATA_URL` in `index.html` is its Apps Script web app; `?api=summary` returns every dojo kata with its rank belt, handbook **Learned at** belt and how many active members still need it (counts only, no names). `KATA_SITE` is the app's address.
-- In a section whose name contains "kata", **Add from library** has two tabs: **Exercises** and **Dojo kata**. Dojo kata default to the handbook ones (those with a Learned at belt), sorted by how many students still need them; tapping one adds it as a one-off 10-min item named after the kata (tap again to remove). The summary is cached in `skal.kata` and refreshed on open and whenever the app comes back to the foreground.
+- In a section whose name contains "kata", **Add from library** has two tabs: **Exercises** and **Dojo kata**. Dojo kata are grouped like the Kata Tracker's Kata tab (Gary's choice, Oct 18): Solo, then Multi-person, then Weapon, each by belt (Learned at, else rank; "Blue/Purple" counts as Blue), in the sheet's order, with type chips (All / Solo / Multi-person / Weapon) and belt chips to narrow it; tapping one adds it as a one-off 10-min item named after the kata (tap again to remove). The summary is cached in `skal.kata` and refreshed on open and whenever the app comes back to the foreground.
 - Review mode shows **Update kata progress** for every dojo kata in the plan (matched by name). It opens `KATA_SITE?kata=<name>&from=planner` in a new tab, which goes straight to that kata, asks the instructor to sign in with their Moderator or Admin access code if needed (the tracker has per-person access levels now), and lists the students who still need it; its back button closes the tab.
 
 ## Changing things
 
 - Browser: Gary has several Chrome instances connected. The one signed in to garyluo.gs@gmail.com, GitHub (Dailuo-source) and Cloudflare is named **GARYMAIN**; select it before doing setup work.
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v15`), commit and push to `main`. Cloudflare deploys in about a minute.
+- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v16`), commit and push to `main`. Cloudflare deploys in about a minute.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**; URL stays the same). Through Claude in Chrome: open the script project (script.google.com/home → SKA Lesson Planner; the sheet's Extensions → Apps Script opens outside the tab group), set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. A new sheet column also needs adding to the live sheet (the header is matched by name).
 - Commits use author `Claude <noreply@anthropic.com>`; GitHub rejects Gary's private email.
 - Testing: a Node mock of SpreadsheetApp plus Playwright (route `script.google.com` to `api()`) covers the main flows end to end; a second suite covers two instructors (private/shared/admin, refused edits), timeslots and custom lengths.
@@ -76,10 +76,11 @@ Inside the `index.html` script, search for:
 - Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
 
 ## Status
-- Working: plans with view / edit / review modes, shared library, private/shared sharing with admins, class timeslots and custom lengths, Kata Tracker link. Web app deployment version 6; cache v15.
+- Working: plans with view / edit / review modes, shared library, private/shared sharing with admins, class timeslots and custom lengths, Kata Tracker link. Web app deployment version 6; cache v16.
 - Watch: Gary once reported tapping a plan opened the newest one (Oct 17, 2026); not reproducible, so ask for steps if it comes back.
 
 ## Changelog (latest first, keep about 10 lines)
+- 2026-10-18: Dojo kata picker grouped by type then belt, like the Kata Tracker (replaces the handbook filter)
 - 2026-10-18: Turned the handoff notes into a brief (read-first rules, code map, status, changelog)
 - 2026-10-17: Notes: Kata Tracker now uses moderator sign-in
 - 2026-10-17: Notes: cache is v15

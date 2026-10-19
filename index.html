@@ -205,6 +205,11 @@ select.inp{appearance:auto}
 .segtabs button{height:44px;border:0;border-radius:18px;background:transparent;font-size:15px;font-weight:800;color:var(--ink2)}
 .kmeta{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:3px}
 .kdot{width:12px;height:12px;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.28);flex:none;display:inline-block}
+.kcat{display:flex;align-items:center;justify-content:space-between;margin:14px 4px 6px;font-family:var(--f-d);font-size:16px;font-weight:800;color:var(--ink)}
+.kcat:first-child{margin-top:4px}
+.kcount{font-size:12.5px;font-weight:800;color:var(--ink2);background:#F1F1F1;border-radius:10px;padding:2px 9px}
+.kbelt{display:flex;align-items:center;gap:7px;margin:8px 4px 6px;font-size:13px;font-weight:800;color:var(--ink2)}
+.kbelts .kdot{margin-right:6px}
 .kneed{display:block;font-size:13px;font-weight:800;color:#8E0B21;margin-top:2px}
 .kupd{padding:16px;border:2px solid var(--red);background:var(--red-tint)}
 .kupd h2{margin:0 0 2px;font-family:var(--f-d);font-size:18px;font-weight:800}
@@ -541,6 +546,12 @@ const kataBelt=k=>kataGroup(k).split(/[\/,]/)[0].trim();            // its first
 const kataWhen=k=>k.learnedAt?"Learned at "+k.learnedAt:(k.belt?k.belt+" belt kata":"");
 const kataNeed=k=>`${k.need} ${k.need===1?"student still needs":"students still need"} it`;
 const KATA_SITE="https://dailuo-source.github.io/SKA-Kata-Tracker/"; // the Kata Tracker app (its data feed is KATA_URL)
+const KATA_CATS=["Solo","Multi-person","Weapon"];
+const kataCat=k=>String(k.category||"").trim()||"Solo";
+const kataCats=list=>{const seen=new Set(list.map(kataCat));return KATA_CATS.filter(c=>seen.has(c)).concat([...seen].filter(c=>!KATA_CATS.includes(c)).sort());}; // Solo, Multi-person, Weapon, then anything else
+const looseBelt=t=>{let best=-1;String(t||"").split(/[\/,&]| or | and /i).forEach(p=>{const i=BELTS.findIndex(b=>eqi(b,p.trim()));if(i>=0&&(best<0||i<best))best=i;});return best;};
+const kataRank=k=>looseBelt(k.belt);
+const kataBeltIdx=k=>{const l=looseBelt(k.learnedAt);return l>=0?l:kataRank(k);}; // "Blue/Purple" counts as Blue, like the tracker
 const kataLink=name=>KATA_SITE+"?kata="+encodeURIComponent(name)+"&from=planner";
 function usage(){const m={};S.items.forEach(i=>{if(!i.exercise)return;(m[i.exercise]=m[i.exercise]||new Set()).add(i.plan);});return m;}
 
@@ -1076,14 +1087,25 @@ function kataPickHTML(s){
   const col=secColour(s.sec);
   const have=new Set(secItems(p,s.sec).map(i=>i.name.toLowerCase()));
   const q=(s.q||"").trim().toLowerCase();
-  const f=s.belt||"Handbook";
-  const list=KATA.filter(k=>(f==="Handbook"?!!k.learnedAt:f==="Other"?!k.learnedAt:String(k.learnedAt).trim()===f)&&(!q||(k.name+" "+(k.meaning||"")).toLowerCase().includes(q)))
-    .sort((a,b)=>(b.need-a.need)||a.name.localeCompare(b.name));
+  const cat=s.cat||"All",bf=s.belt||"All";
+  const list=KATA.filter(k=>(cat==="All"||kataCat(k)===cat)&&(bf==="All"||kataBeltIdx(k)===BELTS.indexOf(bf))&&(!q||(k.name+" "+(k.meaning||"")).toLowerCase().includes(q)));
   if(!list.length)return`<p class="small" style="margin:8px 4px 14px">Nothing matches.</p>`;
-  return list.map(k=>{const on=have.has(k.name.toLowerCase());
-    return`<button type="button" class="pickrow" data-act="addKata" data-name="${esc(k.name)}" aria-pressed="${on}"${on?` style="border-color:${col};background:${tint(col,.93)}"`:""}>
-    <span class="nm">${esc(k.name)}<span class="kmeta"><span class="kdot" style="background:${BELT_COL[kataBelt(k)]||"#CCC"}"></span>${esc(kataWhen(k))}</span><span class="kneed">${esc(kataNeed(k))}${k.learning?" · "+k.learning+" learning":""}</span></span>
-    ${on?`<span class="ok">In plan</span>`:`<span class="m" style="color:${col}">10 min</span>`}${on?ICON.check:ICON.plus}</button>`;}).join("");
+  // Same order as the Kata Tracker's Kata tab: Solo, then Multi-person, then Weapon; each by the belt it's learned at.
+  let html="";
+  kataCats(list).forEach(c=>{
+    const inCat=list.filter(k=>kataCat(k)===c);
+    html+=`<div class="kcat"><span>${esc(c)} kata</span><span class="kcount">${inCat.length}</span></div>`;
+    BELTS.map((_,i)=>i).concat([-1]).forEach(i=>{
+      const grp=inCat.filter(k=>kataBeltIdx(k)===i);if(!grp.length)return;
+      html+=`<div class="kbelt"><span class="kdot" style="background:${i>=0?BELT_COL[BELTS[i]]:"#CCC"}"></span>${i>=0?esc(BELTS[i])+" belt":"No belt set"}</div>`;
+      html+=grp.map(k=>{const on=have.has(k.name.toLowerCase()),rank=kataRank(k);
+        const sub=[k.meaning,rank>=0&&rank!==i?BELTS[rank]+" belt kata":""].filter(Boolean).join(" · ");
+        return`<button type="button" class="pickrow" data-act="addKata" data-name="${esc(k.name)}" aria-pressed="${on}"${on?` style="border-color:${col};background:${tint(col,.93)}"`:""}>
+        <span class="nm">${esc(k.name)}${sub?`<span class="kmeta">${esc(sub)}</span>`:""}<span class="kneed">${esc(kataNeed(k))}${k.learning?" · "+k.learning+" learning":""}</span></span>
+        ${on?`<span class="ok">In plan</span>`:`<span class="m" style="color:${col}">10 min</span>`}${on?ICON.check:ICON.plus}</button>`;}).join("");
+    });
+  });
+  return html;
 }
 function pickListHTML(s){
   if(s.mode==="kata")return kataPickHTML(s);
@@ -1102,14 +1124,16 @@ function sheetPick(s){
   const tabs=kataSec?`<div class="segtabs" role="tablist" aria-label="What to add">${[["ex","Exercises"],["kata","Dojo kata"]].map(([m,l])=>{const on=(s.mode||"ex")===m;
     return`<button type="button" role="tab" aria-selected="${on}" data-act="pickMode" data-m="${m}"${on?` style="background:${col};color:#fff"`:""}>${l}</button>`;}).join("")}</div>`:"";
   if(kataSec&&s.mode==="kata"){
-    // Handbook kata (the ones with a "Learned at" belt) come first; everything else is under "Other kata".
-    const groups=KATA?[...new Set(KATA.map(k=>String(k.learnedAt||"").trim()).filter(Boolean))].sort((a,b)=>BELTS.indexOf(a.split("/")[0].trim())-BELTS.indexOf(b.split("/")[0].trim())):[];
-    const label={Handbook:"Handbook kata",Other:"Other kata"};
-    const chips=["Handbook"].concat(groups,["Other"]).map(g=>{const on=(s.belt||"Handbook")===g;return`<button type="button" class="chip sm" data-act="pickBelt" data-v="${esc(g)}" aria-pressed="${on}"${on?` style="background:${col};border-color:${col}"`:""}>${esc(label[g]||g)}</button>`;}).join("");
+    // Filters match the Kata Tracker: kata type, then belt (the belt it's learned at, else its rank).
+    const cats=["All"].concat(KATA?kataCats(KATA):KATA_CATS),beltsHere=["All"].concat(KATA?BELTS.filter((b,i)=>KATA.some(k=>kataBeltIdx(k)===i)):[]);
+    const chipOn=on=>on?` style="background:${col};border-color:${col};color:#fff"`:"";
+    const catChips=cats.map(c=>{const on=(s.cat||"All")===c;return`<button type="button" class="chip sm" data-act="pickCat" data-v="${esc(c)}" aria-pressed="${on}"${chipOn(on)}>${esc(c)}</button>`;}).join("");
+    const beltChips=beltsHere.map(b=>{const on=(s.belt||"All")===b;return`<button type="button" class="chip sm" data-act="pickBelt" data-v="${esc(b)}" aria-pressed="${on}"${chipOn(on)}>${b==="All"?"All belts":`<span class="kdot" style="background:${BELT_COL[b]}"></span>${esc(b)}`}</button>`;}).join("");
+    const chips=`<div class="chips" role="group" aria-label="Kata type" style="margin-bottom:8px">${catChips}</div><div class="chips kbelts" role="group" aria-label="Belt">${beltChips}</div>`;
     return sheetHead("Add to "+esc(s.sec),`<div class="small">From the dojo’s kata list</div>`)+tabs+
     `<div class="search" style="margin-bottom:10px">${ICON.search}<input id="pickSearch" type="search" placeholder="Search kata" aria-label="Search the dojo’s kata" value="${esc(s.q||"")}" autocomplete="off"></div>
-    <div class="chips" style="margin-bottom:8px">${chips}</div>
-    <p class="small" style="margin:0 4px 12px">Sorted by how many students still need each kata${(s.belt||"Handbook")==="Handbook"?" (the ones the handbook lists for grading)":""}.</p>
+    ${chips}
+    <p class="small" style="margin:10px 4px 4px">Grouped like the Kata Tracker: solo, multi-person, then weapon kata, each by belt.</p>
     <div id="pickList">${pickListHTML(s)}</div>
     <div class="btnrow" style="margin-top:6px"><button type="button" class="btn primary" data-act="closeSheet">Done</button></div>`;
   }
@@ -1316,6 +1340,7 @@ document.addEventListener("click",e=>{
       addItem(pp,sheet.sec,ex);$("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-id="${ex.id}"]`);if(b)b.focus({preventScroll:true});break;}
     case"pickMode":if(sheet&&sheet.type==="pick"){sheet.mode=t.dataset.m;sheet.q="";renderSheet();}break;
     case"pickBelt":if(sheet&&sheet.type==="pick"){sheet.belt=t.dataset.v;renderSheet();}break;
+    case"pickCat":if(sheet&&sheet.type==="pick"){sheet.cat=t.dataset.v;renderSheet();}break;
     case"addKata":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),k=dojoKata(t.dataset.name);if(!pp||!k)break;
       const there=secItems(pp,sheet.sec).filter(i=>eqi(i.name,k.name));
       if(there.length){const it=there[there.length-1];store.del("items",it.id);touchPlan(pp.id);}
