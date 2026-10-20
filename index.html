@@ -284,6 +284,96 @@ ul.vpts.mine{color:var(--red-d)}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 .err{background:var(--red-soft);color:var(--red-d);border-radius:14px;padding:12px 14px;font-weight:700;margin:0 0 16px}
 @media (min-width:700px){.tabs{max-width:640px;margin:0 auto;border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0}}
+
+/* ---------- Plans calendar ---------- */
+.phead{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.slotsbtn{min-height:44px;padding:0 14px;gap:6px;flex:none}
+.slotsbtn svg{width:20px;height:20px}
+.caltools{display:flex;flex-direction:column;gap:10px}
+.seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--sunk)}
+.seg button{flex:1;height:40px;border:0;border-radius:11px;background:transparent;font-weight:800;color:var(--ink2);font-size:15px}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.calnav{display:flex;align-items:center;gap:8px}
+.caltitle{flex:1;text-align:center;font-family:var(--f-d);font-weight:800;font-size:18px}
+.daychips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.daychips::-webkit-scrollbar{display:none}
+.daychips .chip{flex:none}
+.calweek{display:flex;flex-direction:column;gap:16px}
+.calday{display:flex;flex-direction:column;gap:8px}
+.cd-head{margin:0;display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-size:17px;font-weight:800;color:var(--ink)}
+.cd-dow .sh{display:none}
+.calday.past .cd-head,.calday.none .cd-head{color:var(--muted)}
+.calday.none .cd-head{font-size:14px;font-weight:700}
+.cd-none{font-family:var(--f-b);font-size:13px;font-weight:600;color:var(--muted)}
+.todaytag{font-family:var(--f-b);padding:2px 8px;border-radius:999px;background:var(--ink);color:#fff;font-size:11px;font-weight:800}
+.ccard{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;background:#fff;border:1.5px solid var(--line);text-align:left;color:var(--ink);min-height:64px}
+.ccard.st-past{opacity:.6}
+.cc-time{flex:0 0 78px}
+.cc-time b{display:block;font-family:var(--f-d);font-size:19px;font-weight:800;line-height:1.1}
+.cc-time b small{font-family:var(--f-b);font-size:12px;font-weight:800}
+.cc-time span{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-top:2px}
+.cc-body{flex:1;min-width:0}
+.cc-type{display:block;font-weight:800;font-size:15px}
+.cc-sub{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-pill{flex:none;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.st-planned .cc-pill{background:var(--red);color:#fff}
+.st-open .cc-pill{border:1.5px solid var(--red);color:var(--red-d)}
+.st-past .cc-pill{background:var(--sunk);color:var(--muted)}
+.calmonth{padding:8px}
+.mhead,.mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center}
+.mhead span{font-size:11px;font-weight:800;color:var(--muted);padding:4px 0}
+.mcell{height:52px;border:0;border-radius:12px;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--ink)}
+.mcell.out{opacity:.4}
+.mcell.sel{background:var(--red-soft)}
+.mnum{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.mcell.today .mnum{background:var(--ink);color:#fff}
+.mdots{display:flex;gap:3px;min-height:7px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;box-sizing:border-box}
+.dot.st-planned{background:var(--red)}
+.dot.st-open{border:1.5px solid var(--ink2)}
+.dot.st-past{background:#C9C9C9}
+.mlegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--ink2);margin:0 4px}
+.mlegend span{display:inline-flex;align-items:center;gap:6px}
+.allplans summary{cursor:pointer;font-weight:800;color:var(--ink2);padding:10px 4px;min-height:44px;display:flex;align-items:center}
+
+/* ---------- big screens (Gary, Oct 20): tabs in the red bar, wider pages, panels slide in from the right ---------- */
+@media (min-width:1000px){
+  main{max-width:900px;padding:28px 40px 48px}
+  body[data-tab=plans] main{max-width:1240px}
+  .plansview .btnrow{max-width:480px}
+  .tabs{top:0;bottom:auto;left:50%;right:auto;transform:translateX(-50%);height:62px;padding:0;background:transparent;border:0;display:flex;gap:6px;align-items:center;z-index:21}
+  .tabs button{flex-direction:row;gap:8px;min-height:44px;padding:0 16px;color:#fff;font-size:15px;border-radius:12px}
+  .tabs button:hover:not([aria-current=page]){background:rgba(255,255,255,.14)}
+  .tabs button[aria-current=page]{background:#fff;color:var(--red)}
+  .tabs svg{width:20px;height:20px}
+  .toast{bottom:28px}
+  .caltools{flex-direction:row;align-items:center;gap:18px}
+  .seg{width:220px;flex:none}
+  .calnav{flex:1;justify-content:flex-start}
+  .caltitle{flex:none;min-width:200px}
+  .daychips{margin:0;padding:0;flex-wrap:wrap}
+  .calweek{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:10px;align-items:stretch}
+  .calweek .calday{padding:10px;border-radius:18px;background:var(--sunk);min-height:240px}
+  .calweek .calday.today{box-shadow:inset 0 0 0 2px var(--red)}
+  .calweek .cd-head{flex-direction:column;align-items:flex-start;gap:0;padding:2px 4px 6px}
+  .calweek .cd-dow .lg{display:none}
+  .calweek .cd-dow .sh{display:inline;font-family:var(--f-b);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  .calweek .cd-num{font-size:26px;line-height:1.1}
+  .calweek .calday.none .cd-head{font-size:inherit}
+  .calweek .ccard{flex-direction:column;align-items:flex-start;gap:6px;padding:12px}
+  .calweek .cc-time{flex:none}
+  .calweek .cc-sub{white-space:normal}
+  .calmonth{padding:12px}
+  .mcell{height:84px;align-items:flex-start;padding:6px 8px}
+  .mcell:hover{background:var(--sunk)}
+  .mcell.sel{background:var(--red-soft)}
+  .mdots{gap:4px}
+  .dot{width:9px;height:9px}
+  .sheet:not(.center){top:0;bottom:0;left:auto;right:0;width:480px;max-width:none;max-height:none;margin:0;border-radius:28px 0 0 28px;padding:22px 26px 26px}
+  .sheet:not(.center) .grab{display:none}
+  .vex h3{font-size:22px}
+  .vsteps,.vpts{font-size:17px}
+}
 </style>
 </head>
 <body>
@@ -326,6 +416,7 @@ const ICON={
   more:svg('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',1.4),
   copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
+  clock:svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
   search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), lock:svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), people:svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c2.2.6 3.5 2.4 3.5 5.4"/>'), globe:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'), clock:svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
 };
 
@@ -441,6 +532,7 @@ let S={plans:[],items:[],exercises:[],lists:[],people:[]};
 let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
+let calView=LS.get("calview","week")==="month"?"month":"week",calOff=0,calSel="";
 function readLinkParams(){
   try{
     const h=new URLSearchParams((location.hash||"").replace(/^#/,""));const q=new URLSearchParams(location.search);
@@ -594,6 +686,7 @@ function render(msg){
   $("#sync").hidden=!signedIn();
   const showTabs=signedIn()&&tab!=="profile";
   document.body.classList.toggle("notabs",!showTabs);
+  document.body.dataset.tab=tab;document.body.dataset.mode=planMode;
   const tb=$("#tabs");tb.hidden=!showTabs;
   if(showTabs){
     const T=[["plans","Plans",ICON.cal],["plan","This class",ICON.list],["library","Library",ICON.book],["attend","Attendance",ICON.clip]];
@@ -635,27 +728,87 @@ function planCard(p,next){
     <button type="button" class="iconbtn round" data-act="copyPlan" data-id="${esc(p.id)}" aria-label="Copy ${esc(planTitle(p))} to a new date">${ICON.copy}</button>
   </div>`;
 }
+/* Plans calendar (Gary, Oct 20): week view by default, Expand to month; filter by class day.
+   Each day lists its regular timeslots (Lists → Timeslot) matched to that date's plans by time,
+   plus any plan at another time (special events). */
+const shiftKey=(k,n)=>{const d=new Date(keyMs(k));d.setDate(d.getDate()+n);return dayKey(d.getTime());};
+const weekStartKey=k=>{const d=new Date(keyMs(k));return shiftKey(k,-((d.getDay()+6)%7));};
+const monthKey=(k,n)=>{const d=new Date(keyMs(k));d.setDate(1);d.setMonth(d.getMonth()+(n||0));return dayKey(d.getTime());};
+function classDays(){const set=new Set(slots().map(x=>x.day));if(!set.size)S.plans.forEach(p=>{if(p.date)set.add(new Date(p.date).getDay());});return DAY_ORDER.filter(d=>set.has(d));}
+const dayOK=k=>plansFilter==="All"||new Date(keyMs(k)).getDay()===+plansFilter;
+function dayEntries(k){
+  if(!dayOK(k))return[];
+  const plans=S.plans.filter(p=>p.date&&dayKey(p.date)===k),used=new Set(),out=[];
+  slotsOn(k).forEach(x=>{
+    const cand=plans.filter(p=>!used.has(p.id)&&(parseTime(p.time)||{}).key===x.key);
+    const p=cand.find(c=>!x.label||eqi(c.type,x.label))||cand[0];
+    if(p)used.add(p.id);
+    out.push({k,start:x.start,end:x.end,key:x.key,label:x.label||(p&&p.type)||"",plan:p||null});
+  });
+  plans.filter(p=>!used.has(p.id)).forEach(p=>{const t=parseTime(p.time);out.push({k,start:t?t.start:"",end:t?t.end:"",key:t?t.key:"",label:p.type,plan:p,extra:true});});
+  return out.sort((a,b)=>(toMin(a.start)==null?-1:toMin(a.start))-(toMin(b.start)==null?-1:toMin(b.start)));
+}
+const entryState=e=>e.plan?"planned":e.k<todayKey()?"past":"open";
+function calCard(e){
+  const st=entryState(e),a=clock12(e.start),b=clock12(e.end);
+  const same=a&&a.slice(-4)===b.slice(-4),big=a?a.slice(0,-5):"Any time",mer=a&&!same?a.slice(-4):"",small=b?"to "+b:"";
+  const sub=e.plan?(e.plan.focus||(e.plan.addedBy?"Plan by "+e.plan.addedBy:"Plan ready")):st==="past"?"Finished, no plan":"No plan yet";
+  const pill=st==="planned"?"Planned":st==="past"?"No plan":"Plan it";
+  const act=e.plan?`data-act="openPlan" data-id="${esc(e.plan.id)}"`:`data-act="planSlot" data-k="${esc(e.k)}" data-slot="${esc(e.key)}" data-type="${esc(e.label)}"`;
+  const aria=`${fmtLongDay(keyMs(e.k))}, ${a||"any time"}${e.label?", "+e.label:""}: ${pill}`;
+  return`<button type="button" class="ccard st-${st}" ${act} aria-label="${esc(aria)}">
+    <span class="cc-time"><b>${esc(big)}${mer?`<small> ${mer}</small>`:""}</b>${small?`<span>${esc(small)}</span>`:""}</span>
+    <span class="cc-body"><span class="cc-type">${esc(e.label||"Class")}${e.extra?' <span class="tag dark">Special</span>':""}</span><span class="cc-sub">${esc(sub)}</span></span>
+    <span class="cc-pill">${pill}</span></button>`;
+}
+function calWeek(){
+  const first=shiftKey(weekStartKey(todayKey()),calOff*7),tk=todayKey();
+  const days=[...Array(7)].map((_,i)=>shiftKey(first,i)).filter(dayOK);
+  return`<div class="calweek" style="--n:${days.length}">${days.map(k=>{const es=dayEntries(k),d=new Date(keyMs(k));
+    const cls=["calday",k===tk?"today":"",es.length?"":"none",k<tk?"past":""].join(" ");
+    return`<section class="${cls}"><h3 class="cd-head"><span class="cd-dow"><span class="lg">${DAYS[d.getDay()]}</span><span class="sh">${DAYS[d.getDay()].slice(0,3)}</span></span><span class="cd-num">${d.getDate()}</span>${k===tk?'<span class="todaytag">Today</span>':""}${es.length?"":'<span class="cd-none">No classes</span>'}</h3>${es.map(calCard).join("")}</section>`;}).join("")}</div>`;
+}
+function calMonth(){
+  const m0=monthKey(todayKey(),calOff),start=weekStartKey(m0),tk=todayKey(),mon=new Date(keyMs(m0)).getMonth();
+  if(!calSel||new Date(keyMs(calSel)).getMonth()!==mon)calSel=mon===new Date().getMonth()&&calOff===0?tk:m0;
+  let cells="";
+  for(let i=0;i<42;i++){const k=shiftKey(start,i),d=new Date(keyMs(k));if(i>=35&&d.getMonth()!==mon)break;
+    const dots=dayEntries(k).map(e=>`<i class="dot st-${entryState(e)}"></i>`).join("");
+    cells+=`<button type="button" class="mcell${d.getMonth()!==mon?" out":""}${k===tk?" today":""}${k===calSel?" sel":""}" data-act="calSel" data-k="${k}" aria-label="${esc(fmtLongDay(keyMs(k)))}" aria-pressed="${k===calSel}"><span class="mnum">${d.getDate()}</span><span class="mdots">${dots}</span></button>`;}
+  const es=dayEntries(calSel);
+  return`<div class="card calmonth"><div class="mhead" aria-hidden="true">${["M","T","W","T","F","S","S"].map(x=>`<span>${x}</span>`).join("")}</div><div class="mgrid">${cells}</div></div>
+    <div class="mlegend"><span><i class="dot st-planned"></i>Planned</span><span><i class="dot st-open"></i>Needs a plan</span><span><i class="dot st-past"></i>Past, no plan</span></div>
+    <h2 class="grouph" style="font-size:16px;color:var(--ink)">${esc(fmtLongDay(keyMs(calSel)))}</h2>
+    ${es.length?`<div class="calday">${es.map(calCard).join("")}</div>`:`<p class="small" style="margin:0 4px">No classes on this day.</p>`}
+    <button type="button" class="btn outline square" data-act="planSlot" data-k="${calSel}" data-slot="" style="align-self:flex-start">${ICON.plus}Plan something else on this day</button>`;
+}
+function calTitle(){
+  if(calView==="month")return new Date(keyMs(monthKey(todayKey(),calOff))).toLocaleDateString("en-CA",{month:"long",year:"numeric"});
+  const a=new Date(keyMs(shiftKey(weekStartKey(todayKey()),calOff*7))),b=new Date(a);b.setDate(b.getDate()+6);
+  const m=d=>d.toLocaleDateString("en-CA",{month:"short"});
+  return a.getMonth()===b.getMonth()?`${m(a)} ${a.getDate()} – ${b.getDate()}`:`${m(a)} ${a.getDate()} – ${m(b)} ${b.getDate()}`;
+}
 function viewPlans(){
-  const types=classTypes();if(plansFilter!=="All"&&!types.includes(plansFilter))plansFilter="All";
-  const list=S.plans.filter(p=>plansFilter==="All"||eqi(p.type,plansFilter));
+  const days=classDays();if(plansFilter!=="All"&&!days.includes(+plansFilter))plansFilter="All";
+  const list=S.plans.filter(p=>plansFilter==="All"||(p.date&&new Date(p.date).getDay()===+plansFilter));
   const t0=keyMs(todayKey())-12*3600e3;
   const byWhen=(a,b)=>(a.date-b.date)||((toMin((parseTime(a.time)||{}).start)||0)-(toMin((parseTime(b.time)||{}).start)||0));
   const up=list.filter(p=>p.date>=t0).sort(byWhen);
   const past=list.filter(p=>p.date<t0).sort((a,b)=>byWhen(b,a));
-  const chips=["All"].concat(types).map(t=>`<button type="button" class="chip sm" data-act="pfilter" data-v="${esc(t)}" aria-pressed="${plansFilter===t}">${esc(t)}</button>`).join("");
-  let body="";
-  if(!S.plans.length)body=`<div class="card empty"><p>No plans yet. Start your first class plan. It begins with the ${defaultSections().length} usual sections.</p><button type="button" class="btn primary" data-act="newPlan">${ICON.plus}New plan</button></div>`;
-  else if(!list.length)body=`<div class="card empty"><p>No ${esc(plansFilter)} plans yet.</p></div>`;
-  else{
-    if(up.length)body+=`<h2 class="grouph">Coming up</h2>`+up.map((p,i)=>planCard(p,i===0)).join("");
-    if(past.length)body+=`<h2 class="grouph">Past classes</h2>`+past.map(p=>planCard(p,false)).join("");
-  }
-  return`<div class="stack">
-    <h1>Lesson plans</h1>
+  const chips=[["All","All days"]].concat(days.map(d=>[String(d),DAYS[d].slice(0,3)])).map(([v,l])=>`<button type="button" class="chip sm" data-act="pfilter" data-v="${v}" aria-pressed="${plansFilter===v}">${l}</button>`).join("");
+  const noSlots=!slots().length;
+  const listHTML=(up.length?`<h2 class="grouph">Coming up</h2>`+up.map((p,i)=>planCard(p,i===0)).join(""):"")+(past.length?`<h2 class="grouph">Past classes</h2>`+past.map(p=>planCard(p,false)).join(""):"");
+  return`<div class="stack plansview">
+    <div class="phead"><h1>Lesson plans</h1><button type="button" class="btn outline square slotsbtn" data-act="slots">${ICON.clock}Class times</button></div>
     <div class="btnrow"><button type="button" class="btn primary square" data-act="newPlan">${ICON.plus}New plan</button><button type="button" class="btn outline square" data-act="copyPick">${ICON.copy}Copy a plan</button></div>
-    <p class="small" style="margin:0 4px">New plans start with the ${defaultSections().length} usual sections. Skip or add sections inside the plan. <button type="button" class="textbtn" data-act="slots" style="padding:0;min-height:0;display:inline;font-size:inherit">Class timeslots</button></p>
-    <div class="chips" role="group" aria-label="Class type">${chips}</div>
-    ${body}
+    ${noSlots?`<div class="editbanner">${ICON.clock}<span>Add the dojo’s regular class times so they show on the calendar. <button type="button" class="textbtn" data-act="slots" style="padding:0;min-height:0;display:inline;font-size:inherit;font-weight:800">Class times</button></span></div>`:""}
+    <div class="caltools">
+      <div class="seg" role="group" aria-label="Calendar view"><button type="button" data-act="calView" data-v="week" aria-pressed="${calView==="week"}">Week</button><button type="button" data-act="calView" data-v="month" aria-pressed="${calView==="month"}">Month</button></div>
+      <div class="calnav"><button type="button" class="iconbtn round" data-act="calNav" data-v="-1" aria-label="Previous ${calView}">${ICON.back}</button><span class="caltitle" aria-live="polite">${esc(calTitle())}</span><button type="button" class="iconbtn round" data-act="calNav" data-v="1" aria-label="Next ${calView}">${ICON.go}</button>${calOff?`<button type="button" class="textbtn" data-act="calNav" data-v="0">${calView==="week"?"This week":"This month"}</button>`:""}</div>
+    </div>
+    <div class="chips daychips" role="group" aria-label="Class day">${chips}</div>
+    ${calView==="month"?calMonth():calWeek()}
+    ${S.plans.length?`<details class="allplans"><summary>All plans as a list</summary><div class="stack" style="margin-top:12px">${listHTML||`<p class="small">No plans on ${esc(DAYS[+plansFilter]||"")}s yet.</p>`}</div></details>`:""}
   </div>`;
 }
 
@@ -1021,7 +1174,7 @@ function renderSheet(){
     case"item":h=sheetItem(s);break;
     case"pick":h=sheetPick(s);break;
     case"ex":h=sheetEx(s);break;
-    case"newPlan":h=sheetNewPlan();break;
+    case"newPlan":h=sheetNewPlan(s);break;
     case"copyPick":h=sheetCopyPick();break;
     case"copy":h=sheetCopy(s);break;
     case"planMenu":{const p=planById(PLAN);if(!p){h=sheetHead("Plan");break;}
@@ -1210,28 +1363,29 @@ function sheetSlots(){
   const list=slots();const adm=isAdmin();
   let body=DAY_ORDER.map(d=>{const its=list.filter(x=>x.day===d);if(!its.length)return"";
     return`<div class="slotday">${DAYS[d]}</div>`+its.map(x=>`<div class="slotrow"><span class="grow">${esc(fmtTime(x.key))}${x.label?` · <span style="color:var(--muted)">${esc(x.label)}</span>`:""}</span>${adm?`<button type="button" class="iconbtn" data-act="delSlot" data-id="${esc(x.id)}" aria-label="Remove ${esc(DAYS[d])} ${esc(fmtTime(x.key))}">${ICON.x}</button>`:""}</div>`).join("");}).join("");
-  if(!body)body=`<p class="small">No regular timeslots yet.${adm?" Add your class times below.":" An admin can add them."}</p>`;
+  if(!body)body=`<p class="small">No class times yet.${adm?" Add your class times below.":" An admin can add them."}</p>`;
   const types=classTypes();
-  return sheetHead("Class timeslots",`<div class="small">Regular classes, by day</div>`)+body+(adm?`<form id="slotForm" class="mt">
-    <div class="slotday" style="margin-top:18px">Add a timeslot</div>
+  return sheetHead("Class times",`<div class="small">The dojo’s regular weekly classes. They fill the Plans calendar and the day filter.</div>`)+body+(adm?`<form id="slotForm" class="mt">
+    <div class="slotday" style="margin-top:18px">Add a class time</div>
     <div class="field"><label for="slDay">Day</label><select class="inp" id="slDay" name="day">${DAY_ORDER.map(d=>`<option value="${d}">${DAYS[d]}</option>`).join("")}</select></div>
     <div class="field"><span class="label" style="margin:0">Time</span><div class="timein"><input class="inp" name="tStart" type="time" step="300" required aria-label="Start time"><span>to</span><input class="inp" name="tEnd" type="time" step="300" required aria-label="End time"></div></div>
     <div class="field"><label for="slType">Class (optional)</label><select class="inp" id="slType" name="label"><option value="">Any class</option>${types.map(t=>`<option>${esc(t)}</option>`).join("")}</select></div>
     <p class="msg" id="slotMsg" aria-live="polite"></p>
-    <button class="btn primary block" type="submit">Add timeslot</button></form>`:"");
+    <button class="btn primary block" type="submit">Save class time</button></form>`:"");
 }
 function sheetExView(s){const e=exById(s.id);if(!e)return sheetHead("Not found");
   return sheetHead(esc(e.name),secChip(e.section)+"<br>")+`<p class="small" style="margin:-6px 0 12px">${esc(personName(e.ownerId)||"Another instructor")}’s exercise · ${e.minutes} min · shared with ${esc(shareMode(e.share)==="all"?"everyone":"you")}</p>
     ${e.addedBy?`<p style="margin:0 0 8px"><span class="tag creator">${ICON.user}${esc(e.addedBy)}</span></p>`:""}
     ${e.description?`<h3 class="vlabel">Instructions</h3>${stepsHTML(e.description)}`:""}${toPoints(e.notes).length?`<h3 class="vlabel">Notes</h3>${ptsHTML(e.notes)}`:""}
     <div class="btnrow" style="margin-top:14px"><button type="button" class="btn outline" data-act="closeSheet">Close</button><button type="button" class="btn primary" data-act="copyEx" data-id="${esc(e.id)}">${ICON.copy}Copy to edit</button></div>`;}
-function sheetNewPlan(){
-  const lens=classLengths();const def=lens.includes(105)?105:lens[0];
+function sheetNewPlan(s){
+  s=s||{};const lens=classLengths();const k=s.date||todayKey();const sl=parseTime(s.slot);
+  const def=sl?sl.mins:lens.includes(105)?105:lens[0];const ty=classTypes().find(t=>eqi(t,s.ptype))||classTypes()[0];
   return sheetHead("New plan",`<div class="small">Starts with: ${esc(defaultSections().join(" · "))}</div>`)+
   `<form id="newPlanForm" class="planform">
-    <div class="field"><label for="nDate">Date</label><input class="inp" id="nDate" name="date" type="date" value="${todayKey()}" required></div>
-    ${timeField(todayKey(),"")}
-    ${typeLenFields(classTypes()[0],def)}
+    <div class="field"><label for="nDate">Date</label><input class="inp" id="nDate" name="date" type="date" value="${k}" required></div>
+    ${timeField(k,sl?sl.key:"")}
+    ${typeLenFields(ty,def)}
     <div class="field"><label for="nFocus">Focus or event name (optional)</label><input class="inp" id="nFocus" name="focus" type="text" maxlength="60" placeholder="e.g. Kumite focus, Grading day"></div>
     ${shareField("sh","me","this plan")}
     <button class="btn primary block" type="submit">Create plan</button></form>`;
@@ -1278,6 +1432,10 @@ document.addEventListener("click",e=>{
     case"attendGo":setTimeout(closeSheet,50);break;
     case"toastAct":{const a=toastFns[+t.dataset.i];hideToast();if(a)a.fn();break;}
     case"pfilter":plansFilter=t.dataset.v;LS.set("pfilter",plansFilter);renderView();break;
+    case"calView":calView=t.dataset.v==="month"?"month":"week";calOff=0;LS.set("calview",calView);renderView();break;
+    case"calNav":{const v=+t.dataset.v;calOff=v?calOff+v:0;calSel="";renderView();break;}
+    case"calSel":calSel=t.dataset.k;renderView();break;
+    case"planSlot":openSheet({type:"newPlan",date:t.dataset.k,slot:t.dataset.slot||"",ptype:t.dataset.type||""});break;
     case"lfilter":libFilter=t.dataset.v;renderView();break;
     case"openPlan":{editFromView=false;const op=planById(t.dataset.id);go("plan",t.dataset.id,op&&isPast(op)?"review":"view");break;}
     case"setMode":{const m=t.dataset.m;if(sheet){hideSheet();planMode=m;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}else go("plan",undefined,m);break;}
