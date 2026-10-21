@@ -285,6 +285,75 @@ ul.vpts.mine{color:var(--red-d)}
 .err{background:var(--red-soft);color:var(--red-d);border-radius:14px;padding:12px 14px;font-weight:700;margin:0 0 16px}
 @media (min-width:700px){.tabs{max-width:640px;margin:0 auto;border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0}}
 
+/* ---------- Tap feedback (every button) ---------- */
+button,a.btn,.pickrow{transition:transform .08s ease,filter .08s ease,background-color .12s}
+button:not(:disabled):active,a.btn:active{transform:scale(.96);filter:brightness(.92)}
+
+/* ---------- Last class recap and class notes ---------- */
+.recap{border:1.5px solid #F2C4CB;background:var(--red-tint);border-radius:20px;overflow:hidden}
+.recap .rch{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;text-align:left;min-height:64px;color:var(--ink)}
+.recap .rch:active{transform:none}
+.ring2{width:40px;height:40px;border-radius:20px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.ring2 svg{width:22px;height:22px}
+.recap h2{margin:0;font-family:var(--f-d);font-size:17px;font-weight:800}
+.rcopen{font-size:13px;font-weight:800;color:var(--red-d);flex:none}
+.rcb{padding:0 14px 14px;display:flex;flex-direction:column;gap:14px}
+.rcb .btnrow .btn{background:#fff}
+.rcount{display:flex;gap:6px;flex-wrap:wrap}
+.rcount span{font-size:12.5px;font-weight:800;padding:5px 10px;border-radius:12px;color:#fff}
+.rclabel{font-size:13px;font-weight:800;color:var(--ink2);margin:0 0 6px}
+.rcpts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:15px;line-height:1.4}
+.rcpts li{display:flex;gap:8px;overflow-wrap:anywhere}
+.rcpts li::before{content:"•";color:var(--red);font-weight:800;flex:none}
+.asg{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:6px 6px 6px 12px;border:1.5px solid #EADFC9;margin-bottom:6px}
+.asg .w,.openasg .w{font-size:12px;font-weight:800;color:#8A4B00}
+.asg .x{font-size:15px;font-weight:700;line-height:1.35;overflow-wrap:anywhere}
+.asg.done .x{text-decoration:line-through;color:#767676}
+.fup{min-height:44px;padding:0 12px;border-radius:22px;font-size:13px;font-weight:800;border:1.5px solid #8A4B00;background:#fff;color:#8A4B00;flex:none;display:inline-flex;align-items:center;gap:4px}
+.fup svg{width:16px;height:16px}
+.fup[aria-pressed=true]{background:#8A4B00;color:#fff}
+.fup:disabled{opacity:.6}
+.fup.sm{min-height:36px;margin-top:6px;font-size:12.5px}
+.pchip{--c:#5B3FA8;min-height:44px;padding:0 14px;border-radius:22px;font-size:14px;font-weight:800;border:1.5px solid #D9CFF0;background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.pchip[aria-pressed=true]{background:var(--c);border-color:var(--c);color:#fff}
+.kdot{width:10px;height:10px;border-radius:5px;display:inline-block;box-shadow:0 0 0 1px rgba(0,0,0,.25);flex:none}
+.pbox{background:#fff;border-radius:14px;padding:10px 12px 2px;border:1.5px solid #D9CFF0;margin-top:8px}
+.pbox .rcpts li::before{color:#5B3FA8}
+.linkbtn{display:flex;align-items:center;min-height:44px;border:0;background:none;padding:0;font-size:14px;font-weight:800;color:#5B3FA8}
+.notebox{padding:16px}
+.notebox h2{margin:0 0 2px;font-family:var(--f-d);font-size:18px;font-weight:800}
+.nkinds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.nkind{min-height:48px;border-radius:16px;font-size:14px;font-weight:800;border:1.5px solid var(--c);background:#fff;color:var(--ink);padding:0 8px}
+.nkind[aria-pressed=true]{background:var(--c);color:#fff}
+.nbpick{margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+.nbpick .label{margin:0}
+.findbox{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line2);border-radius:14px;padding:0 0 0 12px;background:#fff}
+.findbox svg{width:18px;height:18px;color:var(--muted);flex:none}
+.findbox .inp{border:0;height:44px;padding-left:4px}
+.nshare{margin-top:8px;min-height:44px;border:0;background:var(--sunk);border-radius:22px;padding:0 14px;font-size:13.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.nshare svg{width:16px;height:16px}
+.nshare[aria-pressed=true]{background:#EFEAFB;color:#5B3FA8}
+.nlist{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column}
+.nlist li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid #ECECEC}
+.nlist li.done .nx{text-decoration:line-through;color:#767676}
+.ntag{font-size:12px;font-weight:800;padding:4px 9px;border-radius:10px;color:#fff;white-space:nowrap;flex:none;margin-top:1px}
+.nx{font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+.nm{font-size:12px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.nm svg{width:12px;height:12px}
+.nacts{display:flex;flex:none;margin:-8px -6px 0 0}
+.openasg{background:#FBF3E6;border:1.5px solid #EADFC9;border-radius:16px;padding:10px 12px;margin-bottom:12px}
+.openasg .x{font-size:15px;font-weight:700}
+.studay{margin-bottom:14px}
+.backlink{display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:0;min-height:40px;font-size:14px;font-weight:800;color:var(--ink2)}
+.backlink svg{width:18px;height:18px}
+.phead h1{white-space:nowrap}
+@media (max-width:400px){.phead h1{font-size:23px}}
+.phead .slotsbtn{padding:0 12px}
+.stuh{width:100%;display:flex;align-items:center;gap:8px;border:0;background:var(--sunk);border-radius:12px;min-height:44px;padding:0 10px 0 12px;font-size:14px;font-weight:800;color:var(--ink);text-align:left}
+.stuh svg{width:18px;height:18px}
+.studay .nlist{margin-top:4px}
+.studay .nlist li:first-child{border-top:0}
+
 /* ---------- Plans calendar ---------- */
 .phead{display:flex;align-items:center;gap:10px;justify-content:space-between}
 .slotsbtn{min-height:44px;padding:0 14px;gap:6px;flex:none}
@@ -417,7 +486,7 @@ const ICON={
   copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
   clock:svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
-  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), lock:svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), people:svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c2.2.6 3.5 2.4 3.5 5.4"/>'), globe:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'), clock:svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
+  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), lock:svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), people:svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c2.2.6 3.5 2.4 3.5 5.4"/>'), globe:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'), clock:svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), history:svg('<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/>',2.2), eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
 };
 
 /* ---------- dates and times ---------- */
@@ -528,7 +597,7 @@ function addPointAfter(box,row){const tmp=document.createElement("div");tmp.inne
    SYNC — the Google Sheet is the source of truth.
    Changes show on screen right away, then go to the sheet in batches.
    ===================================================================== */
-let S={plans:[],items:[],exercises:[],lists:[],people:[]};
+let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[]};
 let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
@@ -546,7 +615,7 @@ const uid=()=>("x"+Date.now().toString(36)+Math.random().toString(36).slice(2,9)
 function applyLocal(o){const arr=S[o.coll];if(o.op==="add"){const rec=Object.assign({id:o.id},o.data);const i=arr.findIndex(d=>d.id===o.id);if(i>=0)arr[i]=rec;else arr.push(rec);}else if(o.op==="update"){const x=arr.find(d=>d.id===o.id);if(x)Object.assign(x,o.data);}else S[o.coll]=arr.filter(d=>d.id!==o.id);}
 function enqueue(o){queue.push(o);applyLocal(o);onData();clearTimeout(flushT);flushT=setTimeout(flush,350);}
 const store={
-  add(c,data){const id=uid();if(c==="plans"||c==="exercises")data=Object.assign({share:"me"},data,ownFlags());enqueue({op:"add",coll:c,id,data});return id;},
+  add(c,data){const id=uid();if(c==="plans"||c==="exercises"||c==="notes")data=Object.assign({share:"me"},data,ownFlags());enqueue({op:"add",coll:c,id,data});return id;},
   update(c,id,data){enqueue({op:"update",coll:c,id,data});},
   del(c,id){enqueue({op:"del",coll:c,id});}
 };
@@ -558,6 +627,8 @@ function normalize(st){
     plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
     items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy)})),
     people:(st.people||[]).map(r=>({id:str(r.id),name:str(r.name),admin:!!r.admin})).filter(r=>r.id),
+    notes:(st.notes||[]).map(r=>Object.assign({},r,{plan:str(r.plan),item:str(r.item),kind:str(r.kind)||"Class",who:str(r.who),text:str(r.text),done:str(r.done),share:r.share==="all"?"all":"me",addedBy:str(r.addedBy),created:num(r.created,0)||num(r.updated,0)})).filter(r=>r.text),
+    students:(st.students||[]).map(r=>({name:str(r.name),belt:str(r.belt)})).filter(r=>r.name),
     exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),notes:str(r.notes),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
   };
 }
@@ -607,7 +678,7 @@ const planTitle=p=>p.focus||(p.type?p.type+" class":"Class plan");
 const isPast=p=>!!p.date&&p.date<keyMs(todayKey())-12*3600e3;
 const ptLines=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*•\s*/,"").trim()).filter(Boolean);
 const ptJoin=a=>a.map(l=>"• "+l).join("\n");
-const noteCount=p=>itemsOf(p.id).reduce((a,i)=>a+ptLines(i.live).length,0)+ptLines(p.review).length;
+const noteCount=p=>itemsOf(p.id).reduce((a,i)=>a+ptLines(i.live).length,0)+ptLines(p.review).length+S.notes.filter(n=>n.plan===p.id).length;
 function touchPlan(pid){if(planById(pid))store.update("plans",pid,{editedBy:who(),updated:Date.now()});}
 function addItem(p,sec,ex,extra){
   const sections=planSections(p);const data={};
@@ -799,7 +870,7 @@ function viewPlans(){
   const noSlots=!slots().length;
   const listHTML=(up.length?`<h2 class="grouph">Coming up</h2>`+up.map((p,i)=>planCard(p,i===0)).join(""):"")+(past.length?`<h2 class="grouph">Past classes</h2>`+past.map(p=>planCard(p,false)).join(""):"");
   return`<div class="stack plansview">
-    <div class="phead"><h1>Lesson plans</h1><button type="button" class="btn outline square slotsbtn" data-act="slots">${ICON.clock}Class times</button></div>
+    <div class="phead"><h1>Lesson plans</h1><div class="row" style="gap:8px"><button type="button" class="iconbtn outline" data-act="students" aria-label="Student notes">${ICON.user}</button><button type="button" class="btn outline square slotsbtn" data-act="slots">${ICON.clock}Class times</button></div></div>
     <div class="btnrow"><button type="button" class="btn primary square" data-act="newPlan">${ICON.plus}New plan</button><button type="button" class="btn outline square" data-act="copyPick">${ICON.copy}Copy a plan</button></div>
     ${noSlots?`<div class="editbanner">${ICON.clock}<span>Add the dojo’s regular class times so they show on the calendar. <button type="button" class="textbtn" data-act="slots" style="padding:0;min-height:0;display:inline;font-size:inherit;font-weight:800">Class times</button></span></div>`:""}
     <div class="caltools">
@@ -857,6 +928,7 @@ function viewPlan(){
       <div class="grow"><div class="kicker">${esc(whenLine(p))}</div><h1>${esc(planTitle(p))}</h1>${edited?`<div class="small" style="margin-top:2px">${edited}</div>`:""}</div>
       <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: date, time, focus, sharing, copy, delete">${ICON.more}</button>
     </div>
+    ${recapHTML(p)}
     <button type="button" class="pickrow" data-act="planInfo" style="margin:0"><span class="nm" style="font-weight:700">${parseTime(p.time)?`<b>${esc(fmtTime(p.time))}</b>`:"No set time"} · <span style="color:var(--muted)">change date or time</span></span>${ICON.clock}</button>
     ${canShareR(p)?`<button type="button" class="pickrow" data-act="sharePlan" style="margin:0"><span class="nm" style="font-weight:700">Who can see it: <b>${esc(shareLabel(p.share))}</b></span>${shareMode(p.share)==="me"?ICON.lock:shareMode(p.share)==="all"?ICON.globe:ICON.people}</button>`:""}
     <div><span class="label">Class type</span><div class="chips">${typeChips}</div></div>
@@ -910,7 +982,8 @@ function viewTeach(p){
         <div class="small" style="margin-top:4px">${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}</div></div>
       <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: edit, date, focus, copy, delete">${ICON.more}</button>
     </div>
-    ${any?secs+`<button type="button" class="btn outline block" data-act="setMode" data-m="review">${ICON.review}Class done? Review the notes</button>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
+    ${recapHTML(p)}
+    ${any?secs+noteBoxHTML(p)+`<button type="button" class="btn outline block" data-act="setMode" data-m="review">${ICON.review}Class done? Review the notes</button>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
   </div>`;
 }
 
@@ -935,7 +1008,8 @@ function viewReview(p){
       ${cards}
     </section>`;
   }).join("");
-  const sum=[`<span class="${qnTotal?"on":""}">${qnTotal} quick ${qnTotal===1?"note":"notes"}</span>`,`<span>${withNotes} of ${itemsOf(p.id).length} exercises noted</span>`,`<span class="${rv.length?"on":""}">${rv.length} after-class ${rv.length===1?"note":"notes"}</span>`].join("");
+  const tn=notesOf(p.id).length;
+  const sum=[`<span class="${tn?"on":""}">${tn} class ${tn===1?"note":"notes"}</span>`,`<span class="${qnTotal?"on":""}">${qnTotal} quick ${qnTotal===1?"note":"notes"}</span>`,`<span>${withNotes} of ${itemsOf(p.id).length} exercises noted</span>`,`<span class="${rv.length?"on":""}">${rv.length} after-class ${rv.length===1?"note":"notes"}</span>`].join("");
   const ed=canEditR(p);
   return`<div class="stack">
     ${viewOnlyNote(p)}
@@ -950,6 +1024,7 @@ function viewReview(p){
       ${rv.length?`<ul class="rvlist">${rv.map((x,i)=>`<li><span class="grow">${esc(x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delRv" data-i="${i}" aria-label="Delete this note">${ICON.x}</button>`:""}</li>`).join("")}</ul>`:(ed?"":`<p class="small" style="margin:8px 0 0">No after-class notes.</p>`)}
       ${ed?`<form class="rform qform" data-id="${esc(p.id)}" style="margin-top:10px"><label for="rv-${esc(p.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add an after-class note</label><input class="inp keepval" id="rv-${esc(p.id)}" name="q" type="text" placeholder="e.g. Kids need more kumite time" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add after-class note">${ICON.plus}</button></form>`:""}
     </section>
+    ${noteBoxHTML(p)}
     ${kataUpdateHTML(p)}
     <button type="button" class="btn primary block" data-act="shareNotes">${ICON.share}Share or copy all notes</button>
     ${secs||`<div class="card empty"><p>No exercises in this plan.</p></div>`}
@@ -967,6 +1042,10 @@ function kataUpdateHTML(p){
 }
 function notesText(p){
   const out=[`SKA class review: ${planTitle(p)}`,`${whenLine(p)}${p.type?" · "+p.type:""}`];
+  const tn=notesOf(p.id);
+  NOTE_KINDS.forEach(K=>{const ns=tn.filter(n=>n.kind===K.k);if(!ns.length)return;out.push("",K.label);
+    ns.forEach(n=>{const it=n.item?itemById(n.item):null;const lead=n.kind==="Feedback"?(it?it.name:""):(isWhole(n.who)?"":n.who);
+      out.push("• "+(lead?lead+": ":"")+n.text+(n.kind==="Assignment"&&isDone(n)?" (followed up)":""));});});
   const rv=ptLines(p.review);if(rv.length){out.push("","After class");rv.forEach(x=>out.push("• "+x));}
   planSections(p).filter(s=>!isSkipped(p,s)).forEach(s=>{
     const its=secItems(p,s).filter(it=>qnLines(it.live).length||toPoints(it.note).length);if(!its.length)return;
@@ -975,6 +1054,157 @@ function notesText(p){
   });
   if(out.length===2)out.push("","No notes yet.");
   return out.join("\n");
+}
+
+/* ---------- Class notes (Gary, Oct 21) ----------
+   Typed notes: Told the class / Assignment / One student / Exercise feedback. Private to whoever wrote them
+   unless they share them with the instructors on that class. Student names come from the Kata Tracker's
+   active members (S.students), and any name typed by hand is remembered from past notes.
+   "Last class" recap: the plan before this one in the same timeslot (same weekday and start time). */
+const NOTE_KINDS=[
+  {k:"Class",label:"Told the class",tag:"Class",col:"#111111",ph:"e.g. Grading is Sat, Nov 15"},
+  {k:"Assignment",label:"Assignment",tag:"Assignment",col:"#8A4B00",ph:"e.g. Practise Heian Shodan 5 times at home"},
+  {k:"Person",label:"One student",tag:"Student",col:"#5B3FA8",ph:"e.g. Front stance too short"},
+  {k:"Feedback",label:"Exercise feedback",tag:"Feedback",col:"#0F6E6A",ph:"e.g. Too long for Kids, 10 min max"}];
+const kindOf=k=>NOTE_KINDS.find(x=>x.k===k)||NOTE_KINDS[0];
+const WHOLE="Whole class";
+const isWhole=w=>!w||eqi(w,WHOLE);
+const notesOf=pid=>S.notes.filter(n=>n.plan===pid).sort((a,b)=>(a.created||0)-(b.created||0));
+const noteTime=n=>n.created?new Date(n.created).toLocaleTimeString("en-CA",{hour:"numeric",minute:"2-digit"}):"";
+const isDone=n=>/^y/i.test(n.done||"");
+const startOf=p=>{const t=parseTime(p.time);return t?t.start:"";};
+function sameSlot(a,b){
+  if(!a.date||!b.date||new Date(a.date).getDay()!==new Date(b.date).getDay())return false;
+  const sa=startOf(a),sb=startOf(b);
+  return sa||sb?(!!sa&&!!sb&&toMin(sa)===toMin(sb)):eqi(a.type,b.type);
+}
+const earlierSlot=p=>p&&p.date?S.plans.filter(x=>x.id!==p.id&&x.date&&x.date<p.date&&sameSlot(x,p)).sort((a,b)=>b.date-a.date):[];
+const beltOf=name=>{const s=S.students.find(x=>eqi(x.name,name));return s?s.belt:"";};
+const beltDot=name=>{const b=looseBelt(beltOf(name));return b>=0?`<span class="kdot" style="background:${BELT_COL[BELTS[b]]}" aria-hidden="true"></span>`:"";};
+function allNames(){const out=[];const add=n=>{n=String(n||"").trim();if(n&&!isWhole(n)&&!out.some(o=>eqi(o,n)))out.push(n);};
+  S.students.forEach(s=>add(s.name));S.notes.forEach(n=>add(n.who));return out.sort((a,b)=>a.localeCompare(b));}
+function recentNames(){const out=[];S.notes.filter(n=>!isWhole(n.who)).sort((a,b)=>(b.created||0)-(a.created||0)).forEach(n=>{if(!out.some(o=>eqi(o,n.who)))out.push(n.who);});return out;}
+const notesAbout=name=>S.notes.filter(n=>eqi(n.who,name));
+
+/* The note box: in the teaching view and the review */
+let NB={kind:"Person",who:"",item:"",q:"",share:false};
+function nbNamesHTML(){
+  const K=kindOf(NB.kind),q=NB.q.trim().toLowerCase();let names;
+  if(q){names=allNames().filter(n=>n.toLowerCase().includes(q)).slice(0,12);
+    if(!names.some(n=>n.toLowerCase()===q))names.push(NB.q.trim());}
+  else{names=recentNames().slice(0,8);if(NB.who&&!isWhole(NB.who)&&!names.some(n=>eqi(n,NB.who)))names.unshift(NB.who);
+    if(NB.kind==="Assignment")names.unshift(WHOLE);}
+  const cur=NB.who||(NB.kind==="Assignment"?WHOLE:"");
+  const chips=names.map(n=>{const typed=q&&n===NB.q.trim()&&!allNames().some(x=>eqi(x,n));
+    return`<button type="button" class="pchip" data-act="nbWho" data-v="${esc(n)}" aria-pressed="${eqi(n,cur)}" style="--c:${K.col}">${beltDot(n)}${typed?"Use “"+esc(n)+"”":esc(n)}</button>`;}).join("");
+  return chips||`<span class="small">${S.students.length?"Find a student below.":"Type a student’s name below. Names you use are remembered."}</span>`;
+}
+function noteBoxHTML(p){
+  const K=kindOf(NB.kind);
+  const kinds=NOTE_KINDS.map(x=>`<button type="button" class="nkind" data-act="nbKind" data-v="${x.k}" aria-pressed="${x.k===NB.kind}" style="--c:${x.col}">${x.label}</button>`).join("");
+  let pick="";
+  if(NB.kind==="Person"||NB.kind==="Assignment"){
+    pick=`<div class="nbpick"><span class="label">${NB.kind==="Assignment"?"For whom?":"Which student?"}</span>
+      <div class="chips" id="nbNames">${nbNamesHTML()}</div>
+      <div class="findbox">${ICON.search}<input class="inp" id="nbFind" type="search" value="${esc(NB.q)}" placeholder="${S.students.length?"Find a student":"Type a name"}" autocomplete="off" aria-label="Find a student"></div></div>`;
+  }else if(NB.kind==="Feedback"){
+    const its=itemsOf(p.id).filter(i=>!isSkipped(p,i.section));
+    if(its.length)pick=`<div class="nbpick"><span class="label">Which exercise?</span><div class="chips">${its.map(i=>`<button type="button" class="pchip" data-act="nbItem" data-id="${esc(i.id)}" aria-pressed="${NB.item===i.id}" style="--c:${K.col}">${esc(i.name)}</button>`).join("")}</div></div>`;
+  }
+  const mine=notesOf(p.id);
+  return`<section class="card notebox" id="noteBox">
+    <h2>Class notes</h2><p class="small" style="margin:0 0 12px">Only you see a note unless you share it. Next class at this time shows them under <b>Last class</b>.</p>
+    <div class="nkinds" role="group" aria-label="What kind of note">${kinds}</div>
+    ${pick}
+    <form class="nform qform" data-id="${esc(p.id)}"><label for="nbText" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Note</label><input class="inp keepval" id="nbText" name="q" type="text" placeholder="${esc(K.ph)}" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add this note">${ICON.plus}</button></form>
+    <button type="button" class="nshare" data-act="nbShare" aria-pressed="${NB.share}">${NB.share?ICON.people+"Shared with instructors on this class":ICON.lock+"Only me · tap to share"}</button>
+    ${mine.length?`<ul class="nlist">${mine.map(n=>noteLi(n)).join("")}</ul>`:""}
+  </section>`;
+}
+function noteLi(n,opt){
+  opt=opt||{};const K=kindOf(n.kind),it=n.item?itemById(n.item):null;
+  const lead=n.kind==="Feedback"?(it?it.name:""):opt.noWho?"":(isWhole(n.who)?(n.kind==="Assignment"?WHOLE:""):n.who);
+  const meta=[opt.when||noteTime(n)];if(!n.mine)meta.push(esc(personName(n.ownerId)||n.addedBy||"Another instructor"));
+  const lockIc=n.share==="all"?`<span class="nm" title="Shared">${ICON.people}Shared</span>`:`<span class="nm" title="Only you">${ICON.lock}Only me</span>`;
+  return`<li class="${n.kind==="Assignment"&&isDone(n)?"done":""}">
+    <span class="ntag" style="background:${K.col}">${K.tag}</span>
+    <div class="grow"><div class="nx">${lead?`<b>${esc(lead)}:</b> `:""}${esc(n.text)}</div>
+      <div class="nm">${meta.filter(Boolean).join(" · ")}${n.mine?" · ":""}${n.mine?lockIc:""}</div>
+      ${n.kind==="Assignment"?`<button type="button" class="fup sm" data-act="noteDone" data-id="${esc(n.id)}" aria-pressed="${isDone(n)}"${n.mine?"":" disabled"}>${isDone(n)?ICON.check+"Followed up":"Follow up"}</button>`:""}</div>
+    ${n.mine&&!opt.readonly?`<div class="nacts"><button type="button" class="iconbtn" data-act="noteShare" data-id="${esc(n.id)}" aria-label="${n.share==="all"?"Make this note private":"Share this note with instructors on this class"}">${n.share==="all"?ICON.people:ICON.lock}</button><button type="button" class="iconbtn" data-act="delNote" data-id="${esc(n.id)}" aria-label="Delete this note">${ICON.x}</button></div>`:""}
+  </li>`;
+}
+
+/* Last class: everything from the previous class in this timeslot, at the top of tonight's class */
+let recapWho="";
+function recapHTML(p){
+  const prev=earlierSlot(p),last=prev[0];if(!last)return"";
+  const open=LS.get("recap","1")!=="0";
+  const ns=notesOf(last.id);
+  const told=ns.filter(n=>n.kind==="Class");
+  const after=ptLines(last.review);
+  const prevIds=new Set(prev.map(x=>x.id));
+  const asg=S.notes.filter(n=>n.kind==="Assignment"&&prevIds.has(n.plan)&&(n.plan===last.id||!isDone(n)))
+    .sort((a,b)=>((planById(b.plan)||{}).date||0)-((planById(a.plan)||{}).date||0)||(a.created||0)-(b.created||0));
+  const ppl={};ns.filter(n=>!isWhole(n.who)&&(n.kind==="Person"||n.kind==="Assignment")).forEach(n=>{const k=Object.keys(ppl).find(x=>eqi(x,n.who))||n.who;(ppl[k]=ppl[k]||[]).push(n);});
+  const names=Object.keys(ppl).sort((a,b)=>a.localeCompare(b));
+  const fb=ns.filter(n=>n.kind==="Feedback").map(n=>{const it=itemById(n.item);return{ex:it?it.name:"",x:n.text};});
+  itemsOf(last.id).forEach(it=>qnLines(it.live).forEach(x=>fb.push({ex:it.name,x:splitQn(x).x})));
+  const openAsg=asg.filter(n=>!isDone(n)).length;
+  const sub=fmtDay(last.date)+(last.type?" · "+last.type:"")+(parseTime(last.time)?" · "+clock12(startOf(last)):"")+(last.mine===false&&last.ownerId?" · "+(personName(last.ownerId)||""):"");
+  const nothing=!told.length&&!after.length&&!asg.length&&!names.length&&!fb.length;
+  const counts=[[told.length+after.length,"to the class","#111111"],[openAsg,openAsg===1?"assignment open":"assignments open","#8A4B00"],[names.length,names.length===1?"student":"students","#5B3FA8"],[fb.length,"feedback","#0F6E6A"]]
+    .filter(c=>c[0]).map(c=>`<span style="background:${c[2]}">${c[0]} ${c[1]}</span>`).join("");
+  if(recapWho&&!names.some(n=>eqi(n,recapWho)))recapWho="";
+  const body=nothing?`<p class="small" style="margin:0">No notes from that class.</p>`:`
+    ${counts?`<div class="rcount">${counts}</div>`:""}
+    ${told.length?`<div><div class="rclabel">Told the class</div><ul class="rcpts">${told.map(n=>`<li><span>${esc(n.text)}</span></li>`).join("")}</ul></div>`:""}
+    ${asg.length?`<div><div class="rclabel">Assignments to follow up</div>${asg.map(n=>{const pl=planById(n.plan),older=n.plan!==last.id;
+      return`<div class="asg${isDone(n)?" done":""}"><div class="grow"><div class="w">${esc(isWhole(n.who)?WHOLE:n.who)}${older&&pl?" · from "+esc(fmtDay(pl.date)):""}</div><div class="x">${esc(n.text)}</div></div>
+        <button type="button" class="fup" data-act="noteDone" data-id="${esc(n.id)}" aria-pressed="${isDone(n)}"${n.mine?"":` disabled title="${esc(personName(n.ownerId)||"Another instructor")}’s note"`}>${isDone(n)?"Done":"Follow up"}</button></div>`;}).join("")}</div>`:""}
+    ${names.length?`<div><div class="rclabel">Individual notes</div><div class="chips">${names.map(n=>`<button type="button" class="pchip" data-act="recapWho" data-v="${esc(n)}" aria-pressed="${eqi(n,recapWho)}" aria-expanded="${eqi(n,recapWho)}">${beltDot(n)}${esc(n)} · ${ppl[n].length}</button>`).join("")}</div>
+      ${recapWho?`<div class="pbox"><ul class="rcpts">${ppl[names.find(n=>eqi(n,recapWho))].map(n=>`<li><span>${n.kind==="Assignment"?"<b>Assignment:</b> ":""}${esc(n.text)}</span></li>`).join("")}</ul>
+        <button type="button" class="linkbtn" data-act="student" data-v="${esc(recapWho)}">Every note for ${esc(recapWho)} ›</button></div>`:""}</div>`:""}
+    ${fb.length?`<div><div class="rclabel">Exercise feedback</div><ul class="rcpts">${fb.map(f=>`<li><span>${f.ex?`<b style="color:#0F6E6A">${esc(f.ex)}</b> · `:""}${esc(f.x)}</span></li>`).join("")}</ul></div>`:""}
+    ${after.length?`<div><div class="rclabel">After class</div><ul class="rcpts">${after.map(x=>`<li><span>${esc(x)}</span></li>`).join("")}</ul></div>`:""}`;
+  return`<section class="recap">
+    <button type="button" class="rch" data-act="recapToggle" aria-expanded="${open}">
+      <span class="ring2" aria-hidden="true">${ICON.history}</span>
+      <span class="grow"><h2>Last class</h2><span class="small" style="display:block">${esc(sub)}</span></span>
+      <span class="rcopen">${open?"Hide":"Show"}</span>
+    </button>
+    ${open?`<div class="rcb">${body}
+      <div class="btnrow"><button type="button" class="btn outline small" data-act="openReview" data-id="${esc(last.id)}">${ICON.review}Full review</button><button type="button" class="btn outline small" data-act="students">${ICON.user}Find a student</button></div></div>`:""}
+  </section>`;
+}
+
+/* Student notes: every note about one student, across all classes */
+function studentListHTML(q){
+  q=String(q||"").trim().toLowerCase();
+  const count={};S.notes.forEach(n=>{if(!isWhole(n.who)){const k=n.who.toLowerCase();count[k]=(count[k]||0)+1;}});
+  let names=allNames().filter(n=>!q||n.toLowerCase().includes(q));
+  names.sort((a,b)=>((count[b.toLowerCase()]?1:0)-(count[a.toLowerCase()]?1:0))||a.localeCompare(b));
+  const more=names.length>60;names=names.slice(0,60);
+  if(!names.length)return`<p class="small">${q?"No student matches “"+esc(q)+"”.":"No students yet. Names show up here once the Kata Tracker is connected, or once you tag a note with a name."}</p>`;
+  return names.map(n=>{const c=count[n.toLowerCase()]||0,b=beltOf(n);
+    return`<button type="button" class="pickrow" data-act="student" data-v="${esc(n)}">${beltDot(n)}<span class="nm">${esc(n)}${b?`<span class="small" style="display:block">${esc(b)} belt</span>`:""}</span>${c?`<span class="m">${c} ${c===1?"note":"notes"}</span>`:""}${ICON.go}</button>`;}).join("")+(more?`<p class="small">Type more of the name to see others.</p>`:"");
+}
+function sheetStudents(s){
+  return sheetHead("Student notes",`<div class="small">${S.students.length?S.students.length+" active members from the Kata Tracker":"Names from your notes"}</div>`)+
+    `<div class="findbox" style="margin-bottom:12px">${ICON.search}<input class="inp" id="stuFind" type="search" value="${esc(s.q||"")}" placeholder="Find a student" autocomplete="off" aria-label="Find a student" data-focus></div>
+    <div id="stuList">${studentListHTML(s.q)}</div>`;
+}
+function sheetStudent(s){
+  const name=s.name,ns=notesAbout(name),b=beltOf(name);
+  const open=ns.filter(n=>n.kind==="Assignment"&&!isDone(n));
+  const byPlan={};ns.forEach(n=>{(byPlan[n.plan]=byPlan[n.plan]||[]).push(n);});
+  const plans=Object.keys(byPlan).map(id=>planById(id)).filter(Boolean).sort((a,c)=>(c.date||0)-(a.date||0));
+  const back=s.back?`<button type="button" class="backlink" data-act="studentsBack">${ICON.back}All students</button>`:"";
+  return sheetHead(esc(name),`${back}<div class="small">${b?esc(b)+" belt · ":""}${ns.length} ${ns.length===1?"note":"notes"}</div>`)+
+    (open.length?`<div class="openasg"><div class="w">Open ${open.length===1?"assignment":"assignments"}</div>${open.map(n=>`<div class="x">${esc(n.text)}</div>`).join("")}</div>`:"")+
+    (plans.length?plans.map(pl=>`<div class="studay"><button type="button" class="stuh" data-act="openReview" data-id="${esc(pl.id)}"><span class="grow">${esc(fmtDay(pl.date))}${pl.type?" · "+esc(pl.type):""}${parseTime(pl.time)?" · "+esc(clock12(startOf(pl))):""}</span>${ICON.go}</button>
+      <ul class="nlist">${byPlan[pl.id].sort((a,c)=>(a.created||0)-(c.created||0)).map(n=>noteLi(n,{readonly:true,noWho:true})).join("")}</ul></div>`).join("")
+      :`<p class="small">No notes about ${esc(name)} yet. In a class, choose <b>One student</b> in Class notes and pick their name.</p>`);
 }
 
 /* ---------- Library ---------- */
@@ -1170,6 +1400,8 @@ function renderSheet(){
     case"share":{const r=s.coll==="plans"?planById(s.id):exById(s.id);if(!r)break;
       h=sheetHead("Who can see it",`<div class="small">${esc(s.coll==="plans"?planTitle(r):r.name)}</div>`)+`<form id="shareForm" data-coll="${s.coll}" data-id="${esc(r.id)}">${shareField("sh",r.share,s.coll==="plans"?"this plan":"this exercise")}<button class="btn primary block" type="submit">Save</button></form>`;break;}
     case"slots":h=sheetSlots();break;
+    case"students":h=sheetStudents(s);break;
+    case"student":h=sheetStudent(s);break;
     case"exView":h=sheetExView(s);break;
     case"item":h=sheetItem(s);break;
     case"pick":h=sheetPick(s);break;
@@ -1470,7 +1702,7 @@ document.addEventListener("click",e=>{
       toast("Quick note deleted",[{label:"Undo",fn:()=>{const cur=qnLines((itemById(it.id)||{}).live);cur.splice(i,0,gone);store.update("items",it.id,{live:cur.map(l=>"• "+l).join("\n")});}}]);break;}
     case"planInfo":if(sheet)swapSheet({type:"planInfo"});else openSheet({type:"planInfo"});break;
     case"askDelPlan":if(p)swapSheet({type:"confirm",center:true,title:"Delete this plan?",text:`“${planTitle(p)}” on ${fmtDay(p.date)} and its ${itemsOf(p.id).length} exercises will be removed for everyone. The library isn’t affected.`,yes:"Delete",act:"delPlan",id:p.id});break;
-    case"delPlan":{const pp=planById(t.dataset.id);if(!pp)break;itemsOf(pp.id).forEach(i=>store.del("items",i.id));store.del("plans",pp.id);finishSheet("plans","");toast("Plan deleted");break;}
+    case"delPlan":{const pp=planById(t.dataset.id);if(!pp)break;itemsOf(pp.id).forEach(i=>store.del("items",i.id));S.notes.filter(n=>n.plan===pp.id&&n.mine).forEach(n=>store.del("notes",n.id));store.del("plans",pp.id);finishSheet("plans","");toast("Plan deleted");break;}
     case"setType":if(p&&!eqi(p.type,t.dataset.v)){store.update("plans",p.id,{type:t.dataset.v,editedBy:who(),updated:Date.now()});}break;
     case"setLength":if(p){const l=+t.dataset.v;if(l!==p.length)store.update("plans",p.id,{length:l,editedBy:who(),updated:Date.now()});}break;
     case"otherLength":if(p)openSheet({type:"length"});break;
@@ -1504,6 +1736,20 @@ document.addEventListener("click",e=>{
       if(there.length){const it=there[there.length-1];store.del("items",it.id);touchPlan(pp.id);}
       else addItem(pp,sheet.sec,{id:"",name:k.name,minutes:10});
       $("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-name="${CSS.escape(k.name)}"]`);if(b)b.focus({preventScroll:true});break;}
+    case"nbKind":NB.kind=t.dataset.v;NB.who="";NB.item="";NB.q="";renderView();break;
+    case"nbWho":{const v=t.dataset.v;NB.who=eqi(NB.who,v)&&!isWhole(v)?"":v;NB.q="";renderView();break;}
+    case"nbItem":NB.item=NB.item===t.dataset.id?"":t.dataset.id;renderView();break;
+    case"nbShare":NB.share=!NB.share;renderView();break;
+    case"noteDone":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;store.update("notes",n.id,{done:isDone(n)?"":"Yes"});if(sheet&&sheet.type==="student")renderSheet();break;}
+    case"noteShare":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const sh=n.share==="all"?"me":"all";store.update("notes",n.id,{share:sh});toast(sh==="all"?"Shared with the instructors on this class":"Only you can see this note now");break;}
+    case"delNote":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const copy=Object.assign({},n);["id","mine","ownerId","canEdit","canShare"].forEach(k=>delete copy[k]);store.del("notes",n.id);
+      toast("Note deleted",[{label:"Undo",fn:()=>{store.add("notes",copy);}}]);break;}
+    case"recapToggle":LS.set("recap",LS.get("recap","1")==="0"?"1":"0");renderView();break;
+    case"recapWho":recapWho=eqi(recapWho,t.dataset.v)?"":t.dataset.v;renderView();break;
+    case"openReview":{const id=t.dataset.id;if(!planById(id))break;editFromView=false;recapWho="";if(sheet)finishSheet("plan",id,"review");else go("plan",id,"review");break;}
+    case"students":if(sheet)swapSheet({type:"students",q:""});else openSheet({type:"students",q:""});break;
+    case"student":{const v=t.dataset.v;if(sheet&&sheet.type==="students")swapSheet({type:"student",name:v,back:{type:"students",q:sheet.q||""}});else if(sheet)swapSheet({type:"student",name:v});else openSheet({type:"student",name:v});break;}
+    case"studentsBack":if(sheet&&sheet.back)swapSheet(sheet.back);break;
     case"openKata":window.open(kataLink(t.dataset.name),"_blank","noopener");break;
     case"newExFor":if(sheet&&sheet.type==="pick")swapSheet({type:"ex",sec:sheet.sec,addTo:sheet.plan,back:Object.assign({},sheet)});break;
     case"backToPick":if(sheet&&sheet.back)swapSheet(sheet.back);break;
@@ -1544,6 +1790,8 @@ document.addEventListener("input",e=>{
     } else fit(t);
     return;
   }
+  if(id==="nbFind"){NB.q=e.target.value;const box=$("#nbNames");if(box)box.innerHTML=nbNamesHTML();return;}
+  if(id==="stuFind"&&sheet&&sheet.type==="students"){sheet.q=e.target.value;$("#stuList").innerHTML=studentListHTML(sheet.q);return;}
   if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
   if(id==="pickSearch"&&sheet&&sheet.type==="pick"){sheet.q=e.target.value;$("#pickList").innerHTML=pickListHTML(sheet);}
   if(e.target.form&&/^(profile|signup)Form$/.test(e.target.form.id)&&draft&&e.target.name!=="code"&&e.target.form.first){const f=e.target.form;draft.first=f.first.value;draft.last=f.last.value;const r=f.querySelector("input[name=title]:checked");if(r)draft.title=r.value;updateProfilePreview();}
@@ -1582,6 +1830,15 @@ document.addEventListener("submit",e=>{
       $("#pwMsg").textContent=(res&&res.message)||"Couldn’t save. Try again.";
     }).catch(()=>{btn.disabled=false;$("#pwMsg").textContent="Can’t reach the dojo sheet. Check your connection and try again.";});
     return;}
+  if(f.classList.contains("nform")){const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!p||!txt)return;
+    const K=NB.kind;let whoName="";
+    if(K==="Person"||K==="Assignment"){whoName=(NB.who||NB.q||"").replace(/\s+/g," ").trim().slice(0,60);
+      if(K==="Assignment"&&!whoName)whoName=WHOLE;
+      if(K==="Person"&&!whoName){toast("Pick the student first.");const fb=$("#nbFind");if(fb)fb.focus();return;}
+      const known=allNames().find(n=>eqi(n,whoName));if(known)whoName=known;}
+    store.add("notes",{plan:p.id,item:K==="Feedback"?NB.item:"",kind:K,who:whoName,text:txt.slice(0,500),done:"",share:NB.share?"all":"me",addedBy:who(),created:Date.now()});
+    inp.value="";NB.q="";NB.share=false;if(K==="Person")NB.who="";renderView();
+    setTimeout(()=>{const ni=$("#nbText");if(ni)ni.focus({preventScroll:true});},0);return;}
   if(f.classList.contains("rform")){const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!p||!txt)return;
     const lines=ptLines(p.review);lines.push(txt);inp.value="";store.update("plans",p.id,{review:ptJoin(lines)});
     setTimeout(()=>{const ni=document.getElementById("rv-"+p.id);if(ni)ni.focus({preventScroll:true});},0);return;}

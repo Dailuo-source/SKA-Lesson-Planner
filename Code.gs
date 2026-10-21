@@ -30,6 +30,10 @@ const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Timeslot', 'Attend
 const ROLES = ['Admin', 'Instructor'];
 const SHARE_ME = 'Only me', SHARE_ALL = 'Everyone';
 const TOKEN_DAYS = 400; // how long a sign-in lasts on a phone before asking again
+// The SKA Kata Tracker's web app. Student names for class notes come from its Members tab
+// (active members only, name and belt), using the key from menu: Connect to the Kata Tracker…
+const KATA_API = 'https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec';
+const NOTE_KINDS = ['Class', 'Assignment', 'Person', 'Feedback'];
 
 // Instructor accounts live in their own tab and are never sent to the app as data.
 const INSTR = {
@@ -102,6 +106,25 @@ const SCHEMA = {
       ['share', 'Shared with', 'share', 220],
       ['addedBy', 'Added by', 'text', 120],
       ['editedBy', 'Last edited by', 'text', 120],
+      ['updated', 'Updated', 'datetime', 160],
+    ],
+  },
+  // Typed class notes: what was told to the class, assignments, notes about one student, feedback on an exercise.
+  // Private to the instructor who wrote them ("Only me") unless they share them ("Everyone" = everyone who can see the plan).
+  notes: {
+    sheet: 'Class notes', key: 'text',
+    cols: [
+      ['id', 'ID', 'id', 90],
+      ['plan', 'Plan ID', 'text', 100],
+      ['item', 'Plan item ID', 'text', 100],
+      ['kind', 'Kind (Class/Assignment/Person/Feedback)', 'text', 150],
+      ['who', 'Student (or Whole class)', 'text', 170],
+      ['text', 'Note', 'text', 360],
+      ['done', 'Followed up (Yes/blank)', 'text', 120],
+      ['owner', 'Owner (email)', 'text', 200],
+      ['share', 'Shared with', 'share', 140],
+      ['addedBy', 'Added by', 'text', 120],
+      ['created', 'Created', 'datetime', 160],
       ['updated', 'Updated', 'datetime', 160],
     ],
   },
@@ -507,6 +530,8 @@ function access_(me, people, raw) {
   raw.plans.forEach(function (p) { acc.plans[p.id] = { owner: normEmail_(p.owner), share: shareOf_(p.share) }; });
   raw.exercises.forEach(function (e) { acc.exercises[e.id] = { owner: normEmail_(e.owner), share: shareOf_(e.share) }; });
   raw.items.forEach(function (i) { acc.items[i.id] = i.plan; });
+  acc.notes = {};
+  (raw.notes || []).forEach(function (n) { acc.notes[n.id] = { owner: normEmail_(n.owner), share: /^every/i.test(String(n.share || '')) ? 'all' : 'me', plan: n.plan }; });
   return acc;
 }
 function sees_(acc, r) {
@@ -556,6 +581,24 @@ function allowOp_(acc, op) {
     }
     return out;
   }
+  if (op.coll === 'notes') {
+    // Only the instructor who wrote a note can change or delete it, and only on a plan they can see.
+    const n = acc.notes[op.id];
+    if ('share' in data) data.share = data.share === 'all' ? SHARE_ALL : SHARE_ME;
+    if ('kind' in data && NOTE_KINDS.indexOf(data.kind) < 0) data.kind = 'Class';
+    if (op.op === 'add' && !n) {
+      if (!sees_(acc, acc.plans[data.plan])) return null;
+      data.owner = acc.email;
+      if (!('share' in data)) data.share = SHARE_ME;
+      acc.notes[op.id] = { owner: acc.email, share: data.share === SHARE_ALL ? 'all' : 'me', plan: data.plan };
+      return out;
+    }
+    if (!n || n.owner !== acc.email) return null;
+    if (op.op === 'del') return out;
+    out.op = 'update';
+    delete data.plan;
+    return out;
+  }
   if (op.coll === 'items') {
     const pid = acc.items[op.id] || data.plan;
     if (!canEdit_(acc, acc.plans[pid])) return null;
@@ -588,13 +631,79 @@ function stateFor_(me, people) {
   const plans = dress(raw.plans, acc.plans);
   const seen = {};
   plans.forEach(function (p) { seen[p.id] = true; });
+  // Notes: your own, plus ones shared on plans you can see. Owners go out as IDs, never emails.
+  const notes = (raw.notes || []).filter(function (n) {
+    const a = acc.notes[n.id];
+    return seen[n.plan] && (a.owner === acc.email || a.share === 'all');
+  }).map(function (n) {
+    const a = acc.notes[n.id];
+    const o = Object.assign({}, n);
+    delete o.owner;
+    o.ownerId = a.owner ? (idOf[a.owner] || '') : '';
+    o.share = a.share;
+    o.mine = a.owner === acc.email;
+    return o;
+  });
   return {
     plans: plans,
+    notes: notes,
+    students: students_(),
     items: raw.items.filter(function (i) { return seen[i.plan]; }),
     exercises: dress(raw.exercises, acc.exercises),
     lists: raw.lists,
     people: people.map(function (p) { return { id: p.id, name: nameOf_(p), admin: isAdmin_(p, people) }; }),
   };
+}
+
+/**
+ * Active members from the Kata Tracker (name and belt), for tagging notes. Cached for 6 hours so the
+ * planner doesn't call the tracker on every sync. Empty until the key is set (menu: Connect to the Kata Tracker…).
+ */
+function students_() {
+  const key = PropertiesService.getScriptProperties().getProperty('KATA_KEY');
+  if (!key) return [];
+  const cache = CacheService.getScriptCache();
+  const hit = cache.get('students');
+  if (hit) { try { return JSON.parse(hit); } catch (e) { /* fetch again */ } }
+  const r = fetchStudents_(key);
+  if (r.ok) {
+    const list = r.members.map(function (m) { return { name: String(m.name || '').trim(), belt: String(m.belt || '').trim() }; })
+      .filter(function (m) { return m.name; });
+    const text = JSON.stringify(list);
+    if (text.length < 90000) cache.put('students', text, 6 * 3600);
+    return list;
+  }
+  cache.put('students', '[]', 600); // try again in 10 minutes
+  return [];
+}
+function fetchStudents_(key) {
+  try {
+    const res = UrlFetchApp.fetch(KATA_API, {
+      method: 'post', contentType: 'text/plain', muteHttpExceptions: true, followRedirects: true,
+      payload: JSON.stringify({ action: 'plannerMembers', key: key }),
+    });
+    const j = JSON.parse(res.getContentText() || '{}');
+    return j && j.ok && Array.isArray(j.members) ? { ok: true, members: j.members } : { ok: false, error: (j && j.error) || 'HTTP ' + res.getResponseCode() };
+  } catch (e) {
+    return { ok: false, error: String((e && e.message) || e) };
+  }
+}
+
+function connectKataTracker() {
+  const ui = SpreadsheetApp.getUi();
+  const props = PropertiesService.getScriptProperties();
+  const r = ui.prompt('Connect to the Kata Tracker',
+    'In the Kata Tracker sheet choose Kata Tracker → Show the Lesson Planner key, copy the key and paste it here. ' +
+    'Student names (active members only) then show up when instructors tag a note. Leave blank to disconnect.',
+    ui.ButtonSet.OK_CANCEL);
+  if (r.getSelectedButton() !== ui.Button.OK) return;
+  const key = String(r.getResponseText() || '').trim();
+  CacheService.getScriptCache().remove('students');
+  if (!key) { props.deleteProperty('KATA_KEY'); ui.alert('Disconnected. Notes can still name students, typed by hand.'); return; }
+  const t = fetchStudents_(key);
+  if (!t.ok) { ui.alert('The Kata Tracker didn\'t accept that key (' + t.error + '). Nothing was changed.'); return; }
+  props.setProperty('KATA_KEY', key);
+  ui.alert('Connected. ' + t.members.length + ' active members will show up as students when tagging notes.');
 }
 
 function applyOp_(op) {
@@ -649,6 +758,7 @@ function onOpen() {
     .addItem('Change the dojo code…', 'setDojoCode')
     .addItem('Set web app link…', 'setWebAppUrl')
     .addItem('Set Google sign-in client ID…', 'setGoogleClientId')
+    .addItem('Connect to the Kata Tracker…', 'connectKataTracker')
     .addItem('Set up / repair sheets', 'setup')
     .addSeparator()
     .addItem('Sign everyone out', 'signEveryoneOut')
