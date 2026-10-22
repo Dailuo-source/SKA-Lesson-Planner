@@ -1,7 +1,0 @@
-# Files in the repo that aren't part of the website
-.git
-Code.gs
-SETUP.md
-wrangler.jsonc
-.assetsignore
-CLAUDE.md

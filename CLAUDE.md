@@ -1,7 +1,7 @@
 # SKA Lesson Planner — Brief
 
 > **Claude: read this first.** Open only the files a change touches; use the code map to jump to a function.
-> `index.html` (~131 KB) and `Code.gs` (~38 KB) are large: search for a function name (e.g. `grep -n "function render" index.html`) and read just that function.
+> `web/index.html` (~131 KB) and `Code.gs` (~38 KB) are large: search for a function name (e.g. `grep -n "function render" web/index.html`) and read just that function.
 > At the end of a work session, update **Status** and add one line to **Changelog** (keep about 5).
 
 Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class plan is built from sections (Warm-up / Physical training, Technique / Kihon, Kata / Kigu, Kumite, Final activity) filled from a shared exercise library. Slotted exercises keep their own minutes and notes; the library only changes with "Also update the library". Used on phones (Gary: Samsung Android, Chrome PWA; others may use iPhones).
@@ -10,7 +10,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 | Piece | Location |
 | --- | --- |
-| Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main`). Never put Gary's full name in a web address |
+| Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Never put Gary's full name in a web address |
 | Database | Google Sheet **SKA Lesson Planner** (garyluo.gs@gmail.com), id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists, Instructors, Class notes |
 | Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 6 (Execute as Gary, Anyone) |
 | Signing in | Exec URL in `API_URL` (`#api=` overrides). Email + password or Google. New accounts need the **dojo code** (Script Property `DOJO_CODE`; menus **Show app link and dojo code** / **Change the dojo code…**). Google button shows only once `GOOGLE_CLIENT_ID` is set |
@@ -55,9 +55,19 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `sw.js` (currently `ska-lesson-planner-v18`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v18`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome (instance **GARYMAIN**): open script.google.com/home → SKA Lesson Planner, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Commits use author `Claude <noreply@anthropic.com>`.
+
+## Deploying Code.gs
+
+- Web app deployment ID: `AKfycbz7Id0hiGIUFrRDDywyo8o3Ytobt2dnCbeo6BhRW-J7bCeBOZ4rSlz1wmpt3g8Tpe5f`. Always update this deployment so the /exec URL never changes.
+- From this folder, `.clasp.json` points clasp at the script project (rootDir is the repo root, where `Code.gs` is):
+  ```
+  clasp push
+  clasp deploy -i AKfycbz7Id0hiGIUFrRDDywyo8o3Ytobt2dnCbeo6BhRW-J7bCeBOZ4rSlz1wmpt3g8Tpe5f -d "what changed"
+  ```
+- Never run `clasp deploy` without `-i`: that creates a new deployment with a new /exec URL. `clasp deployments` lists them.
 
 ## Code map
 API: op-batched like Pantry Pal, signed with the instructor's token.
@@ -65,7 +75,7 @@ API: op-batched like Pantry Pal, signed with the instructor's token.
 | File | Lines | What's in it |
 |---|---|---|
 | `Code.gs` | 1012 | `doGet`/`doPost`/`api`; accounts (`auth_`, `me_`, `updateProfile_`, `changePassword_`, `codeOk_`, `makeToken_`, `checkToken_`, `verifyGoogle_`); instructors (`instrRows_`, `findInstr_`, `addInstr_`, `updInstr_`); sharing (`shareOf_`, `sees_`, `canEdit_`, `canShare_`, `allowOp_`, `stateFor_`); data (`readRaw_`, `applyOp_`, `applyTo_`); students (`students_`, `fetchStudents_`, `connectKataTracker`); menu (`onOpen`, `setup`, `showKey`, `setDojoCode`, `setGoogleClientId`, `signEveryoneOut`); setup (`buildTab_`, `claimOwners_`, `seedLists_`, `seedExercises_`) |
-| `index.html` | 1917 | CSS (~18–282), markup (~284–297), one `<script>` (~298–1475) |
+| `web/index.html` | 1917 | CSS (~18–282), markup (~284–297), one `<script>` (~298–1475) |
 
 Inside the `index.html` script, search for:
 - Sync: `readLinkParams`, `callApi`, `enqueue`, `flush`, `normalize`, `boot`
@@ -87,6 +97,7 @@ Inside the `index.html` script, search for:
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-21: Moved the site files into `web/`; only that folder is published
 - 2026-10-22: Trimmed this brief
 - 2026-10-21: Class notes, Last class card, Student notes, names from the Kata Tracker, tap feedback. sw v18
 - 2026-10-20: Plans tab is a week/month calendar; day filter; Class times button; desktop layout. sw v17
