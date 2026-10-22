@@ -12,7 +12,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 | --- | --- |
 | Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Never put Gary's full name in a web address |
 | Database | Google Sheet **SKA Lesson Planner** (garyluo.gs@gmail.com), id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists, Instructors, Class notes |
-| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 6 (Execute as Gary, Anyone) |
+| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 8 (Execute as Gary, Anyone) |
 | Signing in | Exec URL in `API_URL` (`#api=` overrides). Email + password or Google. New accounts need the **dojo code** (Script Property `DOJO_CODE`; menus **Show app link and dojo code** / **Change the dojo code…**). Google button shows only once `GOOGLE_CLIENT_ID` is set |
 | Setup guide | `SETUP.md` |
 
