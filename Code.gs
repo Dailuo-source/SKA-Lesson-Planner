@@ -197,6 +197,8 @@ function api(body) {
       }
     }
     const people = instrRows_();
+    // Back from adding a student in the Kata Tracker: fetch the member list again now
+    if (req.refreshStudents) CacheService.getScriptCache().remove('students');
     if (req.ops && req.ops.length) {
       const acc = access_(me, people, readRaw_());
       req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });

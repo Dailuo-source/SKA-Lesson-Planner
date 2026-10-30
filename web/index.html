@@ -405,10 +405,162 @@ button:not(:disabled):active,a.btn:active{transform:scale(.96);filter:brightness
 .mlegend span{display:inline-flex;align-items:center;gap:6px}
 .allplans summary{cursor:pointer;font-weight:800;color:var(--ink2);padding:10px 4px;min-height:44px;display:flex;align-items:center}
 
+/* ---------- Compact layout (Gary, Oct 30): tighter vertical spacing and thinner borders everywhere, like Pantry Pal ---------- */
+:root{--tabh:56px}
+body{line-height:1.38}
+.top{gap:8px;padding:calc(5px + env(safe-area-inset-top)) 10px 5px 12px}
+.top .logo{width:36px;height:36px}
+.brand b{font-size:16px}
+.sync{min-height:16px;padding:0;font-size:11.5px}
+.me{width:36px;height:36px;font-size:13px}
+main{padding:12px 12px calc(var(--tabh) + 20px + env(safe-area-inset-bottom))}
+body.notabs main{padding-bottom:20px}
+.tabs{padding:4px 6px calc(5px + env(safe-area-inset-bottom))}
+.tabs button{min-height:46px;padding:4px 0;gap:1px;border-radius:12px;font-size:11.5px}
+.tabs svg{width:20px;height:20px}
+h1{font-size:22px}
+.kicker{font-size:12.5px}
+.small{font-size:12px}
+.label{margin:0 0 5px;font-size:12.5px}
+.stack{gap:10px}
+.row{gap:10px}
+.mt{margin-top:10px}
+.chips{gap:6px}
+.chip,.chip.sm{height:36px;padding:0 12px;font-size:14px;border-width:1px;border-radius:18px}
+.card{border-width:1px;border-radius:16px}
+.timecard{padding:10px 12px;gap:8px}
+.big{font-size:24px}
+.pill{padding:4px 9px;font-size:12px}
+.bar{height:9px}
+.shead{gap:8px;padding:3px 4px 3px 12px}
+.badge{width:24px;height:24px;font-size:13px}
+.shead h2{font-size:15px}
+.textbtn{min-height:38px;padding:0 10px}
+.item{padding:6px 4px 6px 12px}
+.item.cornered{padding-top:24px}
+.iname{font-size:15px}
+ul.pts{margin-bottom:3px}
+.iconbtn{width:40px;height:40px}
+.iconbtn svg{width:19px;height:19px}
+.iconbtn.outline{border-width:1px}
+.stepper button{width:38px;height:38px}
+.stepper .v{min-width:50px;font-size:15px}
+.addrow{min-height:40px;padding:8px 12px}
+.dashed{min-height:44px;border-radius:16px;border-width:1.5px}
+.btn{min-height:44px;border-radius:22px;padding:0 16px;font-size:15px}
+.btn svg{width:18px;height:18px}
+.btn.outline,.btn.danger{border-width:1px}
+.btn.small{min-height:38px;font-size:13.5px;padding:0 14px;border-radius:19px}
+.btn.square{min-height:44px;border-radius:14px;font-size:14.5px}
+.btnrow{gap:8px}
+.search{height:42px;border-width:1px}
+.search input{height:40px}
+.excard{padding:8px 6px 8px 12px}
+.excard.cornered{padding-top:26px}
+.excard .nm{font-size:15px}
+.excard .body{gap:2px}
+.plan{padding:9px 6px 9px 12px}
+.plan .t{font-size:16px}
+.plan .body{gap:2px}
+.grouph{margin:2px 4px 0;font-size:13px}
+.empty{padding:16px 14px}
+.field{gap:5px;margin:0 0 12px}
+.field>label,.field>legend{font-size:13.5px}
+.inp{height:44px;border-width:1px;border-radius:12px}
+textarea.inp{min-height:60px;padding:10px 12px}
+.ptrow textarea.pt{height:40px;min-height:40px;padding:8px 12px}
+.ptrow .dot{padding-top:10px}
+.opt{padding:9px 12px;border-width:1px;gap:10px}
+.switch{min-height:48px;border-width:1px}
+.sheet{padding-top:8px}
+.grab{margin-bottom:8px}
+.sh{margin-bottom:10px}
+.sh h2,.center h2{font-size:20px}
+.pickrow{min-height:46px;padding:7px 10px;margin-bottom:6px;border-width:1px;border-radius:12px}
+.pickrow.cornered{padding-top:24px}
+.segtabs{margin-bottom:8px}
+.segtabs button{height:38px}
+.kgo{min-height:48px;margin-top:8px}
+.kupd{padding:12px;border-width:1.5px}
+.kcat{margin:10px 4px 4px}
+.menu .btn{margin-bottom:8px}
+.editbanner,.viewonly{padding:7px 10px;border-width:1px}
+.vsec{gap:6px}
+.vsec-h{padding:2px 2px 5px;border-bottom-width:2px}
+.vsec-h h2{font-size:16px}
+.vex{padding:9px 12px 8px}
+.vex.cornered{padding-top:26px}
+.vex-top{gap:8px}
+.vex-top h3{font-size:16px}
+.vmin{font-size:14px}
+.vlabel{margin:8px 0 2px;font-size:11.5px}
+ol.vsteps{font-size:15px;line-height:1.4}
+ol.vsteps li{margin:2px 0}
+ul.vpts{font-size:14.5px;line-height:1.4}
+.qnlist{gap:3px}
+.qform .inp{height:40px}
+.rvhead,.notebox{padding:12px}
+.rvhead h2,.notebox h2,.kupd h2{font-size:16px}
+.rvsum{gap:6px}
+.rvsum span{padding:4px 9px;font-size:12px}
+.rex{padding:8px 12px;border-left-width:4px}
+.rex.quiet{padding-top:6px;padding-bottom:6px}
+.rex .vex-top h3{font-size:15px}
+.rvlist{margin:6px 0}
+.slotday{margin:10px 0 4px}
+.slotrow{border-width:1px;margin-bottom:4px}
+/* Last class and class notes */
+.recap{border-width:1px;border-radius:16px}
+.recap .rch{min-height:50px;padding:7px 10px;gap:10px}
+.ring2{width:32px;height:32px}
+.ring2 svg{width:18px;height:18px}
+.recap h2{font-size:15.5px}
+.rcb{padding:0 12px 12px;gap:10px}
+.rcount span{padding:3px 9px;font-size:12px}
+.rclabel{margin:0 0 3px;font-size:12.5px}
+.rcpts{gap:3px;font-size:14.5px}
+.asg{padding:4px 4px 4px 10px;margin-bottom:4px;border-width:1px;border-radius:12px}
+.asg .x{font-size:14.5px}
+.fup{min-height:36px;padding:0 10px;border-width:1px}
+.fup.sm{min-height:32px;margin-top:4px}
+.pchip{min-height:36px;padding:0 12px;border-width:1px;border-radius:18px}
+.pbox{padding:8px 10px 0;margin-top:6px;border-width:1px}
+.linkbtn{min-height:38px}
+.nkinds{gap:6px;margin-bottom:8px}
+.nkind{min-height:40px;border-radius:12px;border-width:1px}
+.nbpick{margin-bottom:8px;gap:6px}
+.findbox{border-width:1px;border-radius:12px}
+.findbox .inp{height:40px}
+.nshare{min-height:36px;margin-top:6px}
+.nlist{margin-top:8px}
+.nlist li{padding:6px 0;gap:8px}
+.ntag{padding:2px 8px;font-size:11.5px}
+.nx{font-size:14.5px}
+.nacts{margin:-6px -4px 0 0}
+.openasg{padding:8px 10px;margin-bottom:8px;border-width:1px}
+.studay{margin-bottom:10px}
+.stuh{min-height:38px}
+/* Plans calendar */
+.slotsbtn{min-height:38px}
+.caltools{gap:8px}
+.seg button{height:34px}
+.caltitle{font-size:16px}
+.calweek{gap:10px}
+.calday{gap:5px}
+.cd-head{font-size:15.5px}
+.ccard{min-height:50px;padding:7px 12px;gap:10px;border-width:1px;border-radius:12px}
+.cc-time{flex-basis:70px}
+.cc-time b{font-size:17px}
+.cc-type{font-size:14.5px}
+.cc-pill{padding:3px 9px}
+.mcell{height:44px;gap:2px;padding:3px 0}
+.mnum{width:24px;height:24px;font-size:13px}
+.allplans summary{min-height:38px;padding:6px 4px}
+.phead h1{font-size:22px}
+
 /* ---------- big screens (Gary, Oct 20): tabs in the red bar, wider pages, panels slide in from the right ---------- */
 @media (min-width:1000px){
-  main{max-width:900px;padding:28px 40px 48px}
-  body[data-tab=plans] main{max-width:1240px}
+  main{max-width:none;padding:18px 28px 32px}
   .plansview .btnrow{max-width:480px}
   .tabs{top:0;bottom:auto;left:50%;right:auto;transform:translateX(-50%);height:62px;padding:0;background:transparent;border:0;display:flex;gap:6px;align-items:center;z-index:21}
   .tabs button{flex-direction:row;gap:8px;min-height:44px;padding:0 16px;color:#fff;font-size:15px;border-radius:12px}
@@ -599,7 +751,7 @@ function addPointAfter(box,row){const tmp=document.createElement("div");tmp.inne
    ===================================================================== */
 let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[]};
 let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
-let queue=[],inflight=false,flushT=null,retryT=null;
+let queue=[],inflight=false,flushT=null,retryT=null,wantStudents=false;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
 let calView=LS.get("calview","week")==="month"?"month":"week",calOff=0,calSel="";
 function readLinkParams(){
@@ -638,7 +790,8 @@ async function flush(){
   clearTimeout(retryT);
   const ops=queue.slice();inflight=true;setSync(ops.length?"saving":ready?"loading":"connecting");
   let res;
-  try{res=await callApi({token:TOKEN,ops});}catch(e){res={ok:false,error:"network"};}
+  const fresh=wantStudents;wantStudents=false;
+  try{res=await callApi(fresh?{token:TOKEN,ops,refreshStudents:true}:{token:TOKEN,ops});}catch(e){res={ok:false,error:"network"};if(fresh)wantStudents=true;}
   inflight=false;
   if(res&&res.ok){
     queue=queue.slice(ops.length);
@@ -646,6 +799,7 @@ async function flush(){
     S=normalize(res.state);queue.forEach(applyLocal);
     const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
     if(first){render();loadKata();}else onData();
+    if(fresh&&sheet&&sheet.type==="students"){const l=$("#stuList");if(l)l.innerHTML=studentListHTML(sheet.q);}
     if(queue.length){clearTimeout(flushT);flushT=setTimeout(flush,350);}
     return;
   }
@@ -658,7 +812,7 @@ async function flush(){
 function setSync(s){const el=$("#sync");if(!el)return;
   const t={connecting:"Connecting…",loading:"Refreshing…",saving:"Saving…",ok:"Synced "+new Date(lastSync).toLocaleTimeString("en-CA",{hour:"numeric",minute:"2-digit"}),error:"Offline · tap to retry",off:"Not connected"}[s];
   el.textContent=t;el.className="sync"+(s==="error"||s==="off"?" bad":"");}
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&signedIn()&&Date.now()-lastSync>15000)flush();});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&signedIn()&&(wantStudents||Date.now()-lastSync>15000))flush();});
 setInterval(()=>{if(!document.hidden&&signedIn()&&!queue.length&&!inflight&&Date.now()-lastSync>60000)flush();},20000);
 window.addEventListener("beforeunload",e=>{if(queue.length){e.preventDefault();e.returnValue="";}});
 
@@ -1191,7 +1345,8 @@ function studentListHTML(q){
 }
 function sheetStudents(s){
   return sheetHead("Student notes",`<div class="small">${S.students.length?S.students.length+" active members from the Kata Tracker":"Names from your notes"}</div>`)+
-    `<div class="findbox" style="margin-bottom:12px">${ICON.search}<input class="inp" id="stuFind" type="search" value="${esc(s.q||"")}" placeholder="Find a student" autocomplete="off" aria-label="Find a student" data-focus></div>
+    `<button type="button" class="btn outline small block" data-act="addStudent" style="margin-bottom:10px">${ICON.plus}Add a new student</button>
+    <div class="findbox" style="margin-bottom:12px">${ICON.search}<input class="inp" id="stuFind" type="search" value="${esc(s.q||"")}" placeholder="Find a student" autocomplete="off" aria-label="Find a student" data-focus></div>
     <div id="stuList">${studentListHTML(s.q)}</div>`;
 }
 function sheetStudent(s){
@@ -1749,6 +1904,8 @@ document.addEventListener("click",e=>{
     case"openReview":{const id=t.dataset.id;if(!planById(id))break;editFromView=false;recapWho="";if(sheet)finishSheet("plan",id,"review");else go("plan",id,"review");break;}
     case"students":if(sheet)swapSheet({type:"students",q:""});else openSheet({type:"students",q:""});break;
     case"student":{const v=t.dataset.v;if(sheet&&sheet.type==="students")swapSheet({type:"student",name:v,back:{type:"students",q:sheet.q||""}});else if(sheet)swapSheet({type:"student",name:v});else openSheet({type:"student",name:v});break;}
+    case"addStudent":wantStudents=true;window.open(KATA_SITE+"?add=member&from=planner","_blank","noopener");
+      toast("Add them in the Kata Tracker. They’ll show up here when you come back.");break;
     case"studentsBack":if(sheet&&sheet.back)swapSheet(sheet.back);break;
     case"openKata":window.open(kataLink(t.dataset.name),"_blank","noopener");break;
     case"newExFor":if(sheet&&sheet.type==="pick")swapSheet({type:"ex",sec:sheet.sec,addTo:sheet.plan,back:Object.assign({},sheet)});break;
