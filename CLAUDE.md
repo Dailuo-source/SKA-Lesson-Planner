@@ -26,6 +26,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - **Class notes**: ID, Plan ID, Plan item ID, Kind (Class / Assignment / Person / Feedback), Student, Note, Followed up, Owner, Shared with (`Only me` / `Everyone`), Added by, Created, Updated. **Private to the writer unless shared**; only the writer edits/shares/deletes. Not copied with a plan; deleting a plan deletes your notes on it.
 - Students: `students_()` reads active members from the Kata Tracker (POST `{action:'plannerMembers', key}`, Script Property `KATA_KEY` via menu **Connect to the Kata Tracker…**), cached 6 h. New students are added in the Kata Tracker: Student notes → **Add a new student** opens `KATA_SITE?add=member&from=planner` (straight to its Add a member form); coming back, the next sync sends `refreshStudents:true`, which clears the cache.
 - Section names can't contain commas (app swaps them for " /").
+- **Instructors → Notification settings** (JSON): `{slots:[Timeslot values], before, noplan, asg}`, each `{on, rel: min before}` or `{on, day: -1|0, at:'HH:MM'}`; `asg` may be `{same:true}` (with the Before class reminder). **Push** tab (never sent to the app): one row per phone (email, push address, keys, device).
 
 ## Sharing rules (Gary's)
 
@@ -49,6 +50,18 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - Sync: optimistic, batched ops, 60 s polling. Panels are never redrawn by a background sync; library search keeps focus.
 - Accounts: HMAC token (`TOKEN_SECRET`, 400 days) in `skal.token`, profile in `skal.me`; `bad_token` signs out. Labels on plans are text at edit time ("Mr. Luo").
 
+## Notifications (Gary, Oct 30)
+
+- Profile → **Notifications** (`sheetNotify`): turn on for this device (`pushOn`/`pushOff`, Send a test), **Classes I teach** (Timeslot chips), and three reminders with presets + **Custom**: Before class (30 min / 1 h / 2 h / custom h m), No plan yet (day before 7 p.m. / morning of / 3 h before / custom day + time; only when no plan exists at that date and start time), Assignments to follow up (with the class reminder / morning of / custom; open assignments from earlier plans in the same timeslot that are yours or shared). Settings save as you change them (`req.notify`).
+- Sending: Apps Script can't sign/encrypt Web Push, so `push/` is a Cloudflare Worker (`ska-lesson-planner-push`, cron every 15 min). It POSTs `{cron: CRON_KEY}`; `cron_` → `due_` returns every message due since `CRON_LAST` (max 2 h back), one per phone; the Worker sends them (VAPID ES256 + aes128gcm) and reports 404/410 addresses back as `{cron, gone}`. `POST <worker>/run` sends straight away (used after Send a test).
+- Setup (once): on Gary's PC, `cd push && node setup.mjs` (deploys the Worker, stores `VAPID_PRIVATE`/`VAPID_PUBLIC`/`CRON_KEY` as Worker secrets, prints a setup code) → sheet menu **Set up notifications…** → paste. Script Properties `VAPID_PUBLIC`, `PUSH_URL` (sent to the app by `auth:'config'`), `CRON_KEY`, `CRON_LAST`. Re-running setup makes new keys and clears the Push tab (phones turn on again).
+- Tapping a notification opens `./#plan=<id>` (service worker `notificationclick` → focuses the app and posts `{open}`, or opens it); `openFromLink`. iPhones need the app on the Home Screen.
+- Tests (not in repo): `push.test.mjs` decrypts a payload as a phone would and verifies the JWT; `notify.test.js` runs Code.gs on the mock for timing, privacy and sign-ups.
+
+## Plan switcher
+
+- The plan title in all three modes is a dropdown (`planHead`, `planListHTML`): Coming up / Past classes, class-type filter chips, ‹ › step through plans in date/time order (`planOrder`, `switchPlan`, replaces the history entry). The date line above the title is bold and black.
+
 ## Link to the SKA Kata Tracker
 
 - Separate app: https://dailuo-source.github.io/SKA-Kata-Tracker/ (`KATA_SITE`); `KATA_URL` is its Apps Script. `?api=summary` gives kata with rank, Learned at and counts (no names), cached in `skal.kata`.
@@ -57,7 +70,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v20`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v21`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome (instance **GARYMAIN**): open script.google.com/home → SKA Lesson Planner, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Commits use author `Claude <noreply@anthropic.com>`.
 
@@ -76,8 +89,8 @@ API: op-batched like Pantry Pal, signed with the instructor's token.
 
 | File | Lines | What's in it |
 |---|---|---|
-| `Code.gs` | 1012 | `doGet`/`doPost`/`api`; accounts (`auth_`, `me_`, `updateProfile_`, `changePassword_`, `codeOk_`, `makeToken_`, `checkToken_`, `verifyGoogle_`); instructors (`instrRows_`, `findInstr_`, `addInstr_`, `updInstr_`); sharing (`shareOf_`, `sees_`, `canEdit_`, `canShare_`, `allowOp_`, `stateFor_`); data (`readRaw_`, `applyOp_`, `applyTo_`); students (`students_`, `fetchStudents_`, `connectKataTracker`); menu (`onOpen`, `setup`, `showKey`, `setDojoCode`, `setGoogleClientId`, `signEveryoneOut`); setup (`buildTab_`, `claimOwners_`, `seedLists_`, `seedExercises_`) |
-| `web/index.html` | 1917 | CSS (~18–282), markup (~284–297), one `<script>` (~298–1475) |
+| `Code.gs` | 1232 | `doGet`/`doPost`/`api`; accounts (`auth_`, `me_`, `updateProfile_`, `changePassword_`, `codeOk_`, `makeToken_`, `checkToken_`, `verifyGoogle_`); instructors (`instrRows_`, `findInstr_`, `addInstr_`, `updInstr_`); sharing (`shareOf_`, `sees_`, `canEdit_`, `canShare_`, `allowOp_`, `stateFor_`); data (`readRaw_`, `applyOp_`, `applyTo_`); students (`students_`, `fetchStudents_`, `connectKataTracker`); menu (`onOpen`, `setup`, `showKey`, `setDojoCode`, `setGoogleClientId`, `signEveryoneOut`); setup (`buildTab_`, `claimOwners_`, `seedLists_`, `seedExercises_`) |
+| `web/index.html` | 2256 | CSS (~18–282), markup (~284–297), one `<script>` (~298–1475) |
 
 Inside the `index.html` script, search for:
 - Sync: `readLinkParams`, `callApi`, `enqueue`, `flush`, `normalize`, `boot`
@@ -96,10 +109,11 @@ Inside the `index.html` script, search for:
 
 ## Status
 - Working: plans (view / edit / review), shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Cache v19.
-- To deploy: Code.gs `refreshStudents` (Oct 30). Until it's deployed, new students show up within 6 h instead of right away.
+- To deploy: Code.gs (refreshStudents + notifications, Oct 30) with clasp, then `push/setup.mjs` once and the sheet menu **Set up notifications…**.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-30: Notifications (settings, push Worker, setup), plan switcher dropdown with ‹ ›, bold class date. sw v21
 - 2026-10-30: Tap flash with a 0.1 s delay on every button. sw v20
 - 2026-10-30: Compact layout app-wide; desktop full width; Add a new student (via the Kata Tracker) with an instant list refresh. sw v19
 - 2026-10-21: Moved the site files into `web/`; only that folder is published

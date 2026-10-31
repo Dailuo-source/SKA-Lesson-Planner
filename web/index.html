@@ -559,6 +559,45 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .mnum{width:24px;height:24px;font-size:13px}
 .allplans summary{min-height:38px;padding:6px 4px}
 .phead h1{font-size:22px}
+/* Notifications panel */
+.nson{display:flex;align-items:center;gap:8px;background:#E9F6F1;border-radius:12px;padding:4px 4px 4px 12px;font-size:14px;font-weight:800;color:#0F5E54}
+.nson>svg{width:18px;height:18px}
+.nson .textbtn{color:#0F5E54;padding:0 8px}
+.nson.off{flex-direction:column;align-items:stretch;background:var(--red-tint);color:var(--ink);padding:10px 12px;gap:8px;font-weight:700}
+.nskind{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.nshead{display:flex;align-items:center;gap:10px}
+.nshead b{display:block;font-size:15px}
+.nshead .small{display:block;font-weight:600}
+.nssw{width:52px;height:32px;flex:none;border:0;border-radius:16px;padding:3px;display:flex;background:#9A9A9A}
+.nssw i{width:26px;height:26px;border-radius:13px;background:#fff;transition:transform .15s}
+.nssw[aria-pressed=true]{background:var(--red)}
+.nssw[aria-pressed=true] i{transform:translateX(20px)}
+.nscust{background:var(--sunk);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.nsrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px;font-weight:700}
+.nsrow .inp{width:58px;height:38px;text-align:center;padding:0 6px}
+.nsrow .inp.nstime{width:auto;min-width:120px;text-align:left}
+.nscust .small{color:var(--ink2)}
+/* Plan switcher and bold class date */
+.phd{display:flex;align-items:center;gap:6px}
+.phd .pnav{width:34px;height:44px;border-radius:12px;flex:none}
+.phd .pnav:disabled{opacity:.3}
+.pswrap{position:relative}
+.psw{width:100%;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:5px 8px 5px 10px;text-align:left;color:var(--ink)}
+.psw .kicker{display:block;font-size:14px;font-weight:800;color:var(--ink)}
+.psw h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psw .small{display:block}
+.psw>svg{width:18px;height:18px;color:var(--ink2);transition:transform .15s}
+.psw[aria-expanded=true]>svg{transform:rotate(180deg)}
+.pllist{position:absolute;top:calc(100% + 6px);left:-40px;right:-84px;z-index:30;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.18);padding:6px;max-height:60vh;overflow:auto}
+.plchips{display:flex;gap:6px;flex-wrap:wrap;padding:2px 2px 6px}
+.plchips .chip{height:32px;font-size:13px}
+.plgh{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:6px 6px 2px}
+.plrow{width:100%;display:flex;align-items:center;gap:10px;border:0;border-radius:10px;background:#fff;padding:6px 8px;min-height:44px;text-align:left;color:var(--ink)}
+.plrow.on{background:var(--red-tint)}
+.plrow .pld{flex:0 0 84px;font-size:13px;font-weight:800}
+.plrow b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plrow .grow>span{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+.plrow>svg{width:18px;height:18px;color:var(--red)}
 
 /* ---------- big screens (Gary, Oct 20): tabs in the red bar, wider pages, panels slide in from the right ---------- */
 @media (min-width:1000px){
@@ -760,6 +799,7 @@ function readLinkParams(){
   try{
     const h=new URLSearchParams((location.hash||"").replace(/^#/,""));const q=new URLSearchParams(location.search);
     const api=h.get("api")||q.get("api"),key=h.get("key")||q.get("key");
+    if(h.get("plan")){OPEN_PLAN=h.get("plan");history.replaceState(null,"",location.pathname);}
     if(api&&/^https:\/\/script\.google\.com\//.test(api)){API=api;LS.set("api",api);}
     if(api||key)history.replaceState(null,"",location.pathname);
   }catch(e){}
@@ -800,7 +840,7 @@ async function flush(){
     if(res.me){ME=res.me;LS.set("me",JSON.stringify(ME));const mb=$("#me");if(mb)mb.textContent=initialsOf(ME);}
     S=normalize(res.state);queue.forEach(applyLocal);
     const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
-    if(first){render();loadKata();}else onData();
+    if(first){render();loadKata();if(OPEN_PLAN)openFromLink(OPEN_PLAN);}else onData();
     if(fresh&&sheet&&sheet.type==="students"){const l=$("#stuList");if(l)l.innerHTML=studentListHTML(sheet.q);}
     if(queue.length){clearTimeout(flushT);flushT=setTimeout(flush,350);}
     return;
@@ -831,6 +871,32 @@ const secItems=(p,sec)=>itemsOf(p.id).filter(i=>eqi(i.section,sec));
 const secTotal=(p,sec)=>isSkipped(p,sec)?0:secItems(p,sec).reduce((a,i)=>a+(i.minutes||0),0);
 const planTotal=p=>planSections(p).reduce((a,s)=>a+secTotal(p,s),0);
 const planTitle=p=>p.focus||(p.type?p.type+" class":"Class plan");
+/* Plan switcher (Gary, Oct 30): the title is a dropdown of every plan, with ‹ › to step to the previous/next one */
+let planListOpen=false,plFilter="All";
+const startMin=p=>{const t=parseTime(p.time);return t?toMin(t.start):0;};
+const planOrder=()=>S.plans.filter(p=>plFilter==="All"||eqi(p.type,plFilter)).slice().sort((a,b)=>((a.date||0)-(b.date||0))||(startMin(a)-startMin(b))||String(a.id).localeCompare(String(b.id)));
+function planListHTML(p){
+  const all=planOrder();
+  const types=[...new Set(S.plans.map(x=>x.type).filter(Boolean))];
+  const chips=types.length>1?`<div class="plchips">${["All"].concat(types).map(t=>`<button type="button" class="chip sm" data-act="plFilter" data-v="${esc(t)}" aria-pressed="${eqi(plFilter,t)}">${t==="All"?"All plans":esc(t)}</button>`).join("")}</div>`:"";
+  const row=x=>`<button type="button" class="plrow${x.id===p.id?" on":""}" data-act="plPick" data-id="${esc(x.id)}"${x.id===p.id?' aria-current="true"':""}><span class="pld">${esc(fmtDay(x.date))}</span><span class="grow"><b>${esc(planTitle(x))}</b><span>${esc([x.type,parseTime(x.time)?clock12(parseTime(x.time).start):""].filter(Boolean).join(" · "))}</span></span>${x.id===p.id?ICON.check:""}</button>`;
+  const up=all.filter(x=>!isPast(x)),past=all.filter(x=>isPast(x)).reverse();
+  return`<div class="pllist" role="menu">${chips}${up.length?`<div class="plgh">Coming up</div>${up.map(row).join("")}`:""}${past.length?`<div class="plgh">Past classes</div>${past.map(row).join("")}`:""}${all.length?"":`<p class="small" style="padding:8px">No ${esc(plFilter)} plans.</p>`}</div>`;
+}
+function planHead(p,kick,sub,menuLabel){
+  const all=planOrder(),i=all.findIndex(x=>x.id===p.id);
+  const prev=i>0?all[i-1]:null,next=i>=0&&i<all.length-1?all[i+1]:null;
+  return`<div class="phd">
+    <button type="button" class="iconbtn round pnav" data-act="planStep" data-d="-1" aria-label="${prev?"Previous plan: "+esc(planTitle(prev)):"No earlier plan"}"${prev?"":" disabled"}>${ICON.back}</button>
+    <div class="pswrap grow"><button type="button" class="psw" data-act="planList" aria-expanded="${planListOpen}" aria-label="Switch lesson plan">
+      <span class="grow"><span class="kicker">${kick}</span><h1>${esc(planTitle(p))}</h1>${sub?`<span class="small">${sub}</span>`:""}</span>${ICON.down}</button>
+      ${planListOpen?planListHTML(p):""}</div>
+    <button type="button" class="iconbtn round pnav" data-act="planStep" data-d="1" aria-label="${next?"Next plan: "+esc(planTitle(next)):"No later plan"}"${next?"":" disabled"}>${ICON.go}</button>
+    <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="${menuLabel}">${ICON.more}</button>
+  </div>`;
+}
+function switchPlan(id){const np=planById(id);if(!np)return;planListOpen=false;editFromView=false;recapWho="";
+  PLAN=id;LS.set("plan",PLAN);planMode=isPast(np)?"review":"view";history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}
 const isPast=p=>!!p.date&&p.date<keyMs(todayKey())-12*3600e3;
 const ptLines=s=>String(s||"").split(/\r?\n/).map(l=>l.replace(/^\s*•\s*/,"").trim()).filter(Boolean);
 const ptJoin=a=>a.map(l=>"• "+l).join("\n");
@@ -885,6 +951,7 @@ let needGuard=true;
 let planMode="view",editFromView=false;
 const stateNow=()=>({t:tab,p:PLAN,m:planMode});
 function go(t,plan,mode){
+  planListOpen=false;
   if(mode)planMode=mode;
   if(plan!==undefined){PLAN=plan;LS.set("plan",PLAN);}
   if(t===tab&&plan===undefined&&!mode){window.scrollTo(0,0);return;}
@@ -1089,10 +1156,7 @@ function viewPlan(){
   const edited=p.editedBy?`Last edited by ${esc(p.editedBy)}${p.updated?" · "+esc(fmtWhen(p.updated)):""}`:(p.addedBy?`Started by ${esc(p.addedBy)}`:"");
   return`<div class="stack">
     <div class="editbanner">${ICON.edit}<span>Editing. Changes save as you go; tap <b>Save plan</b> when you’re done.</span></div>
-    <div class="row" style="align-items:flex-start">
-      <div class="grow"><div class="kicker">${esc(whenLine(p))}</div><h1>${esc(planTitle(p))}</h1>${edited?`<div class="small" style="margin-top:2px">${edited}</div>`:""}</div>
-      <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: date, time, focus, sharing, copy, delete">${ICON.more}</button>
-    </div>
+    ${planHead(p,esc(whenLine(p)),edited,"Plan options: date, time, focus, sharing, copy, delete")}
     ${recapHTML(p)}
     <button type="button" class="pickrow" data-act="planInfo" style="margin:0"><span class="nm" style="font-weight:700">${parseTime(p.time)?`<b>${esc(fmtTime(p.time))}</b>`:"No set time"} · <span style="color:var(--muted)">change date or time</span></span>${ICON.clock}</button>
     ${canShareR(p)?`<button type="button" class="pickrow" data-act="sharePlan" style="margin:0"><span class="nm" style="font-weight:700">Who can see it: <b>${esc(shareLabel(p.share))}</b></span>${shareMode(p.share)==="me"?ICON.lock:shareMode(p.share)==="all"?ICON.globe:ICON.people}</button>`:""}
@@ -1142,11 +1206,7 @@ function viewTeach(p){
   const diff=len-tot;
   return`<div class="stack">
     ${viewOnlyNote(p)}
-    <div class="row" style="align-items:flex-start">
-      <div class="grow"><div class="kicker">${esc(whenLine(p))}</div><h1>${esc(planTitle(p))}</h1>
-        <div class="small" style="margin-top:4px">${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}</div></div>
-      <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: edit, date, focus, copy, delete">${ICON.more}</button>
-    </div>
+    ${planHead(p,esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}`,"Plan options: edit, date, focus, copy, delete")}
     ${recapHTML(p)}
     ${any?secs+noteBoxHTML(p)+`<button type="button" class="btn outline block" data-act="setMode" data-m="review">${ICON.review}Class done? Review the notes</button>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
   </div>`;
@@ -1178,11 +1238,7 @@ function viewReview(p){
   const ed=canEditR(p);
   return`<div class="stack">
     ${viewOnlyNote(p)}
-    <div class="row" style="align-items:flex-start">
-      <div class="grow"><div class="kicker">Class review · ${esc(whenLine(p))}</div><h1>${esc(planTitle(p))}</h1>
-        <div class="small" style="margin-top:4px">${p.type?esc(p.type)+" · ":""}${fmtHM(planTotal(p))} planned</div></div>
-      <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="Plan options: teaching view, edit, copy, delete">${ICON.more}</button>
-    </div>
+    ${planHead(p,"Class review · "+esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(planTotal(p))} planned`,"Plan options: teaching view, edit, copy, delete")}
     <div class="rvsum">${sum}</div>
     <section class="card rvhead">
       <h2>After class</h2><p class="small" style="margin:0">How it went, and what to change next time.</p>
@@ -1373,6 +1429,97 @@ function sheetStudent(s){
       :`<p class="small">No notes about ${esc(name)} yet. In a class, choose <b>One student</b> in Class notes and pick their name.</p>`);
 }
 
+/* ---------- Notifications (Gary, Oct 30): Profile → Notifications ----------
+   Settings live on the instructor's row (ME.notify); each phone signs up separately (push subscription).
+   The push sender (push/ Worker) sends what Code.gs says is due, every 15 minutes. */
+let VAPID=LS.get("vapid",""),PUSH_URL=LS.get("pushurl","");
+let NS=null,nsT=null,pushState="checking",pushBusy=false;
+const NPRE={
+  before:[["30 min before",{rel:30}],["1 hour before",{rel:60}],["2 hours before",{rel:120}]],
+  noplan:[["Day before, 7 p.m.",{day:-1,at:"19:00"}],["Morning of",{day:0,at:"08:00"}],["3 hours before",{rel:180}]],
+  asg:[["With the class reminder",{same:true}],["Morning of",{day:0,at:"08:00"}]]};
+const NKIND=[["before","Before class","Class name, focus, and whether the plan is ready"],["noplan","No plan yet","Only if your class still has no plan"],["asg","Assignments to follow up","Open assignments from last class at that time"]];
+const sameWhen=(a,b)=>!!a&&!!b&&(a.same?!!b.same:a.rel!=null?a.rel===b.rel&&b.rel!=null:(b.rel==null&&!b.same&&a.day===b.day&&a.at===b.at));
+const presetOf=(k,w)=>{const i=NPRE[k].findIndex(p=>sameWhen(p[1],w));return i<0?"custom":String(i);};
+function nsInit(){if(!NS)NS=JSON.parse(JSON.stringify((ME&&ME.notify)||{slots:[],before:{on:true,rel:60},noplan:{on:true,day:-1,at:"19:00"},asg:{on:true,same:true}}));return NS;}
+function nsSave(){clearTimeout(nsT);nsT=setTimeout(()=>{callApi({token:TOKEN,ops:[],notify:NS}).then(r=>{if(r&&r.ok&&r.me){ME=r.me;LS.set("me",JSON.stringify(ME));}else if(r&&r.error==="bad_token")signOut("Please sign in again.");}).catch(()=>toast("Couldn’t save. Check your connection."));},500);}
+const slotVal=s=>{const r=S.lists.find(x=>x.id===s.id);return r?r.value.trim():"";};
+const slotName=s=>DAYS[s.day].slice(0,3)+" "+clock12(s.start)+(s.label?" "+s.label:"");
+const u8=b=>{const s=b.replace(/-/g,"+").replace(/_/g,"/");const r=atob(s+"===".slice((s.length+3)%4));return Uint8Array.from(r,c=>c.charCodeAt(0));};
+async function checkPush(){
+  if(!("serviceWorker"in navigator)||!("PushManager"in window)||!("Notification"in window)){pushState="unsupported";return;}
+  if(!VAPID){pushState="notset";return;}
+  if(Notification.permission==="denied"){pushState="denied";return;}
+  try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();pushState=sub?"on":"off";}catch(e){pushState="off";}
+}
+async function pushOn(){
+  if(pushBusy)return;pushBusy=true;renderSheet();
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=="granted"){pushState=perm==="denied"?"denied":"off";return;}
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(sub){const k=sub.options&&sub.options.applicationServerKey;if(k&&btoa(String.fromCharCode(...new Uint8Array(k))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")!==VAPID){await sub.unsubscribe();sub=null;}}
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)});
+    const dev=/Android/i.test(navigator.userAgent)?"Android phone":/iPhone|iPad/i.test(navigator.userAgent)?"iPhone":"Computer";
+    const r=await callApi({token:TOKEN,ops:[],subscribe:sub.toJSON(),device:dev,notify:nsInit()});
+    if(r&&r.ok){pushState="on";if(r.me){ME=r.me;LS.set("me",JSON.stringify(ME));}toast("Notifications are on for this "+(dev==="Computer"?"computer":"phone"));}
+    else toast((r&&r.message)||"Couldn’t turn them on. Try again.");
+  }catch(e){toast("Couldn’t turn on notifications on this device.");}
+  finally{pushBusy=false;renderSheet();}
+}
+async function pushOff(){
+  try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();
+    if(sub){const ep=sub.endpoint;await sub.unsubscribe();callApi({token:TOKEN,ops:[],unsubscribe:ep}).catch(()=>{});}
+  }catch(e){}
+  pushState="off";renderSheet();toast("Notifications are off on this device");
+}
+function pushTest(){
+  callApi({token:TOKEN,ops:[],notifyTest:true}).then(r=>{
+    if(!r||!r.ok){toast("Couldn’t send a test. Try again.");return;}
+    if(PUSH_URL)fetch(PUSH_URL+"/run",{method:"POST"}).catch(()=>{});
+    toast("Test sent. It should arrive in a few seconds.");
+  }).catch(()=>toast("Couldn’t reach the sheet."));
+}
+function whenEditor(k,w){
+  const p=presetOf(k,w);
+  const chips=NPRE[k].map((x,i)=>`<button type="button" class="chip sm" data-act="nsPick" data-k="${k}" data-v="${i}" aria-pressed="${p===String(i)}">${x[0]}</button>`).join("")+`<button type="button" class="chip sm" data-act="nsPick" data-k="${k}" data-v="custom" aria-pressed="${p==="custom"}">Custom</button>`;
+  let custom="";
+  if(p==="custom"){
+    if(k==="before"){const h=Math.floor((w.rel||0)/60),m=(w.rel||0)%60;
+      custom=`<div class="nscust"><div class="nsrow"><input class="inp" type="number" inputmode="numeric" min="0" max="23" id="ns-${k}-h" data-ns="${k}" data-f="h" value="${h}" aria-label="Hours before class"><span>h</span><input class="inp" type="number" inputmode="numeric" min="0" max="59" step="5" id="ns-${k}-m" data-ns="${k}" data-f="m" value="${m}" aria-label="Minutes before class"><span>m before class</span></div><div class="small" id="ns-${k}-sum">${esc(nsSum(k,w))}</div></div>`;}
+    else{const d=w.day===-1?-1:0;
+      custom=`<div class="nscust"><div class="nsrow"><button type="button" class="chip sm" data-act="nsDay" data-k="${k}" data-v="-1" aria-pressed="${d===-1}">Day before</button><button type="button" class="chip sm" data-act="nsDay" data-k="${k}" data-v="0" aria-pressed="${d===0}">Day of</button><span>at</span><input class="inp nstime" type="time" id="ns-${k}-at" data-ns="${k}" data-f="at" value="${esc(w.at||"08:00")}" aria-label="Time"></div><div class="small" id="ns-${k}-sum">${esc(nsSum(k,w))}</div></div>`;}
+  }
+  return`<div class="chips">${chips}</div>${custom}`;
+}
+function nsSum(k,w){
+  if(w.rel!=null){const h=Math.floor(w.rel/60),m=w.rel%60;return"Notifies you "+(h?h+"h ":"")+(m?m+"m ":"")+(h||m?"":"right at the start ")+"before each of your classes.";}
+  return"Notifies you "+(w.day===-1?"the day before":"on class day")+" at "+clock12(w.at||"08:00")+".";
+}
+function sheetNotify(){
+  const n=nsInit();const sl=slots();
+  let top="";
+  if(pushState==="checking")top=`<p class="small">Checking this device…</p>`;
+  else if(pushState==="unsupported")top=`<div class="viewonly">${ICON.eye}<span>This browser can’t show notifications. On an iPhone, add the app to the Home Screen first (Share → Add to Home Screen), then open it from there.</span></div>`;
+  else if(pushState==="notset")top=`<div class="viewonly">${ICON.eye}<span>Notifications aren’t set up for the dojo yet. An admin runs <b>Set up notifications…</b> from the sheet’s menu.</span></div>`;
+  else if(pushState==="denied")top=`<div class="viewonly">${ICON.eye}<span>Notifications are blocked for this app. Allow them in your phone’s settings for this app (or the site in Chrome), then come back.</span></div>`;
+  else if(pushState==="off")top=`<div class="nson off"><span>Notifications are off on this ${/Android|iPhone|iPad/i.test(navigator.userAgent)?"phone":"device"}.</span><button type="button" class="btn primary small block" data-act="nsOn"${pushBusy?" disabled":""}>${pushBusy?"Turning on…":"Turn on for this device"}</button></div>`;
+  else top=`<div class="nson">${ICON.check}<span class="grow">On for this device</span><button type="button" class="textbtn" data-act="nsTest">Send a test</button><button type="button" class="textbtn" data-act="nsOff">Turn off</button></div>`;
+  const slotChips=sl.length?sl.map(s=>{const v=slotVal(s),on=n.slots.some(x=>eqi(x,v));return`<button type="button" class="chip sm" data-act="nsSlot" data-v="${esc(v)}" aria-pressed="${on}">${esc(slotName(s))}</button>`;}).join(""):`<p class="small" style="margin:0">No class times yet. An admin adds them from Plans → Class times.</p>`;
+  const kinds=NKIND.map(([k,t,sub])=>{const w=n[k];return`<div class="nskind"><div class="nshead"><div class="grow"><b>${t}</b><span class="small">${sub}</span></div>
+    <button type="button" class="nssw" data-act="nsToggle" data-k="${k}" aria-pressed="${w.on!==false}" aria-label="${t}"><i></i></button></div>${w.on!==false?whenEditor(k,w):""}</div>`;}).join("");
+  return sheetHead("Notifications")+`<div class="stack nsbox">${top}
+    <div><span class="label" style="margin-bottom:2px">Classes I teach</span><p class="small" style="margin:0 0 6px">You’re only reminded about these class times.</p><div class="chips">${slotChips}</div>${sl.length&&!n.slots.length?`<p class="small" style="margin:6px 0 0;color:var(--red-d)">Pick at least one class time to get reminders.</p>`:""}</div>
+    ${kinds}
+    <p class="small" style="margin:0">Each phone is turned on separately. iPhones need the app added to the Home Screen first.</p></div>`;
+}
+function openNotify(){NS=null;pushState="checking";openSheet({type:"notify"});checkPush().then(()=>{if(sheet&&sheet.type==="notify")renderSheet();});}
+/* Opening a plan from a notification: ./#plan=<id> (cold start) or a message from the service worker */
+let OPEN_PLAN="";
+function openFromLink(id){if(!id)return;if(!ready){OPEN_PLAN=id;return;}OPEN_PLAN="";if(planById(id)){tab="plan";switchPlan(id);}else go("plans");}
+if("serviceWorker"in navigator)navigator.serviceWorker.addEventListener("message",e=>{const d=e.data||{};if(d.open){const m=/plan=([^&]+)/.exec(d.open);if(m)openFromLink(decodeURIComponent(m[1]));else if(ready)go("plans");}});
+
 /* ---------- Library ---------- */
 function exListHTML(){
   const q=libQuery.trim().toLowerCase();
@@ -1439,6 +1586,7 @@ function viewProfile(){
     <p class="msg" id="pwMsg" role="alert" style="margin:0"></p>
     <button type="submit" class="btn outline block">Save password</button>
   </form>
+  <button type="button" class="pickrow" data-act="notify" style="margin:0"><span class="nm">Notifications<span class="small" style="display:block;font-weight:700">Class reminders, plans to make, assignments to follow up</span></span>${ICON.go}</button>
   <button type="button" class="btn danger block" data-act="signOut">Sign out on this device</button>
   </div>`;
 }
@@ -1509,6 +1657,7 @@ function mountGis(){
 }
 function fetchConfig(){
   callApi({auth:"config"}).then(r=>{if(!r||!r.ok)return;const c=(r.config&&r.config.googleClientId)||"";
+    const vp=(r.config&&r.config.vapidPublic)||"",pu=(r.config&&r.config.pushUrl)||"";if(vp!==VAPID){VAPID=vp;LS.set("vapid",vp);}if(pu!==PUSH_URL){PUSH_URL=pu;LS.set("pushurl",pu);}
     if(c!==GCID){GCID=c;LS.set("gcid",c);if(!signedIn())renderView();}}).catch(()=>{});
 }
 async function authCall(payload,btn){
@@ -1567,6 +1716,7 @@ function renderSheet(){
       h=sheetHead("Who can see it",`<div class="small">${esc(s.coll==="plans"?planTitle(r):r.name)}</div>`)+`<form id="shareForm" data-coll="${s.coll}" data-id="${esc(r.id)}">${shareField("sh",r.share,s.coll==="plans"?"this plan":"this exercise")}<button class="btn primary block" type="submit">Save</button></form>`;break;}
     case"slots":h=sheetSlots();break;
     case"students":h=sheetStudents(s);break;
+    case"notify":h=sheetNotify();break;
     case"student":h=sheetStudent(s);break;
     case"exView":h=sheetExView(s);break;
     case"item":h=sheetItem(s);break;
@@ -1918,6 +2068,21 @@ document.addEventListener("click",e=>{
     case"addStudent":wantStudents=true;window.open(KATA_SITE+"?add=member&from=planner","_blank","noopener");
       toast("Add them in the Kata Tracker. They’ll show up here when you come back.");break;
     case"studentsBack":if(sheet&&sheet.back)swapSheet(sheet.back);break;
+    case"notify":openNotify();break;
+    case"nsOn":pushOn();break;
+    case"nsOff":pushOff();break;
+    case"nsTest":pushTest();break;
+    case"nsSlot":{const n=nsInit(),v=t.dataset.v;n.slots=n.slots.some(x=>eqi(x,v))?n.slots.filter(x=>!eqi(x,v)):n.slots.concat(v);nsSave();renderSheet();break;}
+    case"nsToggle":{const n=nsInit(),k=t.dataset.k;n[k].on=n[k].on===false;nsSave();renderSheet();break;}
+    case"nsPick":{const n=nsInit(),k=t.dataset.k,v=t.dataset.v,on=n[k].on!==false;
+      if(v==="custom"){if(presetOf(k,n[k])==="custom")break;const was=n[k];n[k]=k==="before"?{rel:was.rel!=null?was.rel:90}:{day:was.day!=null?was.day:-1,at:was.at||"20:00"};}
+      else n[k]=Object.assign({},NPRE[k][+v][1]);
+      n[k].on=on;nsSave();renderSheet();break;}
+    case"nsDay":{const n=nsInit(),k=t.dataset.k;n[k].day=+t.dataset.v;nsSave();renderSheet();break;}
+    case"planList":planListOpen=!planListOpen;renderView();break;
+    case"plFilter":plFilter=t.dataset.v;renderView();break;
+    case"plPick":switchPlan(t.dataset.id);break;
+    case"planStep":{if(!p)break;const all=planOrder(),i=all.findIndex(x=>x.id===p.id),n=all[i+ +t.dataset.d];if(n)switchPlan(n.id);break;}
     case"openKata":window.open(kataLink(t.dataset.name),"_blank","noopener");break;
     case"newExFor":if(sheet&&sheet.type==="pick")swapSheet({type:"ex",sec:sheet.sec,addTo:sheet.plan,back:Object.assign({},sheet)});break;
     case"backToPick":if(sheet&&sheet.back)swapSheet(sheet.back);break;
@@ -1958,6 +2123,10 @@ document.addEventListener("input",e=>{
     } else fit(t);
     return;
   }
+  if(e.target.dataset&&e.target.dataset.ns){const n=nsInit(),k=e.target.dataset.ns,f=e.target.dataset.f;
+    if(f==="at"){if(/^\d{2}:\d{2}$/.test(e.target.value))n[k].at=e.target.value;}
+    else{const h=Math.max(0,Math.min(23,parseInt(($("#ns-"+k+"-h")||{}).value,10)||0)),m=Math.max(0,Math.min(59,parseInt(($("#ns-"+k+"-m")||{}).value,10)||0));n[k].rel=h*60+m;}
+    const sm=$("#ns-"+k+"-sum");if(sm)sm.textContent=nsSum(k,n[k]);nsSave();return;}
   if(id==="nbFind"){NB.q=e.target.value;const box=$("#nbNames");if(box)box.innerHTML=nbNamesHTML();return;}
   if(id==="stuFind"&&sheet&&sheet.type==="students"){sheet.q=e.target.value;$("#stuList").innerHTML=studentListHTML(sheet.q);return;}
   if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
@@ -2059,7 +2228,9 @@ document.addEventListener("submit",e=>{
     if(p&&l>0)store.update("plans",p.id,{length:Math.min(600,l),editedBy:who(),updated:Date.now()});closeSheet();return;}
   if(id==="secForm"){const p=planById(PLAN);if(p)addSection(p,val("name"));closeSheet();return;}
 });
+document.addEventListener("click",e=>{if(planListOpen&&!e.target.closest(".pswrap")&&!e.target.closest("[data-act=planStep]")){planListOpen=false;renderView();}});
 document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&planListOpen){planListOpen=false;renderView();}
   if(e.key==="Escape"&&sheet)closeSheet();
   const t=e.target;if(!t.classList||!t.classList.contains("pt"))return;
   const row=t.closest(".ptrow"),box=row.parentElement;

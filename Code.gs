@@ -51,6 +51,21 @@ const INSTR = {
     ['salt', 'Salt', 'secret', 90],
     ['joined', 'Joined', 'datetime', 160],
     ['lastSeen', 'Last signed in', 'datetime', 160],
+    ['notify', 'Notification settings', 'text', 220],
+  ],
+};
+
+// Phones signed up for notifications (one row per phone). Never sent to the app.
+const PUSH = {
+  sheet: 'Push', key: 'endpoint',
+  cols: [
+    ['id', 'ID', 'id', 90],
+    ['email', 'Instructor email', 'text', 200],
+    ['endpoint', 'Push address', 'secret', 300],
+    ['p256dh', 'Key', 'secret', 120],
+    ['auth', 'Auth', 'secret', 90],
+    ['device', 'Device', 'text', 160],
+    ['added', 'Added', 'datetime', 160],
   ],
 };
 
@@ -174,12 +189,14 @@ function api(body) {
   }
   req = req || {};
   const props = PropertiesService.getScriptProperties();
-  if (req.auth === 'config') return { ok: true, config: { googleClientId: props.getProperty('GOOGLE_CLIENT_ID') || '' } };
+  if (req.auth === 'config') return { ok: true, config: { googleClientId: props.getProperty('GOOGLE_CLIENT_ID') || '',
+    vapidPublic: props.getProperty('VAPID_PUBLIC') || '', pushUrl: props.getProperty('PUSH_URL') || '' } };
   if (!props.getProperty('DOJO_CODE')) return { ok: false, error: 'not_setup', message: 'Run "Set up / repair sheets" from the ' + APP_NAME + ' menu first.' };
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(20000)) return { ok: false, error: 'busy', message: 'The sheet is busy. Try again in a moment.' };
   try {
+    if (req.cron) return cron_(req);
     let me, token;
     if (req.auth) {
       const r = auth_(req);
@@ -199,6 +216,11 @@ function api(body) {
     const people = instrRows_();
     // Back from adding a student in the Kata Tracker: fetch the member list again now
     if (req.refreshStudents) CacheService.getScriptCache().remove('students');
+    // Notifications: settings, this phone's push address, a test
+    if (req.notify) { ensureCols_(INSTR); me = updInstr_(me, { notify: JSON.stringify(cleanNotify_(req.notify)) }); }
+    if (req.subscribe) addSub_(me, req.subscribe, req.device);
+    if (req.unsubscribe) dropEndpoints_([req.unsubscribe], me.email);
+    if (req.notifyTest) props.setProperty('TEST_' + me.id, String(Date.now()));
     if (req.ops && req.ops.length) {
       const acc = access_(me, people, readRaw_());
       req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });
@@ -285,7 +307,7 @@ function cleanProfile_(p) {
 
 function me_(o, people) {
   return { id: o.id, email: o.email, title: o.title || 'Mr.', first: o.first || '', last: o.last || '',
-    showFirst: /^y/i.test(String(o.showFirst || '')), google: !!o.google, password: !!o.hash,
+    showFirst: /^y/i.test(String(o.showFirst || '')), google: !!o.google, password: !!o.hash, notify: notifyOf_(o),
     admin: isAdmin_(o, people || instrRows_()) };
 }
 
@@ -657,6 +679,201 @@ function stateFor_(me, people) {
   };
 }
 
+/* ------------------------------------------------------------------ */
+/* Notifications (Gary, Oct 30)                                        */
+/* ------------------------------------------------------------------ */
+/*
+ * Each instructor picks the class times they teach and three reminders: Before class, No plan yet,
+ * Assignments to follow up. A reminder is {rel: minutes before class} or {day: -1|0, at: 'HH:MM'};
+ * assignments can also be {same: true} (with the Before class reminder).
+ * The push sender (Cloudflare Worker in push/) calls {cron: CRON_KEY} every 15 minutes; cron_ answers with
+ * every message due since the last run, one per phone, and the Worker encrypts and sends them.
+ */
+const NOTIFY_DEFAULT = { slots: [], before: { on: true, rel: 60 }, noplan: { on: true, day: -1, at: '19:00' }, asg: { on: true, same: true } };
+
+/** Adds any missing header to an existing tab (new columns go at the end), without the full setup. */
+function ensureCols_(sch) {
+  const sh = ss_().getSheetByName(sch.sheet);
+  if (!sh) return;
+  const have = headerMap_(sh.getRange(1, 1, 1, Math.max(1, sh.getLastColumn())).getValues()[0], sch);
+  sch.cols.forEach(function (c) { if (have[c[0]] == null) sh.getRange(1, sh.getLastColumn() + 1).setValue(c[1]); });
+}
+
+function cleanWhen_(w, kind) {
+  w = w || {};
+  const out = { on: w.on !== false };
+  if (kind === 'asg' && w.same) { out.same = true; return out; }
+  if (w.rel != null && w.rel !== '') { out.rel = Math.max(0, Math.min(24 * 60, Math.round(Number(w.rel) || 0))); return out; }
+  const at = /^(\d{1,2}):(\d{2})$/.exec(String(w.at || ''));
+  out.day = Number(w.day) === -1 ? -1 : 0;
+  out.at = at ? ('0' + Math.min(23, +at[1])).slice(-2) + ':' + ('0' + Math.min(59, +at[2])).slice(-2) : '08:00';
+  return out;
+}
+function cleanNotify_(n) {
+  n = n || {};
+  return {
+    slots: (Array.isArray(n.slots) ? n.slots : []).map(function (x) { return String(x).trim().slice(0, 60); }).filter(String).slice(0, 30),
+    before: cleanWhen_(n.before, 'before'), noplan: cleanWhen_(n.noplan, 'noplan'), asg: cleanWhen_(n.asg, 'asg'),
+  };
+}
+function notifyOf_(o) {
+  try { return o && o.notify ? cleanNotify_(JSON.parse(o.notify)) : JSON.parse(JSON.stringify(NOTIFY_DEFAULT)); }
+  catch (e) { return JSON.parse(JSON.stringify(NOTIFY_DEFAULT)); }
+}
+
+function subRows_() {
+  const sh = ss_().getSheetByName(PUSH.sheet);
+  if (!sh || sh.getLastRow() < 2) return [];
+  const vals = sh.getRange(1, 1, sh.getLastRow(), sh.getLastColumn()).getValues();
+  const cols = headerMap_(vals[0], PUSH);
+  const out = [];
+  for (let r = 1; r < vals.length; r++) {
+    const o = {};
+    PUSH.cols.forEach(function (c) { const i = cols[c[0]]; if (i != null) o[c[0]] = fromCell_(vals[r][i], c[2]); });
+    if (o.endpoint) { o.email = normEmail_(o.email); out.push(o); }
+  }
+  return out;
+}
+function addSub_(me, sub, device) {
+  if (!sub || !/^https:\/\//.test(String(sub.endpoint || '')) || !sub.keys || !sub.keys.p256dh || !sub.keys.auth) return;
+  const old = subRows_().filter(function (r) { return r.endpoint === sub.endpoint; });
+  old.forEach(function (r) { applyTo_(PUSH, { op: 'del', id: r.id }); });
+  applyTo_(PUSH, { op: 'add', id: newId_(), data: { email: normEmail_(me.email), endpoint: String(sub.endpoint), p256dh: String(sub.keys.p256dh),
+    auth: String(sub.keys.auth), device: String(device || '').slice(0, 60), added: Date.now() } });
+}
+/** Removes push addresses (gone ones from the sender, or one phone turning notifications off). */
+function dropEndpoints_(list, onlyEmail) {
+  const want = {};
+  (list || []).forEach(function (e) { want[String(e)] = true; });
+  // delete from the bottom up so row numbers stay right
+  subRows_().filter(function (r) { return want[r.endpoint] && (!onlyEmail || r.email === normEmail_(onlyEmail)); })
+    .reverse().forEach(function (r) { applyTo_(PUSH, { op: 'del', id: r.id }); });
+}
+
+function cron_(req) {
+  const props = PropertiesService.getScriptProperties();
+  const want = props.getProperty('CRON_KEY');
+  if (!want || String(req.cron) !== want) return fail_('bad_key', 'Not allowed.');
+  if (req.gone) { dropEndpoints_(req.gone); return { ok: true }; }
+  const now = req.now || Date.now();
+  const last = Number(props.getProperty('CRON_LAST')) || now - 15 * 60000;
+  const from = Math.max(last, now - 2 * 3600000); // never send more than 2 hours of missed reminders
+  props.setProperty('CRON_LAST', String(now));
+  return { ok: true, pushes: due_(from, now) };
+}
+
+const DOW_ = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const tz_ = function () { return Session.getScriptTimeZone() || 'America/Toronto'; };
+const keyOf_ = function (ms) { return Utilities.formatDate(new Date(ms), tz_(), 'yyyy-MM-dd'); };
+const atOf_ = function (key, hhmm) { return Utilities.parseDate(key + ' ' + hhmm, tz_(), 'yyyy-MM-dd HH:mm').getTime(); };
+const dowOf_ = function (key) { const p = key.split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay(); };
+const hm_ = function (t) { const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || '').trim()); return m ? ('0' + m[1]).slice(-2) + ':' + m[2] : ''; };
+const startOf_ = function (time) { const m = /^\s*(\d{1,2}:\d{2})/.exec(String(time || '')); return m ? hm_(m[1]) : ''; };
+const clock12_ = function (hhmm) { const p = hhmm.split(':'); const h = +p[0]; return ((h + 11) % 12 + 1) + ':' + p[1] + (h < 12 ? ' a.m.' : ' p.m.'); };
+const shortDay_ = function (key) { return DOW_[dowOf_(key)].replace(/^./, function (c) { return c.toUpperCase(); }); };
+
+function parseSlot_(v) {
+  const m = /^\s*([a-z]{3})[a-z]*\.?\s+(\d{1,2}:\d{2})\s*[-\u2013]\s*(\d{1,2}:\d{2})\s*(.*)$/i.exec(String(v || ''));
+  if (!m) return null;
+  const d = DOW_.indexOf(m[1].toLowerCase());
+  return d < 0 ? null : { value: String(v).trim(), day: d, start: hm_(m[2]), label: m[4].trim() };
+}
+
+/** Every message due in (from, now], one per phone: [{sub: {endpoint, keys}, msg: {title, body, url, tag}}]. */
+function due_(from, now) {
+  const subs = subRows_();
+  if (!subs.length) return [];
+  const props = PropertiesService.getScriptProperties();
+  const people = instrRows_();
+  const raw = readRaw_();
+  raw.notes = raw.notes || [];
+  const slotsAll = raw.lists.filter(function (r) { return /^timeslot$/i.test(r.list); }).map(function (r) { return parseSlot_(r.value); }).filter(Boolean);
+  const plansAt = function (key, start) {
+    return raw.plans.filter(function (p) { return p.date && keyOf_(p.date) === key && startOf_(p.time) === start; });
+  };
+  const today = keyOf_(now);
+  const noon = atOf_(today, '12:00');
+  const out = [];
+  people.forEach(function (person) {
+    const mine = subs.filter(function (s) { return s.email === normEmail_(person.email); });
+    if (!mine.length) return;
+    const msgs = [];
+    const test = props.getProperty('TEST_' + person.id);
+    if (test) {
+      props.deleteProperty('TEST_' + person.id);
+      msgs.push({ title: 'Notifications are on', body: 'This is how SKA Lesson Planner reminders will look on this phone.', url: './', tag: 'test' });
+    }
+    const n = notifyOf_(person);
+    const acc = access_(person, people, raw);
+    const picked = n.slots.map(function (v) { return slotsAll.filter(function (s) { return s.value.toLowerCase() === String(v).toLowerCase(); })[0]; }).filter(Boolean);
+    for (let d = -1; d <= 2; d++) {
+      const key = keyOf_(noon + d * 86400000);
+      picked.forEach(function (sl) {
+        if (dowOf_(key) !== sl.day) return;
+        const start = atOf_(key, sl.start);
+        const plans = plansAt(key, sl.start);
+        const seen = plans.filter(function (p) { return sees_(acc, acc.plans[p.id]); })[0];
+        const name = (sl.label || 'Class') + ' at ' + clock12_(sl.start);
+        const fireAt = function (w) {
+          if (w.same) w = n.before.rel != null ? n.before : { rel: 60 };
+          return w.rel != null ? start - w.rel * 60000 : atOf_(keyOf_(atOf_(key, '12:00') + (w.day || 0) * 86400000), w.at);
+        };
+        const inWindow = function (w) { const t = fireAt(w); return w.on && t > from && t <= now; };
+        const url = seen ? './#plan=' + seen.id : './';
+        if (inWindow(n.before)) {
+          msgs.push(seen
+            ? { title: name + ': ' + (seen.focus || 'class plan'), body: 'Plan ready. Tap to open the teaching view.', url: url, tag: 'before-' + key + sl.start }
+            : { title: name + ': no plan yet', body: plans.length ? 'Another instructor has a plan for it.' : 'Tap to plan it, or copy an earlier plan.', url: url, tag: 'before-' + key + sl.start });
+        }
+        if (!plans.length && inWindow(n.noplan)) {
+          msgs.push({ title: 'No plan yet: ' + shortDay_(key) + ' ' + clock12_(sl.start) + (sl.label ? ' ' + sl.label : ''), body: 'Tap to plan it, or copy an earlier plan.', url: './', tag: 'noplan-' + key + sl.start });
+        }
+        if (inWindow(n.asg)) {
+          const open = raw.notes.filter(function (x) {
+            if (!/^assignment$/i.test(x.kind) || /^y/i.test(String(x.done || ''))) return false;
+            const p = raw.plans.filter(function (q) { return q.id === x.plan; })[0];
+            if (!p || !p.date || keyOf_(p.date) >= key || dowOf_(keyOf_(p.date)) !== sl.day || startOf_(p.time) !== sl.start) return false;
+            const own = normEmail_(x.owner) === normEmail_(person.email);
+            return own || (/^every/i.test(String(x.share || '')) && sees_(acc, acc.plans[p.id]));
+          });
+          if (open.length) {
+            msgs.push({ title: open.length + ' assignment' + (open.length === 1 ? '' : 's') + ' to follow up',
+              body: open.slice(0, 3).map(function (x) { return (x.who && !/^whole class$/i.test(x.who) ? x.who : 'Whole class') + ': ' + x.text; }).join(' \u00b7 ') + (open.length > 3 ? ' \u00b7 +' + (open.length - 3) + ' more' : ''),
+              url: url, tag: 'asg-' + key + sl.start });
+          }
+        }
+      });
+    }
+    msgs.forEach(function (m) {
+      mine.forEach(function (s) { out.push({ sub: { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, msg: m }); });
+    });
+  });
+  return out;
+}
+
+function setUpNotifications() {
+  const ui = SpreadsheetApp.getUi();
+  const r = ui.prompt('Set up notifications',
+    'On your PC, in the SKA-Lesson-Planner folder\'s "push" folder, run:  node setup.mjs\nThen paste the setup code it prints here.',
+    ui.ButtonSet.OK_CANCEL);
+  if (r.getSelectedButton() !== ui.Button.OK) return;
+  let c;
+  try { c = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(String(r.getResponseText() || '').trim())).getDataAsString()); }
+  catch (e) { ui.alert('That setup code couldn\'t be read. Copy the whole line setup.mjs printed.'); return; }
+  if (!c || !c.pub || !c.key || !/^https:\/\/[\w.-]+\.workers\.dev$/.test(String(c.url || ''))) { ui.alert('That setup code is missing a part. Run node setup.mjs again.'); return; }
+  const props = PropertiesService.getScriptProperties();
+  if (props.getProperty('VAPID_PUBLIC') && props.getProperty('VAPID_PUBLIC') !== c.pub) {
+    // New keys: old phone sign-ups can't receive any more
+    const sh = ss_().getSheetByName(PUSH.sheet);
+    if (sh && sh.getLastRow() > 1) sh.deleteRows(2, sh.getLastRow() - 1);
+  }
+  props.setProperty('VAPID_PUBLIC', c.pub);
+  props.setProperty('CRON_KEY', c.key);
+  props.setProperty('PUSH_URL', c.url);
+  props.setProperty('CRON_LAST', String(Date.now()));
+  ui.alert('Notifications are set up. Each instructor turns them on in the app: tap your initials, then Notifications.');
+}
+
 /**
  * Active members from the Kata Tracker (name and belt), for tagging notes. Cached for 6 hours so the
  * planner doesn't call the tracker on every sync. Empty until the key is set (menu: Connect to the Kata Tracker…).
@@ -761,6 +978,7 @@ function onOpen() {
     .addItem('Set web app link…', 'setWebAppUrl')
     .addItem('Set Google sign-in client ID…', 'setGoogleClientId')
     .addItem('Connect to the Kata Tracker…', 'connectKataTracker')
+    .addItem('Set up notifications…', 'setUpNotifications')
     .addItem('Set up / repair sheets', 'setup')
     .addSeparator()
     .addItem('Sign everyone out', 'signEveryoneOut')
