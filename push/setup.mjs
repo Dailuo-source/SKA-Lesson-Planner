@@ -20,6 +20,14 @@ const jwk = await crypto.subtle.exportKey('jwk', pair.privateKey);
 const pub = b64u(new Uint8Array(await crypto.subtle.exportKey('raw', pair.publicKey)));
 const cronKey = b64u(crypto.getRandomValues(new Uint8Array(24)));
 
+// Sign in to Cloudflare first if needed (the browser opens once; later runs skip this)
+const who = spawnSync('npx', ['--yes', 'wrangler@4', 'whoami'], { encoding: 'utf8', shell: process.platform === 'win32' });
+if (!/associated with the email|Account ID/i.test((who.stdout || '') + (who.stderr || ''))) {
+  console.log('Signing in to Cloudflare: a browser window will open. Click Allow, then come back here.');
+  const r = spawnSync('npx', ['--yes', 'wrangler@4', 'login'], { stdio: 'inherit', shell: process.platform === 'win32' });
+  if (r.status !== 0) { console.error('Cloudflare sign-in did not finish. Run node setup.mjs again.'); process.exit(1); }
+}
+
 console.log('Deploying the notification sender…');
 const out = run(['deploy']);
 const url = (out.match(/https:\/\/[\w.-]+\.workers\.dev/) || [])[0];
