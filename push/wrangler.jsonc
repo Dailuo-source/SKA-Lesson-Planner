@@ -1,11 +1,11 @@
-// SKA Lesson Planner push sender: a Cloudflare Worker that runs every 15 minutes.
+// SKA Lesson Planner push sender: a Cloudflare Worker that runs every 5 minutes.
 // First time: `node setup.mjs` from this folder (makes the keys, deploys, sets the secrets).
 // After a code change: `npx wrangler deploy` from this folder.
 {
   "name": "ska-lesson-planner-push",
   "main": "src/index.js",
   "compatibility_date": "2025-09-01",
-  "triggers": { "crons": ["*/15 * * * *"] },
+  "triggers": { "crons": ["*/5 * * * *"] },
   "vars": {
     "API_URL": "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3Ytobt2dnCbeo6BhRW-J7bCeBOZ4rSlz1wmpt3g8Tpe5f/exec"
   }

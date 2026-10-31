@@ -1,5 +1,5 @@
 // SKA Lesson Planner push sender (Cloudflare Worker).
-// Every 15 minutes it asks the planner's Apps Script what is due ({cron: CRON_KEY}) and sends each
+// Every 5 minutes it asks the planner's Apps Script what is due ({cron: CRON_KEY}) and sends each
 // message as a Web Push notification, signed with the VAPID key and encrypted for each phone (RFC 8291).
 // Google Apps Script can't sign ES256 or do the ECDH encryption, which is why this lives here.
 // POST /run does the same thing straight away (the app uses it after "Send a test").

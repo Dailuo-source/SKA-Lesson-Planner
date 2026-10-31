@@ -686,7 +686,7 @@ function stateFor_(me, people) {
  * Each instructor picks the class times they teach and three reminders: Before class, No plan yet,
  * Assignments to follow up. A reminder is {rel: minutes before class} or {day: -1|0, at: 'HH:MM'};
  * assignments can also be {same: true} (with the Before class reminder).
- * The push sender (Cloudflare Worker in push/) calls {cron: CRON_KEY} every 15 minutes; cron_ answers with
+ * The push sender (Cloudflare Worker in push/) calls {cron: CRON_KEY} every 5 minutes; cron_ answers with
  * every message due since the last run, one per phone, and the Worker encrypts and sends them.
  */
 const NOTIFY_DEFAULT = { slots: [], before: { on: true, rel: 60 }, noplan: { on: true, day: -1, at: '19:00' }, asg: { on: true, same: true } };
@@ -756,7 +756,7 @@ function cron_(req) {
   if (!want || String(req.cron) !== want) return fail_('bad_key', 'Not allowed.');
   if (req.gone) { dropEndpoints_(req.gone); return { ok: true }; }
   const now = req.now || Date.now();
-  const last = Number(props.getProperty('CRON_LAST')) || now - 15 * 60000;
+  const last = Number(props.getProperty('CRON_LAST')) || now - 5 * 60000;
   const from = Math.max(last, now - 2 * 3600000); // never send more than 2 hours of missed reminders
   props.setProperty('CRON_LAST', String(now));
   return { ok: true, pushes: due_(from, now) };
