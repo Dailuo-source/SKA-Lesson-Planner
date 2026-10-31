@@ -44,7 +44,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - Class notes box in teaching/review; share switch resets to **Only me** after every note. **Last class** card (`recapHTML`) = previous plan in the same timeslot (`skal.recap` for collapsed). **Student notes** from the person icon.
 - Wide (≥1000px): tabs in the red bar, full-width pages, 7-column week, panels slide in from the right.
 - Time shows as hours and minutes ("1h 40m of 1h 45m planned"); exercise and section times stay in minutes.
-- Every button scales down slightly when pressed.
+- Every button scales down slightly when pressed, and every tap shows a red-ringed flash and waits 0.1 s before acting (Gary, Oct 30; capture click listener after `needGuard`, `.tapflash`).
 - Back button: every screen/panel is a history entry; at the first screen "Press back again to exit". Every panel has a close control (iPhones).
 - Sync: optimistic, batched ops, 60 s polling. Panels are never redrawn by a background sync; library search keeps focus.
 - Accounts: HMAC token (`TOKEN_SECRET`, 400 days) in `skal.token`, profile in `skal.me`; `bad_token` signs out. Labels on plans are text at edit time ("Mr. Luo").
@@ -57,7 +57,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v19`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v20`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome (instance **GARYMAIN**): open script.google.com/home → SKA Lesson Planner, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Commits use author `Claude <noreply@anthropic.com>`.
 
@@ -100,6 +100,7 @@ Inside the `index.html` script, search for:
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-10-30: Tap flash with a 0.1 s delay on every button. sw v20
 - 2026-10-30: Compact layout app-wide; desktop full width; Add a new student (via the Kata Tracker) with an instant list refresh. sw v19
 - 2026-10-21: Moved the site files into `web/`; only that folder is published
 - 2026-10-22: Trimmed this brief

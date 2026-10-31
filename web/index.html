@@ -288,6 +288,8 @@ ul.vpts.mine{color:var(--red-d)}
 /* ---------- Tap feedback (every button) ---------- */
 button,a.btn,.pickrow{transition:transform .08s ease,filter .08s ease,background-color .12s}
 button:not(:disabled):active,a.btn:active{transform:scale(.96);filter:brightness(.92)}
+/* Tap flash (Gary, Oct 30): every tap shows for ~0.15 s, and the action waits 0.1 s so you see what you tapped */
+.tapflash{transform:scale(.95)!important;filter:brightness(.88)!important;box-shadow:0 0 0 3px rgba(200,16,46,.35)!important}
 
 /* ---------- Last class recap and class notes ---------- */
 .recap{border:1.5px solid #F2C4CB;background:var(--red-tint);border-radius:20px;overflow:hidden}
@@ -889,6 +891,15 @@ function go(t,plan,mode){
   tab=t;history.pushState(stateNow(),"");render();window.scrollTo(0,0);
 }
 document.addEventListener("click",()=>{if(needGuard&&signedIn()){history.pushState(stateNow(),"");needGuard=false;}},true);
+/* Tap flash: hold each button tap for 0.1 s with a visible press, then let it through */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button,a.btn,a.pickrow,[data-act]");
+  if(!b||b.disabled||b.matches("input,textarea,select,label")||e.detail===0&&b.dataset.tapGo)return;
+  if(b.dataset.tapGo){delete b.dataset.tapGo;return;}
+  e.preventDefault();e.stopImmediatePropagation();
+  b.classList.add("tapflash");
+  setTimeout(()=>{b.classList.remove("tapflash");if(!b.isConnected)return;b.dataset.tapGo="1";b.click();},100);
+},true);
 window.addEventListener("popstate",e=>{
   const s=e.state||{t:"plans",root:true};
   const hadSheet=!!sheet;
