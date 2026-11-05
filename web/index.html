@@ -599,6 +599,32 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .plrow .grow>span{display:block;font-size:12px;font-weight:700;color:var(--muted)}
 .plrow>svg{width:18px;height:18px;color:var(--red)}
 
+/* ---------- Teaching mode (Gary, Nov 5): check off where you are, fold sections, clock time per exercise, carry notes to next week ---------- */
+.tbar{display:flex;align-items:center;gap:10px;width:100%;padding:6px 10px;border:1px solid #F2C4CB;background:var(--red-tint);border-radius:16px;text-align:left;color:var(--ink);min-height:50px}
+.tbar b{display:block;font-size:14px;font-weight:800;color:var(--red-d)}
+.tbar .small{display:block}
+.vsec-h.tg{width:100%;background:none;border-top:0;border-left:0;border-right:0;border-bottom-style:solid;min-height:44px;text-align:left;color:var(--ink);font:inherit;cursor:pointer}
+.vsec-h.tg>svg{width:18px;height:18px;color:var(--ink2);flex:none}
+.vsec-h .sm{margin-left:auto;font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap}
+.tchk{width:44px;height:44px;border:0;background:none;display:flex;align-items:center;justify-content:center;flex:none;margin:-8px -8px -8px 0;border-radius:22px}
+.tchk i{width:26px;height:26px;border-radius:13px;border:1.5px solid var(--line2);background:#fff;display:flex;align-items:center;justify-content:center}
+.tchk i svg{width:16px;height:16px;color:#fff}
+.tchk[aria-pressed=true] i{background:var(--red);border-color:var(--red)}
+.vex.now .tchk i{border-color:var(--red)}
+.vex.now{border-color:var(--red);box-shadow:inset 4px 0 0 var(--red)}
+.vex.done h3{text-decoration:line-through;color:var(--muted)}
+.vex.done{background:#FAFAFA}
+.nowtag{font-size:11px;font-weight:800;color:var(--red-d);display:block;margin-top:1px;text-decoration:none}
+.carry{min-height:34px;margin-top:4px;border:1px solid var(--line2);background:#fff;border-radius:17px;padding:0 10px;font-size:12.5px;font-weight:800;color:var(--ink2);display:inline-flex;align-items:center;gap:4px;flex:none;white-space:nowrap}
+.carry svg{width:14px;height:14px}
+.carry[aria-pressed=true]{background:var(--red-tint);border-color:var(--red);color:var(--red-d)}
+.nbhd{display:flex;align-items:center;gap:8px}
+.nbhd h2{flex:1;min-width:0}
+.cnhead{font-size:13px;font-weight:800;color:var(--ink2);margin:12px 0 0}
+.cnq{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid #ECECEC}
+.cnq .grow{min-width:0}
+.cnq .nm{font-size:12px;font-weight:700;color:var(--muted)}
+
 /* ---------- big screens (Gary, Oct 20): tabs in the red bar, wider pages, panels slide in from the right ---------- */
 @media (min-width:1000px){
   main{max-width:none;padding:18px 28px 32px}
@@ -669,6 +695,8 @@ const LS={get(k,d){try{const v=localStorage.getItem("skal."+k);return v==null?d:
 const svg=(p,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const ICON={
   plus:svg('<path d="M5 12h14M12 5v14"/>',2.5), minus:svg('<path d="M5 12h14"/>',2.5),
+  stop:svg('<rect x="5" y="5" width="14" height="14" rx="3"/>',2.4), fwd:svg('<path d="M5 12h12M13 7l5 5-5 5"/>',2.4),
+  timer:svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M10 2h4"/>',2.2), lines:svg('<path d="M4 6h16M4 12h10M4 18h6"/>',2.2),
   edit:svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'),
   cal:svg('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
   list:svg('<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>'),
@@ -821,7 +849,7 @@ function normalize(st){
     plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
     items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy)})),
     people:(st.people||[]).map(r=>({id:str(r.id),name:str(r.name),admin:!!r.admin})).filter(r=>r.id),
-    notes:(st.notes||[]).map(r=>Object.assign({},r,{plan:str(r.plan),item:str(r.item),kind:str(r.kind)||"Class",who:str(r.who),text:str(r.text),done:str(r.done),share:r.share==="all"?"all":"me",addedBy:str(r.addedBy),created:num(r.created,0)||num(r.updated,0)})).filter(r=>r.text),
+    notes:(st.notes||[]).map(r=>Object.assign({},r,{plan:str(r.plan),item:str(r.item),kind:str(r.kind)||"Class",who:str(r.who),text:str(r.text),done:str(r.done),next:str(r.next),share:r.share==="all"?"all":"me",addedBy:str(r.addedBy),created:num(r.created,0)||num(r.updated,0)})).filter(r=>r.text),
     students:(st.students||[]).map(r=>({name:str(r.name),belt:str(r.belt)})).filter(r=>r.name),
     exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),notes:str(r.notes),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
   };
@@ -1178,17 +1206,45 @@ const qnLines=ptLines;
 const splitQn=x=>{const m=x.match(/^(\d{1,2}:\d{2}\s*[ap]\.?m\.?)\s*[·-]\s*(.*)$/i);return m?{t:m[1],x:m[2]}:{t:"",x:x};};
 function viewOnlyNote(p){if(canEditR(p))return"";
   return`<div class="viewonly">${ICON.eye}<span>${esc(personName(p.ownerId)||"Another instructor")}’s plan, shared with you to view. To change it, use ⋯ → <b>Copy to a new date</b>.</span></div>`;}
+/* Teaching mode (Gary, Nov 5): tick off each exercise (kept on this phone), "You are here" = the first one not ticked,
+   tap a section header to fold it (a section folds by itself when its last exercise is ticked), and each exercise shows
+   the clock time it should start ("≈ 8:15 p.m.") when the plan has a start time. */
+function tMap(k){let o={};try{o=JSON.parse(LS.get(k,"{}"))||{};}catch(e){o={};}return o;}
+function tGet(k,pid){return new Set(tMap(k)[pid]||[]);}
+function tPut(k,pid,set){const o=tMap(k);delete o[pid];o[pid]=[...set];const ks=Object.keys(o);while(ks.length>30)delete o[ks.shift()];LS.set(k,JSON.stringify(o));}
+const hm12=(n,short)=>{n=((Math.round(n)%1440)+1440)%1440;const h=Math.floor(n/60),mm=n%60;return((h+11)%12+1)+":"+pad(mm)+(short?"":(h<12?" a.m.":" p.m."));};
+function teachList(p){let at=0;const out=[];
+  planSections(p).filter(s=>!isSkipped(p,s)).forEach(s=>secItems(p,s).forEach(it=>{out.push({it,sec:s,from:at});at+=it.minutes||0;}));
+  return out;}
+function teachNow(p){const done=tGet("tdone",p.id),l=teachList(p);const n=l.find(x=>!done.has(x.it.id));return{done,list:l,now:n||null};}
+function teachBar(p){
+  const T=teachNow(p),n=T.list.length;if(!n)return"";
+  const d=T.list.filter(x=>T.done.has(x.it.id)).length;let pace="";
+  const st=toMin(startOf(p));
+  if(T.now&&st!=null&&p.date&&dayKey(p.date)===todayKey()){const d0=new Date(),nowM=d0.getHours()*60+d0.getMinutes(),diff=nowM-(st+T.now.from);
+    if(nowM>=st-30&&nowM<=st+planTotal(p)+60)pace=Math.abs(diff)<=3?" · on time":diff>0?` · ${diff} min behind`:` · ${-diff} min ahead`;}
+  return`<button type="button" class="tbar" data-act="tJump" aria-label="Go to the exercise you’re on">
+    <span class="ring2" aria-hidden="true">${ICON.timer}</span>
+    <span class="grow"><b>${T.now?"Teaching · Now: "+esc(T.now.it.name):"Teaching · All done"}</b><span class="small">${d} of ${n} done${pace}</span></span>
+  </button>`;
+}
 function viewTeach(p){
   const len=p.length||105,tot=planTotal(p);
+  const T=teachNow(p),folded=tGet("tfold",p.id),st=toMin(startOf(p));
   let at=0,any=false;
   const secs=planSections(p).filter(s=>!isSkipped(p,s)).map((s,si)=>{
     const col=secColour(s),its=secItems(p,s);if(!its.length)return"";any=true;
-    const start=at;
-    const cards=its.map(it=>{
+    const start=at,secMin=its.reduce((a,i)=>a+(i.minutes||0),0),nDone=its.filter(i=>T.done.has(i.id)).length,fold=folded.has(s);
+    const cards=fold?(at+=secMin,""):its.map(it=>{
       const lib=exById(it.exercise),from=at;at+=it.minutes||0;
+      const isDoneT=T.done.has(it.id),isNow=!!T.now&&T.now.it.id===it.id;
       const steps=lib?toSteps(lib.description):[],libNotes=lib?toPoints(lib.notes):[],mine=toPoints(it.note),qn=qnLines(it.live);
-      return`<article class="card vex${lib&&lib.addedBy?" cornered":""}">${ctagHTML(lib?lib.addedBy:"")}
-        <div class="vex-top"><span class="vtime" style="background:${tint(col)};color:${col}" title="Starts ${clock(from)} into class">${clock(from)}</span><h3>${esc(it.name)}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span></div>
+      const tm=st!=null?(isDoneT?"":"≈ ")+hm12(st+from):clock(from);
+      const chk=`<button type="button" class="tchk" data-act="tCheck" data-id="${esc(it.id)}" aria-pressed="${isDoneT}" aria-label="${isDoneT?"Untick":"Tick off"} ${esc(it.name)}"><i>${isDoneT?ICON.check:""}</i></button>`;
+      if(isDoneT)return`<article class="card vex done${lib&&lib.addedBy?" cornered":""}" id="ex-${esc(it.id)}">${ctagHTML(lib?lib.addedBy:"")}
+        <div class="vex-top"><span class="vtime" style="background:${tint(col)};color:${col}">${tm}</span><h3>${esc(it.name)}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span>${chk}</div></article>`;
+      return`<article class="card vex${isNow?" now":""}${lib&&lib.addedBy?" cornered":""}" id="ex-${esc(it.id)}">${ctagHTML(lib?lib.addedBy:"")}
+        <div class="vex-top"><span class="vtime" style="background:${tint(col)};color:${col}" title="Starts ${clock(from)} into class">${tm}</span><h3>${esc(it.name)}${isNow?`<span class="nowtag">You are here</span>`:""}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span>${chk}</div>
         ${steps.length?`<div class="vlabel">Instructions</div><ol class="steps vsteps">${steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:(lib?"":(dk=>dk?`<p class="kmeta" style="margin:6px 0 0"><span class="kdot" style="background:${BELT_COL[kataBelt(dk)]||"#CCC"}"></span>Dojo kata · ${esc(kataWhen(dk))}</p>`:`<p class="small" style="margin:6px 0 0">One-off for this class.</p>`)(dojoKata(it.name)))}
         ${libNotes.length?`<div class="vlabel">Notes</div><ul class="pts vpts">${libNotes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
         ${mine.length?`<div class="vlabel">For this class</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
@@ -1198,8 +1254,9 @@ function viewTeach(p){
         ${canEditR(p)?`<form class="qform" data-id="${esc(it.id)}"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Quick note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Jot a quick note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Save quick note for ${esc(it.name)}">${ICON.plus}</button></form>`:""}
       </article>`;
     }).join("");
+    const all=nDone===its.length,when=fold&&!nDone?` · ≈ ${st!=null?hm12(st+start,true):clock(start)}`:"";
     return`<section class="vsec">
-      <div class="vsec-h" style="border-color:${col}"><div class="badge" style="background:${col}">${si+1}</div><h2 class="grow">${esc(s)}</h2><span class="small" style="color:${col};font-weight:800">${clock(start)}–${clock(at)}</span></div>
+      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${nDone}/${its.length} · ${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
       ${cards}
     </section>`;
   }).join("");
@@ -1207,8 +1264,9 @@ function viewTeach(p){
   return`<div class="stack">
     ${viewOnlyNote(p)}
     ${planHead(p,esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}`,"Plan options: edit, date, focus, copy, delete")}
+    ${any?teachBar(p):""}
     ${recapHTML(p)}
-    ${any?secs+noteBoxHTML(p)+`<button type="button" class="btn outline block" data-act="setMode" data-m="review">${ICON.review}Class done? Review the notes</button>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
+    ${any?secs+noteBoxHTML(p)+`<div class="savebar"><button type="button" class="btn primary block" data-act="setMode" data-m="review">${ICON.stop}End class &amp; review</button></div>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
   </div>`;
 }
 
@@ -1334,14 +1392,17 @@ function noteBoxHTML(p){
   }
   const mine=notesOf(p.id);
   return`<section class="card notebox" id="noteBox">
-    <h2>Class notes</h2><p class="small" style="margin:0 0 12px">Only you see a note unless you share it. Next class at this time shows them under <b>Last class</b>.</p>
+    <div class="nbhd"><h2>Class notes</h2><button type="button" class="btn small ghost" data-act="consolidate">${ICON.lines}Consolidate</button></div><p class="small" style="margin:0 0 12px">Only you see a note unless you share it. Next class at this time shows them under <b>Last class</b>.</p>
     <div class="nkinds" role="group" aria-label="What kind of note">${kinds}</div>
     ${pick}
     <form class="nform qform" data-id="${esc(p.id)}"><label for="nbText" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Note</label><input class="inp keepval" id="nbText" name="q" type="text" placeholder="${esc(K.ph)}" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add this note">${ICON.plus}</button></form>
     <button type="button" class="nshare" data-act="nbShare" aria-pressed="${NB.share}">${NB.share?ICON.people+"Shared with instructors on this class":ICON.lock+"Only me · tap to share"}</button>
-    ${mine.length?`<ul class="nlist">${mine.map(n=>noteLi(n)).join("")}</ul>`:""}
+    ${mine.length?`<ul class="nlist">${mine.map(n=>noteLi(n,{carry:true})).join("")}</ul>`:""}
+    ${mine.some(n=>n.mine&&n.kind!=="Assignment")?`<p class="small" style="margin:6px 0 0">Notes marked <b>Next week</b> show in next ${p.date?esc(DAYS[new Date(p.date).getDay()]):"class"}’s plan, under Last class.</p>`:""}
   </section>`;
 }
+const isNext=n=>/^y/i.test(n.next||"");
+const carryBtn=n=>`<button type="button" class="carry" data-act="noteNext" data-id="${esc(n.id)}" aria-pressed="${isNext(n)}" aria-label="${isNext(n)?"Stop carrying this note to next week":"Carry this note to next week’s class"}">${isNext(n)?ICON.check:ICON.fwd}Next week</button>`;
 function noteLi(n,opt){
   opt=opt||{};const K=kindOf(n.kind),it=n.item?itemById(n.item):null;
   const lead=n.kind==="Feedback"?(it?it.name:""):opt.noWho?"":(isWhole(n.who)?(n.kind==="Assignment"?WHOLE:""):n.who);
@@ -1351,9 +1412,29 @@ function noteLi(n,opt){
     <span class="ntag" style="background:${K.col}">${K.tag}</span>
     <div class="grow"><div class="nx">${lead?`<b>${esc(lead)}:</b> `:""}${esc(n.text)}</div>
       <div class="nm">${meta.filter(Boolean).join(" · ")}${n.mine?" · ":""}${n.mine?lockIc:""}</div>
+      ${opt.carry&&n.mine&&n.kind!=="Assignment"?carryBtn(n):""}
       ${n.kind==="Assignment"?`<button type="button" class="fup sm" data-act="noteDone" data-id="${esc(n.id)}" aria-pressed="${isDone(n)}"${n.mine?"":" disabled"}>${isDone(n)?ICON.check+"Followed up":"Follow up"}</button>`:""}</div>
     ${n.mine&&!opt.readonly?`<div class="nacts"><button type="button" class="iconbtn" data-act="noteShare" data-id="${esc(n.id)}" aria-label="${n.share==="all"?"Make this note private":"Share this note with instructors on this class"}">${n.share==="all"?ICON.people:ICON.lock}</button><button type="button" class="iconbtn" data-act="delNote" data-id="${esc(n.id)}" aria-label="Delete this note">${ICON.x}</button></div>`:""}
   </li>`;
+}
+
+/* Consolidate (Gary, Nov 5): every note from this class in one list. Quick notes and after-class notes marked
+   Next week become Exercise feedback notes (yours, private), so they carry to next week's Last class card. */
+const myCopy=(p,item,text)=>S.notes.find(n=>n.mine&&n.plan===p.id&&n.kind==="Feedback"&&(n.item||"")===(item||"")&&eqi(n.text,text));
+function sheetConsol(){
+  const p=planById(PLAN);if(!p)return sheetHead("Consolidate notes")+`<p>This class was removed.</p>`;
+  const tn=notesOf(p.id),rv=ptLines(p.review),qn=[];
+  teachList(p).forEach(({it})=>qnLines(it.live).forEach((x,i)=>{const q=splitQn(x);if(!myCopy(p,it.id,q.x))qn.push({it,q,i});}));
+  const rvs=rv.map((x,i)=>({x,i})).filter(r=>!myCopy(p,"",r.x));
+  const groups=NOTE_KINDS.map(K=>{const ns=tn.filter(n=>n.kind===K.k);return ns.length?`<div class="cnhead">${K.label}</div><ul class="nlist" style="margin-top:2px">${ns.map(n=>noteLi(n,{carry:true})).join("")}</ul>`:"";}).join("");
+  const nxt=`<button type="button" class="carry" data-act="%A" %D aria-pressed="false" aria-label="Carry this note to next week’s class">${ICON.fwd}Next week</button>`;
+  const qnHTML=qn.length?`<div class="cnhead">Quick notes</div>`+qn.map(({it,q,i})=>`<div class="cnq"><div class="grow"><div class="nx"><b>${esc(it.name)}:</b> ${esc(q.x)}</div>${q.t?`<div class="nm">${esc(q.t)}</div>`:""}${nxt.replace("%A","qnNext").replace("%D",`data-id="${esc(it.id)}" data-i="${i}"`)}</div></div>`).join(""):"";
+  const rvHTML=rvs.length?`<div class="cnhead">After class</div>`+rvs.map(r=>`<div class="cnq"><div class="grow"><div class="nx">${esc(r.x)}</div>${nxt.replace("%A","rvNext").replace("%D",`data-i="${r.i}"`)}</div></div>`).join(""):"";
+  const none=!tn.length&&!qn.length&&!rvs.length;
+  return sheetHead("Consolidate notes",`<div class="small">${esc(planTitle(p))} · ${esc(whenLine(p))}</div>`)+
+    `<p class="small" style="margin:-4px 0 6px">Every note from this class in one place. Tap <b>Next week</b> on the ones you want to see in next ${p.date?esc(DAYS[new Date(p.date).getDay()]):"class"}’s plan.</p>
+    ${none?`<p class="small">No notes from this class yet.</p>`:groups+qnHTML+rvHTML}
+    <button type="button" class="btn outline block mt" data-act="shareNotes">${ICON.share}Share or copy all notes</button>`;
 }
 
 /* Last class: everything from the previous class in this timeslot, at the top of tonight's class */
@@ -1361,7 +1442,9 @@ let recapWho="";
 function recapHTML(p){
   const prev=earlierSlot(p),last=prev[0];if(!last)return"";
   const open=LS.get("recap","1")!=="0";
-  const ns=notesOf(last.id);
+  const all=notesOf(last.id);
+  // Notes marked "Next week" in that class come first, under For this week (Gary, Nov 5)
+  const carry=all.filter(n=>isNext(n)&&n.kind!=="Assignment"),ns=all.filter(n=>!carry.includes(n));
   const told=ns.filter(n=>n.kind==="Class");
   const after=ptLines(last.review);
   const prevIds=new Set(prev.map(x=>x.id));
@@ -1370,15 +1453,17 @@ function recapHTML(p){
   const ppl={};ns.filter(n=>!isWhole(n.who)&&(n.kind==="Person"||n.kind==="Assignment")).forEach(n=>{const k=Object.keys(ppl).find(x=>eqi(x,n.who))||n.who;(ppl[k]=ppl[k]||[]).push(n);});
   const names=Object.keys(ppl).sort((a,b)=>a.localeCompare(b));
   const fb=ns.filter(n=>n.kind==="Feedback").map(n=>{const it=itemById(n.item);return{ex:it?it.name:"",x:n.text};});
-  itemsOf(last.id).forEach(it=>qnLines(it.live).forEach(x=>fb.push({ex:it.name,x:splitQn(x).x})));
+  itemsOf(last.id).forEach(it=>qnLines(it.live).forEach(x=>{const q=splitQn(x).x;if(!carry.some(n=>n.item===it.id&&eqi(n.text,q)))fb.push({ex:it.name,x:q});}));
   const openAsg=asg.filter(n=>!isDone(n)).length;
   const sub=fmtDay(last.date)+(last.type?" · "+last.type:"")+(parseTime(last.time)?" · "+clock12(startOf(last)):"")+(last.mine===false&&last.ownerId?" · "+(personName(last.ownerId)||""):"");
-  const nothing=!told.length&&!after.length&&!asg.length&&!names.length&&!fb.length;
-  const counts=[[told.length+after.length,"to the class","#111111"],[openAsg,openAsg===1?"assignment open":"assignments open","#8A4B00"],[names.length,names.length===1?"student":"students","#5B3FA8"],[fb.length,"feedback","#0F6E6A"]]
+  const nothing=!carry.length&&!told.length&&!after.length&&!asg.length&&!names.length&&!fb.length;
+  const counts=[[carry.length,"for this week","#C8102E"],[told.length+after.length,"to the class","#111111"],[openAsg,openAsg===1?"assignment open":"assignments open","#8A4B00"],[names.length,names.length===1?"student":"students","#5B3FA8"],[fb.length,"feedback","#0F6E6A"]]
     .filter(c=>c[0]).map(c=>`<span style="background:${c[2]}">${c[0]} ${c[1]}</span>`).join("");
   if(recapWho&&!names.some(n=>eqi(n,recapWho)))recapWho="";
   const body=nothing?`<p class="small" style="margin:0">No notes from that class.</p>`:`
     ${counts?`<div class="rcount">${counts}</div>`:""}
+    ${carry.length?`<div><div class="rclabel" style="color:var(--red-d)">For this week</div><ul class="rcpts">${carry.map(n=>{const it=n.item?itemById(n.item):null;const lead=n.kind==="Feedback"?(it?it.name:""):(isWhole(n.who)?"":n.who);
+      return`<li><span>${lead?`<b>${esc(lead)}:</b> `:""}${esc(n.text)}</span></li>`;}).join("")}</ul></div>`:""}
     ${told.length?`<div><div class="rclabel">Told the class</div><ul class="rcpts">${told.map(n=>`<li><span>${esc(n.text)}</span></li>`).join("")}</ul></div>`:""}
     ${asg.length?`<div><div class="rclabel">Assignments to follow up</div>${asg.map(n=>{const pl=planById(n.plan),older=n.plan!==last.id;
       return`<div class="asg${isDone(n)?" done":""}"><div class="grow"><div class="w">${esc(isWhole(n.who)?WHOLE:n.who)}${older&&pl?" · from "+esc(fmtDay(pl.date)):""}</div><div class="x">${esc(n.text)}</div></div>
@@ -1391,7 +1476,7 @@ function recapHTML(p){
   return`<section class="recap">
     <button type="button" class="rch" data-act="recapToggle" aria-expanded="${open}">
       <span class="ring2" aria-hidden="true">${ICON.history}</span>
-      <span class="grow"><h2>Last class</h2><span class="small" style="display:block">${esc(sub)}</span></span>
+      <span class="grow"><h2>Last class</h2><span class="small" style="display:block">${esc(sub)}${carry.length?` · <b style="color:var(--red-d)">${carry.length} ${carry.length===1?"note":"notes"} for this week</b>`:""}</span></span>
       <span class="rcopen">${open?"Hide":"Show"}</span>
     </button>
     ${open?`<div class="rcb">${body}
@@ -1716,6 +1801,7 @@ function renderSheet(){
       h=sheetHead("Who can see it",`<div class="small">${esc(s.coll==="plans"?planTitle(r):r.name)}</div>`)+`<form id="shareForm" data-coll="${s.coll}" data-id="${esc(r.id)}">${shareField("sh",r.share,s.coll==="plans"?"this plan":"this exercise")}<button class="btn primary block" type="submit">Save</button></form>`;break;}
     case"slots":h=sheetSlots();break;
     case"students":h=sheetStudents(s);break;
+    case"consol":h=sheetConsol();break;
     case"notify":h=sheetNotify();break;
     case"student":h=sheetStudent(s);break;
     case"exView":h=sheetExView(s);break;
@@ -2056,10 +2142,27 @@ document.addEventListener("click",e=>{
     case"nbWho":{const v=t.dataset.v;NB.who=eqi(NB.who,v)&&!isWhole(v)?"":v;NB.q="";renderView();break;}
     case"nbItem":NB.item=NB.item===t.dataset.id?"":t.dataset.id;renderView();break;
     case"nbShare":NB.share=!NB.share;renderView();break;
-    case"noteDone":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;store.update("notes",n.id,{done:isDone(n)?"":"Yes"});if(sheet&&sheet.type==="student")renderSheet();break;}
-    case"noteShare":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const sh=n.share==="all"?"me":"all";store.update("notes",n.id,{share:sh});toast(sh==="all"?"Shared with the instructors on this class":"Only you can see this note now");break;}
+    case"noteDone":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;store.update("notes",n.id,{done:isDone(n)?"":"Yes"});if(sheet&&(sheet.type==="student"||sheet.type==="consol"))renderSheet();break;}
+    case"noteShare":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const sh=n.share==="all"?"me":"all";store.update("notes",n.id,{share:sh});toast(sh==="all"?"Shared with the instructors on this class":"Only you can see this note now");if(sheet&&sheet.type==="consol")renderSheet();break;}
     case"delNote":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const copy=Object.assign({},n);["id","mine","ownerId","canEdit","canShare"].forEach(k=>delete copy[k]);store.del("notes",n.id);
-      toast("Note deleted",[{label:"Undo",fn:()=>{store.add("notes",copy);}}]);break;}
+      const rs=()=>{if(sheet&&sheet.type==="consol")renderSheet();};rs();
+      toast("Note deleted",[{label:"Undo",fn:()=>{store.add("notes",copy);rs();}}]);break;}
+    case"tCheck":{if(!p)break;const id=t.dataset.id,set=tGet("tdone",p.id);const on=!set.has(id);if(on)set.add(id);else set.delete(id);tPut("tdone",p.id,set);
+      const it=itemById(id);if(on&&it){const its=secItems(p,it.section);if(its.every(i=>set.has(i.id))){const f=tGet("tfold",p.id);f.add(it.section);tPut("tfold",p.id,f);}}
+      renderView();break;}
+    case"tFold":{if(!p)break;const f=tGet("tfold",p.id),sec=t.dataset.sec;if(f.has(sec))f.delete(sec);else f.add(sec);tPut("tfold",p.id,f);renderView();break;}
+    case"tJump":{if(!p)break;const T=teachNow(p);if(!T.now){toast("Everything’s ticked off. Tap End class & review when you’re done.");break;}
+      const f=tGet("tfold",p.id);if(f.has(T.now.sec)){f.delete(T.now.sec);tPut("tfold",p.id,f);renderView();}
+      const el=document.getElementById("ex-"+T.now.it.id);if(el)el.scrollIntoView({behavior:"smooth",block:"center"});break;}
+    case"consolidate":openSheet({type:"consol"});break;
+    case"noteNext":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const on=!isNext(n);store.update("notes",n.id,{next:on?"Yes":""});
+      toast(on?"Shows under Last class next week":"Won’t carry to next week");if(sheet&&sheet.type==="consol")renderSheet();break;}
+    case"qnNext":case"rvNext":{if(!p)break;let item="",txt="";
+      if(act==="qnNext"){const it=itemById(t.dataset.id);const q=it&&qnLines(it.live)[+t.dataset.i];if(q==null)break;item=it.id;txt=splitQn(q).x;}
+      else{const r=ptLines(p.review)[+t.dataset.i];if(r==null)break;txt=r;}
+      if(!txt||myCopy(p,item,txt))break;
+      store.add("notes",{plan:p.id,item,kind:"Feedback",who:"",text:txt.slice(0,500),done:"",next:"Yes",share:"me",addedBy:who(),created:Date.now()});
+      toast("Shows under Last class next week");if(sheet&&sheet.type==="consol")renderSheet();break;}
     case"recapToggle":LS.set("recap",LS.get("recap","1")==="0"?"1":"0");renderView();break;
     case"recapWho":recapWho=eqi(recapWho,t.dataset.v)?"":t.dataset.v;renderView();break;
     case"openReview":{const id=t.dataset.id;if(!planById(id))break;editFromView=false;recapWho="";if(sheet)finishSheet("plan",id,"review");else go("plan",id,"review");break;}

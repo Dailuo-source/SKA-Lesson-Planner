@@ -23,7 +23,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - **Exercises**: Section, Exercise, Minutes, Instructions ("1. step" lines, shown 1. 2. 3., no "Step" word; old header Description still matches), Notes ("• point"), Owner, Shared with, Added by (shown as the editable **Created by** black tag top-right on exercises, never on the Plans overview), Last edited by, Updated.
 - **Instructors** (never sent as data): Email, Title, First, Last, Show first name, Role (Admin/Instructor), Google sign-in, Password (hashed; clear it to allow a reset with the dojo code), Salt, Joined, Last signed in. Deleting a row signs them out.
 - **Lists** (List / Value / Colour / In every new plan): Section, Class type, Class length (90, 105, 120), Timeslot (`Mon 18:00-19:30 Kids`; admin-only), Attendance link. Sections added in the app get a spare-palette colour.
-- **Class notes**: ID, Plan ID, Plan item ID, Kind (Class / Assignment / Person / Feedback), Student, Note, Followed up, Owner, Shared with (`Only me` / `Everyone`), Added by, Created, Updated. **Private to the writer unless shared**; only the writer edits/shares/deletes. Not copied with a plan; deleting a plan deletes your notes on it.
+- **Class notes**: ID, Plan ID, Plan item ID, Kind (Class / Assignment / Person / Feedback), Student, Note, Followed up, Owner, Shared with (`Only me` / `Everyone`), Added by, Created, Updated, Next week (added on first use). **Private to the writer unless shared**; only the writer edits/shares/deletes. Not copied with a plan; deleting a plan deletes your notes on it.
 - Students: `students_()` reads active members from the Kata Tracker (POST `{action:'plannerMembers', key}`, Script Property `KATA_KEY` via menu **Connect to the Kata Tracker…**), cached 6 h. New students are added in the Kata Tracker: Student notes → **Add a new student** opens `KATA_SITE?add=member&from=planner` (straight to its Add a member form); coming back, the next sync sends `refreshStudents:true`, which clears the cache.
 - Section names can't contain commas (app swaps them for " /").
 - **Instructors → Notification settings** (JSON): `{slots:[Timeslot values], before, noplan, asg}`, each `{on, rel: min before}` or `{on, day: -1|0, at:'HH:MM'}`; `asg` may be `{same:true}` (with the Before class reminder). **Push** tab (never sent to the app): one row per phone (email, push address, keys, device).
@@ -42,6 +42,8 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - Tabs: **Plans**, **This class**, **Library**, **Attendance** (always asks "Open attendance?" before opening Muster Hall; it can't be embedded, `X-Frame-Options: SAMEORIGIN`).
 - **Plans** = week/month calendar (`calView` saved as `skal.calview`) of class times (Lists → Timeslot) matched to plans by time; other times show as "Special". Pills: Planned / Plan it / No plan. Day filter (`plansFilter` = weekday). **Class times** button opens `sheetSlots`.
 - **This class** modes (history state `m`): **view** (teaching: start times, instructions, notes, quick-note box), **edit** (sticky **Save plan**), **review** (after class; Share or copy all notes). Opens in view, or review if the date is past; new/copied plans open in edit. View-only plans show a yellow note and offer only Copy to a new date.
+- **Teaching mode** (Gary, Nov 5): `teachBar` (Now: exercise, N of M done, on time / behind / ahead when it's that day), a tick box on the right of each exercise (`tCheck`, kept on the phone in `skal.tdone`), first unticked = **You are here**, ticked cards shrink to one line; section headers fold (`tFold`, `skal.tfold`; a section folds itself when its last exercise is ticked); each exercise shows its clock time (`hm12`, "≈ 8:15 p.m.") when the plan has a start time; sticky **End class & review** opens review.
+- **Next week notes**: class notes have a **Next week** toggle (`noteNext`, `next` column; not for assignments, which already carry); they show first in the next class's **Last class** card under For this week. **Consolidate** (`sheetConsol`) lists every note from the class; quick notes and after-class notes marked Next week become private Exercise feedback notes (`qnNext`/`rvNext`).
 - Class notes box in teaching/review; share switch resets to **Only me** after every note. **Last class** card (`recapHTML`) = previous plan in the same timeslot (`skal.recap` for collapsed). **Student notes** from the person icon.
 - Wide (≥1000px): tabs in the red bar, full-width pages, 7-column week, panels slide in from the right.
 - Time shows as hours and minutes ("1h 40m of 1h 45m planned"); exercise and section times stay in minutes.
@@ -70,7 +72,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v21`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v22`), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome (instance **GARYMAIN**): open script.google.com/home → SKA Lesson Planner, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Commits use author `Claude <noreply@anthropic.com>`.
 
@@ -109,10 +111,11 @@ Inside the `index.html` script, search for:
 
 ## Status
 - Working: plans (view / edit / review), shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Cache v19.
-- To deploy: Code.gs (refreshStudents + notifications, Oct 30) with clasp, then `push/setup.mjs` once and the sheet menu **Set up notifications…**.
+- To deploy: Code.gs Next week column (Nov 5; until then Next week ticks don't stick after a sync). Code.gs (refreshStudents + notifications, Oct 30) with clasp, then `push/setup.mjs` once and the sheet menu **Set up notifications…**.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-05: Teaching mode: tick off exercises ("You are here", teaching bar with pace), tap a section to fold it, clock time per exercise, End class & review; class notes get Next week (carried to next class's Last class card) and Consolidate. Code.gs: Class notes `Next week` column. sw v22
 - 2026-10-30: Notifications (settings, push Worker, setup), plan switcher dropdown with ‹ ›, bold class date. sw v21
 - 2026-10-30: Tap flash with a 0.1 s delay on every button. sw v20
 - 2026-10-30: Compact layout app-wide; desktop full width; Add a new student (via the Kata Tracker) with an instant list refresh. sw v19
