@@ -2,7 +2,7 @@
 
 > **Claude: read this first.** Open only the files a change touches; use the code map to jump to a function.
 > `web/index.html` (~131 KB) and `Code.gs` (~38 KB) are large: search for a function name (e.g. `grep -n "function render" web/index.html`) and read just that function.
-> At the end of a work session, update **Status** and add one line to **Changelog** (keep about 5).
+> At the end of a work session, update **Status** and add one line to **Changelog** (keep about 5). Keep **For Gary** current too: tick off (delete) what's done, add each step Gary must do himself (deploy, sheet menus, settings, checks). App Atlas reads Status, For Gary and Changelog to show where each app is.
 
 Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class plan is built from sections (Warm-up / Physical training, Technique / Kihon, Kata / Kigu, Kumite, Final activity) filled from a shared exercise library. Slotted exercises keep their own minutes and notes; the library only changes with "Also update the library". Used on phones (Gary: Samsung Android, Chrome PWA; others may use iPhones).
 
@@ -111,6 +111,15 @@ Inside the `index.html` script, search for:
 - Working: plans (view / edit / review), shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Cache v19.
 - To deploy: Code.gs (refreshStudents + notifications, Oct 30) with clasp, then `push/setup.mjs` once and the sheet menu **Set up notifications…**.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
+
+## For Gary
+
+Steps only Gary can do (App Atlas shows these as his to-dos). One line each; delete a line once it's done.
+
+- [ ] Deploy Code.gs (clasp push, clasp deploy -i)
+- [ ] Run push/setup.mjs once
+- [ ] Sheet menu: Set up notifications
+- [ ] Try the teaching-mode preview (branch atlas-rmw3tz9ghgr60, https://atlas-rmw3tz9ghgr60.ska-lesson-planner.pages.dev/), then merge it into main
 
 ## Changelog (latest first, keep about 5 lines)
 - 2026-10-30: Notifications (settings, push Worker, setup), plan switcher dropdown with ‹ ›, bold class date. sw v21
