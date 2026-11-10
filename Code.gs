@@ -138,6 +138,7 @@ const SCHEMA = {
       ['done', 'Followed up (Yes/blank)', 'text', 120],
       ['owner', 'Owner (email)', 'text', 200],
       ['share', 'Shared with', 'share', 140],
+      ['next', 'Next week (Yes/blank)', 'text', 120],
       ['addedBy', 'Added by', 'text', 120],
       ['created', 'Created', 'datetime', 160],
       ['updated', 'Updated', 'datetime', 160],
@@ -222,6 +223,8 @@ function api(body) {
     if (req.unsubscribe) dropEndpoints_([req.unsubscribe], me.email);
     if (req.notifyTest) props.setProperty('TEST_' + me.id, String(Date.now()));
     if (req.ops && req.ops.length) {
+      // "Next week" on class notes (Nov 5): older sheets get the column on first use
+      if (req.ops.some(function (o) { return o && o.coll === 'notes' && o.data && 'next' in o.data; })) ensureCols_(SCHEMA.notes);
       const acc = access_(me, people, readRaw_());
       req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });
       SpreadsheetApp.flush();
