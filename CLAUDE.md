@@ -12,7 +12,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 | --- | --- |
 | Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Never put Gary's full name in a web address |
 | Database | Google Sheet **SKA Lesson Planner** (garyluo.gs@gmail.com), id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists, Instructors, Class notes |
-| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 8 (Execute as Gary, Anyone) |
+| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 10 (Execute as Gary, Anyone) |
 | Signing in | Exec URL in `API_URL` (`#api=` overrides). Email + password or Google. New accounts need the **dojo code** (Script Property `DOJO_CODE`; menus **Show app link and dojo code** / **Change the dojo code…**). Google button shows only once `GOOGLE_CLIENT_ID` is set |
 | Setup guide | `SETUP.md` |
 
@@ -110,20 +110,22 @@ Inside the `index.html` script, search for:
 - Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
 
 ## Status
-- Working: plans (view / edit / review), shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Cache v19.
-- To deploy: Code.gs Next week column (Nov 5; until then Next week ticks don't stick after a sync). Code.gs (refreshStudents + notifications, Oct 30) with clasp, then `push/setup.mjs` once and the sheet menu **Set up notifications…**.
+- Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Cache v22. Web app v10 (Nov 10: Next week column; v9 Oct 30 had notifications + refreshStudents).
+- Testers (Nov 10): Gary is inviting a few SKA instructors (role Instructor) with the app link + dojo code; sign-in is email + password (no `GOOGLE_CLIENT_ID` set).
+- Not set up: notifications (no `VAPID_PUBLIC`/`PUSH_URL` yet; the app shows them as not set up) until `push/setup.mjs` + **Set up notifications…**.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
 
 ## For Gary
 
 Steps only Gary can do (App Atlas shows these as his to-dos). One line each; delete a line once it's done.
 
-- [ ] Deploy Code.gs (clasp push, clasp deploy -i)
 - [ ] Run push/setup.mjs once
 - [ ] Sheet menu: Set up notifications
-- [ ] Try the teaching-mode preview (branch atlas-rmw3tz9ghgr60, https://atlas-rmw3tz9ghgr60.ska-lesson-planner.pages.dev/), then merge it into main
+- [ ] Add the dojo's other class times (Wed, Sat, Sun) with the Class times button, so testers see their classes
+- [ ] Send the tester invite (app link + dojo code)
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-10: Merged teaching mode into main; Code.gs deployed as web app v10 for testers
 - 2026-11-05: Teaching mode: tick off exercises ("You are here", teaching bar with pace), tap a section to fold it, clock time per exercise, End class & review; class notes get Next week (carried to next class's Last class card) and Consolidate. Code.gs: Class notes `Next week` column. sw v22
 - 2026-10-30: Notifications (settings, push Worker, setup), plan switcher dropdown with ‹ ›, bold class date. sw v21
 - 2026-10-30: Tap flash with a 0.1 s delay on every button. sw v20
