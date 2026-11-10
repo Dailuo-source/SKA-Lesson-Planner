@@ -117,14 +117,14 @@ Inside the `index.html` script, search for:
 ## Status
 - Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v23. Web app v11 (Nov 10: Feedback tab; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
 - Testers (Nov 10): Gary is inviting a few SKA instructors (role Instructor) with the app link + dojo code; sign-in is email + password (no `GOOGLE_CLIENT_ID` set).
-- Notifications: Worker `ska-lesson-planner-push` deployed and secrets set (Nov 10, setup.mjs run on Gary's PC); waiting on the sheet menu **Set up notifications…** with the printed code.
+- Notifications: live (Nov 10). Worker `ska-lesson-planner-push` at ska-lesson-planner-push.garyluo-gs.workers.dev; sheet setup done; `/run` answers ok. Each phone turns them on in Profile → Notifications.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
 
 ## For Gary
 
 Steps only Gary can do (App Atlas shows these as his to-dos). One line each; delete a line once it's done.
 
-- [ ] Sheet menu: Set up notifications
+- [ ] Turn notifications on on your phone (Profile → Notifications) and pick your classes
 - [ ] Check the Feedback tab now and then (set Status to Seen / Done, type a Reply if useful)
 - [ ] Send the tester invite (app link + dojo code)
 
