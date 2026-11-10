@@ -291,6 +291,20 @@ button:not(:disabled):active,a.btn:active{transform:scale(.96);filter:brightness
 /* Tap flash (Gary, Oct 30): every tap shows for ~0.15 s, and the action waits 0.1 s so you see what you tapped */
 .tapflash{transform:scale(.95)!important;filter:brightness(.88)!important;box-shadow:0 0 0 3px rgba(200,16,46,.35)!important}
 
+/* ---------- Feedback (testers, Nov 10) ---------- */
+.fbbtn{height:34px;padding:0 11px;border-radius:17px;border:0;background:#fff;color:var(--red);font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;flex:none}
+.fbbtn svg{width:16px;height:16px}
+@media (max-width:360px){.fbbtn span{display:none}.fbbtn{width:34px;padding:0;justify-content:center}}
+.fbkinds{display:flex;flex-wrap:wrap;gap:6px}
+.fbkinds .chip svg{width:16px;height:16px;margin-right:5px}
+.fbmeta{font-size:12px;color:var(--muted);margin:0}
+.fbli{display:flex;flex-direction:column;gap:2px;padding:7px 0;border-top:1px solid var(--line)}
+.fbli .row{gap:8px}
+.fbli .m{font-size:13px;color:var(--ink2);white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.fbli .rp{font-size:13px;background:var(--sunk);border-radius:10px;padding:6px 8px;margin-top:2px;white-space:pre-wrap}
+.fbst{font-size:11px;font-weight:800;border-radius:6px;padding:1px 7px}
+.fbst.New{background:var(--sunk);color:var(--ink2)}.fbst.Seen{background:#FFF4D6;color:#7A5300}.fbst.Done{background:#E6F4EA;color:#1E6B34}
+
 /* ---------- Last class recap and class notes ---------- */
 .recap{border:1.5px solid #F2C4CB;background:var(--red-tint);border-radius:20px;overflow:hidden}
 .recap .rch{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;text-align:left;min-height:64px;color:var(--ink)}
@@ -668,6 +682,7 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 <header class="top">
   <img class="logo" src="logo-96.png" alt="Scarborough Academy of Karate">
   <div class="brand"><b>SKA Lesson Planner</b><button class="sync" id="sync" data-act="syncNow" type="button"></button></div>
+  <button class="fbbtn" id="fbBtn" data-act="feedback" type="button" aria-label="Send feedback" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span>Feedback</span></button>
   <button class="me" id="me" data-act="profile" type="button" hidden></button>
 </header>
 <main id="view" tabindex="-1"></main>
@@ -688,12 +703,16 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
+const APP_VER = "v23"; // keep in step with CACHE in sw.js (sent with feedback)
+const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
+
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const eqi=(a,b)=>String(a==null?"":a).trim().toLowerCase()===String(b==null?"":b).trim().toLowerCase();
 const LS={get(k,d){try{const v=localStorage.getItem("skal."+k);return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem("skal."+k,v);}catch(e){}}};
 const svg=(p,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const ICON={
+  msg:svg('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',2.2), bug:svg('<path d="M8 9a4 4 0 0 1 8 0v5a4 4 0 0 1-8 0z"/><path d="M12 9v9M4 13h4M16 13h4M5 7l3 2M19 7l-3 2M5 19l3-2M19 19l-3-2"/>'), bulb:svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'), help:svg('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14"/><path d="M12 17.5h.01"/>'),
   plus:svg('<path d="M5 12h14M12 5v14"/>',2.5), minus:svg('<path d="M5 12h14"/>',2.5),
   stop:svg('<rect x="5" y="5" width="14" height="14" rx="3"/>',2.4), fwd:svg('<path d="M5 12h12M13 7l5 5-5 5"/>',2.4),
   timer:svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M10 2h4"/>',2.2), lines:svg('<path d="M4 6h16M4 12h10M4 18h6"/>',2.2),
@@ -746,8 +765,8 @@ function tint(hex,amt){const n=parseInt(hex.slice(1),16),mix=c=>Math.round(c+(25
 function defaultSections(){const r=listRows("Section").filter(x=>/^y/i.test(x.inNew)).map(x=>x.value);return r.length?r:BUILTIN.map(b=>b[0]);}
 function allSections(){const out=[];const add=v=>{if(v&&!out.some(o=>eqi(o,v)))out.push(v);};
   listRows("Section").forEach(r=>add(r.value));if(!out.length)BUILTIN.forEach(b=>add(b[0]));S.exercises.forEach(e=>add(e.section));return out;}
-function classTypes(){const t=[...new Set(listRows("Class type").map(r=>r.value))];return t.length?t:["Regular","Kids","Advanced"];}
-function classLengths(){const l=[...new Set(listRows("Class length").map(r=>parseInt(r.value,10)).filter(n=>n>0))];return l.length?l:[90,105,120];}
+function classTypes(){const t=[...new Set(listRows("Class type").map(r=>r.value))];return t.length?t:["Regular","Junior program","Advanced"];}
+function classLengths(){const l=[...new Set(listRows("Class length").map(r=>parseInt(r.value,10)).filter(n=>n>0))];return l.length?l.sort((a,b)=>a-b):[90,105,120];}
 function attendUrl(){const r=listRows("Attendance link")[0];return r&&/^https:\/\//.test(r.value)?r.value:ATTEND_URL;}
 const cleanSec=s=>String(s||"").replace(/,/g," /").replace(/\s+/g," ").trim().slice(0,60);
 
@@ -1014,7 +1033,7 @@ window.addEventListener("popstate",e=>{
 function render(msg){
   const me=$("#me");
   if(signedIn()){me.hidden=false;me.textContent=initialsOf(ME);me.setAttribute("aria-label","Your profile, "+who());}else me.hidden=true;
-  $("#sync").hidden=!signedIn();
+  $("#sync").hidden=!signedIn();$("#fbBtn").hidden=!signedIn();
   const showTabs=signedIn()&&tab!=="profile";
   document.body.classList.toggle("notabs",!showTabs);
   document.body.dataset.tab=tab;document.body.dataset.mode=planMode;
@@ -1599,6 +1618,42 @@ function sheetNotify(){
     ${kinds}
     <p class="small" style="margin:0">Each phone is turned on separately. iPhones need the app added to the Home Screen first.</p></div>`;
 }
+/* ---------- Feedback (testers): saved to the sheet's Feedback tab; Gary sets Status and Reply there ---------- */
+const FB_KINDS=[["Something broke","bug"],["Idea","bulb"],["Confusing","help"],["Other",""]];
+let FB=null;
+function screenName(){
+  if(tab==="plan"){const p=planById(PLAN);const m={view:"teaching",edit:"editing",review:"review"}[planMode]||planMode;return"This class"+(p?" · "+planTitle(p)+(p.date?" · "+fmtDay(p.date):""):"")+" ("+m+")";}
+  return{plans:"Plans",library:"Library",profile:"Profile"}[tab]||tab||"";}
+function fbDevice(){const u=navigator.userAgent;return /Android/i.test(u)?"Android":/iPhone|iPad/i.test(u)?"iPhone":"Computer";}
+function fbListHTML(){
+  if(!FB||FB.list===null)return`<p class="fbmeta">Loading your earlier feedback…</p>`;
+  if(!FB.list.length)return"";
+  return`<span class="label" style="margin:4px 0 0">Your earlier feedback</span>`+FB.list.map(f=>{const d=f.created?new Date(f.created).toLocaleDateString(undefined,{month:"short",day:"numeric"}):"";
+    return`<div class="fbli"><div class="row"><b class="grow" style="font-size:13px">${esc(f.kind)}${d?" · "+esc(d):""}</b><span class="fbst ${esc(f.status)}">${esc(f.status)}</span></div><span class="m">${esc(f.message)}</span>${f.reply?`<span class="rp"><b>${esc(FEEDBACK_TO)}:</b> ${esc(f.reply)}</span>`:""}</div>`;}).join("");}
+function sheetFeedback(){
+  const k=FB.kind;
+  return sheetHead("Send feedback")+`<div class="stack">
+    <div><span class="label">What kind?</span><div class="fbkinds">${FB_KINDS.map(([v,i])=>`<button type="button" class="chip sm" data-act="fbKind" data-v="${esc(v)}" aria-pressed="${v===k}">${i?ICON[i]:""}${esc(v)}</button>`).join("")}</div></div>
+    <div class="field" style="margin:0"><label for="fbMsg">Tell ${esc(FEEDBACK_TO)} what happened</label><textarea class="inp" id="fbMsg" rows="4" maxlength="2000" style="width:100%;min-height:96px;padding:10px;line-height:1.4" placeholder="e.g. I tapped Save plan and nothing happened"></textarea></div>
+    <p class="fbmeta">Sent with: the screen you were on (${esc(FB.screen||"")}), your phone type and the app version. Only ${esc(FEEDBACK_TO)} sees it.</p>
+    <p class="msg" id="fbErr" role="alert" style="margin:0"></p>
+    <button type="button" class="btn primary block" data-act="fbSend">Send</button>
+    <div id="fbList">${fbListHTML()}</div></div>`;}
+function fbRefreshList(){const el=$("#fbList");if(el&&sheet&&sheet.type==="feedback")el.innerHTML=fbListHTML();}
+function openFeedback(){FB={kind:"Something broke",list:null,screen:screenName(),busy:false};
+  if(sheet)swapSheet({type:"feedback"});else openSheet({type:"feedback"});
+  callApi({token:TOKEN,ops:[],myFeedback:true}).then(r=>{if(r&&r.error==="bad_token"){signOut("Please sign in again.");return;}if(FB){FB.list=(r&&r.feedback)||[];fbRefreshList();}}).catch(()=>{if(FB){FB.list=[];fbRefreshList();}});}
+function fbSend(){
+  const box=$("#fbMsg"),err=$("#fbErr"),btn=$('[data-act="fbSend"]');if(!box||!FB||FB.busy)return;
+  const msg=box.value.trim();
+  if(!msg){if(err)err.textContent="Write a few words first.";return;}
+  if(err)err.textContent="";FB.busy=true;if(btn){btn.disabled=true;btn.textContent="Sending…";}
+  callApi({token:TOKEN,ops:[],feedback:{kind:FB.kind,message:msg,screen:FB.screen,device:fbDevice(),version:APP_VER,from:who()}}).then(r=>{
+    FB.busy=false;if(btn){btn.disabled=false;btn.textContent="Send";}
+    if(r&&r.error==="bad_token"){signOut("Please sign in again.");return;}
+    if(!r||!r.ok){if(err)err.textContent=(r&&r.message)||"Couldn’t send. Try again.";return;}
+    box.value="";FB.list=r.feedback||FB.list;fbRefreshList();toast("Sent. Thank you!");
+  }).catch(()=>{FB.busy=false;if(btn){btn.disabled=false;btn.textContent="Send";}if(err)err.textContent="Couldn’t send. Check your connection and try again.";});}
 function openNotify(){NS=null;pushState="checking";openSheet({type:"notify"});checkPush().then(()=>{if(sheet&&sheet.type==="notify")renderSheet();});}
 /* Opening a plan from a notification: ./#plan=<id> (cold start) or a message from the service worker */
 let OPEN_PLAN="";
@@ -1648,7 +1703,7 @@ function nameFields(){
   return`<fieldset class="field"><legend>Title</legend><div class="chips">${titleChips()}</div></fieldset>
     <div class="field"><label for="pFirst">First name</label><input class="inp" id="pFirst" name="first" type="text" autocomplete="given-name" value="${esc(draft.first)}" required></div>
     <div class="field"><label for="pLast">Last name</label><input class="inp" id="pLast" name="last" type="text" autocomplete="family-name" value="${esc(draft.last)}" required></div>
-    <button type="button" class="switch" data-act="toggleFirst" aria-pressed="${!!draft.showFirst}"><span class="grow"><b style="display:block;font-size:15px">Show my first name</b><span style="font-size:13px;font-weight:600;color:var(--muted)">Off: “Mr. Luo” · On: “Mr. Gary Luo”</span></span><span class="trk" aria-hidden="true"><i></i></span></button>
+    <button type="button" class="switch" data-act="toggleFirst" aria-pressed="${!!draft.showFirst}"><span class="grow"><b style="display:block;font-size:15px">Show my first name</b><span style="font-size:13px;font-weight:600;color:var(--muted)"><span id="pvOO">${esc(firstHint())}</span></span></span><span class="trk" aria-hidden="true"><i></i></span></button>
     <div class="preview"><div class="small">How you’ll appear</div><div class="nm" id="pvName">${esc(previewName())}</div><div style="font-size:13px;font-weight:700;color:var(--ink2)">e.g. “<span id="pvEx">${esc(previewName())}</span> changed to 15 min”</div></div>`;
 }
 function viewProfile(){
@@ -1671,12 +1726,14 @@ function viewProfile(){
     <p class="msg" id="pwMsg" role="alert" style="margin:0"></p>
     <button type="submit" class="btn outline block">Save password</button>
   </form>
+  <button type="button" class="pickrow" data-act="feedback" style="margin:0"><span class="nm">Send feedback<span class="small" style="display:block;font-weight:700">Bugs, ideas, anything confusing</span></span>${ICON.go}</button>
   <button type="button" class="pickrow" data-act="notify" style="margin:0"><span class="nm">Notifications<span class="small" style="display:block;font-weight:700">Class reminders, plans to make, assignments to follow up</span></span>${ICON.go}</button>
   <button type="button" class="btn danger block" data-act="signOut">Sign out on this device</button>
   </div>`;
 }
 function previewName(){if(!draft)return"…";const f=draft.first.trim(),l=draft.last.trim();return draft.title+" "+(draft.showFirst&&f?f+" ":"")+(l||"…");}
-function updateProfilePreview(){const n=previewName();const a=$("#pvName"),b=$("#pvEx"),c=$("#pvInit");if(a)a.textContent=n;if(b)b.textContent=n;if(c)c.textContent=initialsOf(draft)||"?";}
+function firstHint(){if(!draft)return"";const t=draft.title,f=draft.first.trim()||"John",l=draft.last.trim()||"Smith";return`Off: “${t} ${l}” · On: “${t} ${f} ${l}”`;}
+function updateProfilePreview(){const o=$("#pvOO");if(o)o.textContent=firstHint();const n=previewName();const a=$("#pvName"),b=$("#pvEx"),c=$("#pvInit");if(a)a.textContent=n;if(b)b.textContent=n;if(c)c.textContent=initialsOf(draft)||"?";}
 
 /* ---------- Sign in / create account ---------- */
 let authMode="signin",authMsg="",gPending=null,GCID=LS.get("gcid","");
@@ -1803,6 +1860,7 @@ function renderSheet(){
     case"students":h=sheetStudents(s);break;
     case"consol":h=sheetConsol();break;
     case"notify":h=sheetNotify();break;
+    case"feedback":h=sheetFeedback();break;
     case"student":h=sheetStudent(s);break;
     case"exView":h=sheetExView(s);break;
     case"item":h=sheetItem(s);break;
@@ -2172,6 +2230,9 @@ document.addEventListener("click",e=>{
       toast("Add them in the Kata Tracker. They’ll show up here when you come back.");break;
     case"studentsBack":if(sheet&&sheet.back)swapSheet(sheet.back);break;
     case"notify":openNotify();break;
+    case"feedback":openFeedback();break;
+    case"fbKind":if(FB){FB.kind=t.dataset.v;document.querySelectorAll('[data-act="fbKind"]').forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===FB.kind)));}break;
+    case"fbSend":fbSend();break;
     case"nsOn":pushOn();break;
     case"nsOff":pushOff();break;
     case"nsTest":pushTest();break;

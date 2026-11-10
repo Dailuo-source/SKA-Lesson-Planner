@@ -12,7 +12,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 | --- | --- |
 | Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Never put Gary's full name in a web address |
 | Database | Google Sheet **SKA Lesson Planner** (garyluo.gs@gmail.com), id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists, Instructors, Class notes |
-| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 10 (Execute as Gary, Anyone) |
+| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 11 (Execute as Gary, Anyone) |
 | Signing in | Exec URL in `API_URL` (`#api=` overrides). Email + password or Google. New accounts need the **dojo code** (Script Property `DOJO_CODE`; menus **Show app link and dojo code** / **Change the dojo code…**). Google button shows only once `GOOGLE_CLIENT_ID` is set |
 | Setup guide | `SETUP.md` |
 
@@ -22,9 +22,10 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - **Plan items**: Plan ID, Section, Order, Exercise, Minutes, Note ("• point" lines), Quick notes (during class) ("• 7:42 p.m. · text"; not copied), Library ID, Added by, Time changed by, Updated. Items are copies, so they survive library edits/deletes.
 - **Exercises**: Section, Exercise, Minutes, Instructions ("1. step" lines, shown 1. 2. 3., no "Step" word; old header Description still matches), Notes ("• point"), Owner, Shared with, Added by (shown as the editable **Created by** black tag top-right on exercises, never on the Plans overview), Last edited by, Updated.
 - **Instructors** (never sent as data): Email, Title, First, Last, Show first name, Role (Admin/Instructor), Google sign-in, Password (hashed; clear it to allow a reset with the dojo code), Salt, Joined, Last signed in. Deleting a row signs them out.
-- **Lists** (List / Value / Colour / In every new plan): Section, Class type, Class length (90, 105, 120), Timeslot (`Mon 18:00-19:30 Kids`; admin-only), Attendance link. Sections added in the app get a spare-palette colour.
+- **Lists** (List / Value / Colour / In every new plan): Section, Class type (Regular, Junior program, Advanced), Class length (45, 75, 90, 105, 120; shown sorted), Timeslot (`Wed 16:15-17:00 Junior program`; text after the time must match a Class type; admin-only; holds SKA's full weekly timetable as of Nov 10), Attendance link. Sections added in the app get a spare-palette colour.
 - **Class notes**: ID, Plan ID, Plan item ID, Kind (Class / Assignment / Person / Feedback), Student, Note, Followed up, Owner, Shared with (`Only me` / `Everyone`), Added by, Created, Updated, Next week (added on first use). **Private to the writer unless shared**; only the writer edits/shares/deletes. Not copied with a plan; deleting a plan deletes your notes on it.
 - Students: `students_()` reads active members from the Kata Tracker (POST `{action:'plannerMembers', key}`, Script Property `KATA_KEY` via menu **Connect to the Kata Tracker…**), cached 6 h. New students are added in the Kata Tracker: Student notes → **Add a new student** opens `KATA_SITE?add=member&from=planner` (straight to its Add a member form); coming back, the next sync sends `refreshStudents:true`, which clears the cache.
+- **Feedback** (testers, Nov 10; not in SCHEMA, so never sent as data): ID, Sent, From, Email, Kind (Something broke / Idea / Confusing / Other), Screen, Message, Device, App version, Status (New / Seen / Done, Gary sets it), Reply (they see it). Tab is made on the first send (`addFeedback_`); `myFeedback_` returns only the sender's own rows on `{feedback}` or `{myFeedback:true}`.
 - Section names can't contain commas (app swaps them for " /").
 - **Instructors → Notification settings** (JSON): `{slots:[Timeslot values], before, noplan, asg}`, each `{on, rel: min before}` or `{on, day: -1|0, at:'HH:MM'}`; `asg` may be `{same:true}` (with the Before class reminder). **Push** tab (never sent to the app): one row per phone (email, push address, keys, device).
 
@@ -52,6 +53,10 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - Sync: optimistic, batched ops, 60 s polling. Panels are never redrawn by a background sync; library search keeps focus.
 - Accounts: HMAC token (`TOKEN_SECRET`, 400 days) in `skal.token`, profile in `skal.me`; `bad_token` signs out. Labels on plans are text at edit time ("Mr. Luo").
 
+## Feedback (testers, Nov 10)
+
+- **Feedback** chip in the red bar (every screen, signed in) and **Send feedback** row in the profile open `sheetFeedback`: kind chips (DOM toggle, no re-render so typed text stays), textarea (never auto-focused), auto-filled screen (`screenName`), device, `APP_VER` (bump with `CACHE`), Send, then the sender's earlier feedback with Status pill and Gary's Reply. `FEEDBACK_TO` = "Mr. Luo".
+
 ## Notifications (Gary, Oct 30)
 
 - Profile → **Notifications** (`sheetNotify`): turn on for this device (`pushOn`/`pushOff`, Send a test), **Classes I teach** (Timeslot chips), and three reminders with presets + **Custom**: Before class (30 min / 1 h / 2 h / custom h m), No plan yet (day before 7 p.m. / morning of / 3 h before / custom day + time; only when no plan exists at that date and start time), Assignments to follow up (with the class reminder / morning of / custom; open assignments from earlier plans in the same timeslot that are yours or shared). Settings save as you change them (`req.notify`).
@@ -72,7 +77,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v22`), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v23`; also bump `APP_VER` in index.html), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome (instance **GARYMAIN**): open script.google.com/home → SKA Lesson Planner, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Commits use author `Claude <noreply@anthropic.com>`.
 
@@ -110,7 +115,7 @@ Inside the `index.html` script, search for:
 - Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
 
 ## Status
-- Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Cache v22. Web app v10 (Nov 10: Next week column; v9 Oct 30 had notifications + refreshStudents).
+- Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v23. Web app v11 (Nov 10: Feedback tab; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
 - Testers (Nov 10): Gary is inviting a few SKA instructors (role Instructor) with the app link + dojo code; sign-in is email + password (no `GOOGLE_CLIENT_ID` set).
 - Not set up: notifications (no `VAPID_PUBLIC`/`PUSH_URL` yet; the app shows them as not set up) until `push/setup.mjs` + **Set up notifications…**.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
@@ -121,10 +126,11 @@ Steps only Gary can do (App Atlas shows these as his to-dos). One line each; del
 
 - [ ] Run push/setup.mjs once
 - [ ] Sheet menu: Set up notifications
-- [ ] Add the dojo's other class times (Wed, Sat, Sun) with the Class times button, so testers see their classes
+- [ ] Check the Feedback tab now and then (set Status to Seen / Done, type a Reply if useful)
 - [ ] Send the tester invite (app link + dojo code)
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-10: Tester Feedback (chip + profile row → Feedback tab, status and reply shown back); full SKA timetable in Lists, Kids type renamed Junior program, lengths 45/75; profile name hint uses your own name. sw v23
 - 2026-11-10: Merged teaching mode into main; Code.gs deployed as web app v10 for testers
 - 2026-11-05: Teaching mode: tick off exercises ("You are here", teaching bar with pace), tap a section to fold it, clock time per exercise, End class & review; class notes get Next week (carried to next class's Last class card) and Consolidate. Code.gs: Class notes `Next week` column. sw v22
 - 2026-10-30: Notifications (settings, push Worker, setup), plan switcher dropdown with ‹ ›, bold class date. sw v21

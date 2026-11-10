@@ -25,7 +25,7 @@ const APP_NAME = 'SKA Lesson Planner';
 // Where the app lives. Used to build the one-tap phone link in the menu.
 const APP_SITE = 'https://ska-lesson-planner.pages.dev/';
 
-const CLASS_TYPES = ['Regular', 'Kids', 'Advanced'];
+const CLASS_TYPES = ['Regular', 'Junior program', 'Advanced'];
 const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Timeslot', 'Attendance link'];
 const ROLES = ['Admin', 'Instructor'];
 const SHARE_ME = 'Only me', SHARE_ALL = 'Everyone';
@@ -68,6 +68,27 @@ const PUSH = {
     ['added', 'Added', 'datetime', 160],
   ],
 };
+
+// Feedback from testers (Profile → Send feedback, or the Feedback chip in the red bar). Never sent to the app
+// except each instructor's own rows. Gary sets Status (New / Seen / Done) and can type a Reply; the sender sees both.
+const FEEDBACK = {
+  sheet: 'Feedback', key: 'message',
+  cols: [
+    ['id', 'ID', 'id', 90],
+    ['created', 'Sent', 'datetime', 150],
+    ['from', 'From', 'text', 120],
+    ['email', 'Email', 'text', 200],
+    ['kind', 'Kind', 'fbkind', 130],
+    ['screen', 'Screen', 'text', 190],
+    ['message', 'Message', 'text', 360],
+    ['device', 'Device', 'text', 120],
+    ['version', 'App version', 'text', 90],
+    ['status', 'Status', 'fbstatus', 90],
+    ['reply', 'Reply (they see it)', 'text', 260],
+  ],
+};
+const FB_KINDS = ['Something broke', 'Idea', 'Confusing', 'Other'];
+const FB_STATUS = ['New', 'Seen', 'Done'];
 
 // [field, header label, type, column width]. `key` is the field a row must have to count.
 const SCHEMA = {
@@ -222,6 +243,7 @@ function api(body) {
     if (req.subscribe) addSub_(me, req.subscribe, req.device);
     if (req.unsubscribe) dropEndpoints_([req.unsubscribe], me.email);
     if (req.notifyTest) props.setProperty('TEST_' + me.id, String(Date.now()));
+    if (req.feedback) addFeedback_(me, req.feedback);
     if (req.ops && req.ops.length) {
       // "Next week" on class notes (Nov 5): older sheets get the column on first use
       if (req.ops.some(function (o) { return o && o.coll === 'notes' && o.data && 'next' in o.data; })) ensureCols_(SCHEMA.notes);
@@ -229,7 +251,9 @@ function api(body) {
       req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });
       SpreadsheetApp.flush();
     }
-    return { ok: true, token: token, me: me_(me, people), state: stateFor_(me, people), sheetUrl: ss_().getUrl() };
+    const out = { ok: true, token: token, me: me_(me, people), state: stateFor_(me, people), sheetUrl: ss_().getUrl() };
+    if (req.feedback || req.myFeedback) out.feedback = myFeedback_(me);
+    return out;
   } catch (err) {
     return { ok: false, error: 'server', message: String((err && err.message) || err) };
   } finally {
@@ -753,6 +777,36 @@ function dropEndpoints_(list, onlyEmail) {
     .reverse().forEach(function (r) { applyTo_(PUSH, { op: 'del', id: r.id }); });
 }
 
+/* ---------- Feedback (testers) ---------- */
+function addFeedback_(me, f) {
+  f = f || {};
+  const msg = String(f.message || '').trim().slice(0, 2000);
+  if (!msg) return;
+  const ss = ss_();
+  if (!ss.getSheetByName(FEEDBACK.sheet)) buildTab_(ss, FEEDBACK);
+  const s = function (v, n) { return String(v || '').trim().slice(0, n); };
+  applyTo_(FEEDBACK, { op: 'add', id: newId_(), data: { created: Date.now(), from: s(f.from, 60), email: normEmail_(me.email),
+    kind: FB_KINDS.indexOf(f.kind) >= 0 ? f.kind : 'Other', screen: s(f.screen, 100), message: msg, device: s(f.device, 60),
+    version: s(f.version, 20), status: 'New', reply: '' } });
+}
+/** The instructor's own feedback, newest first, with Gary's status and reply. */
+function myFeedback_(me) {
+  const sh = ss_().getSheetByName(FEEDBACK.sheet);
+  if (!sh || sh.getLastRow() < 2) return [];
+  const vals = sh.getRange(1, 1, sh.getLastRow(), sh.getLastColumn()).getValues();
+  const cols = headerMap_(vals[0], FEEDBACK);
+  const want = normEmail_(me.email);
+  const out = [];
+  for (let r = 1; r < vals.length; r++) {
+    const o = {};
+    FEEDBACK.cols.forEach(function (c) { const i = cols[c[0]]; if (i != null) o[c[0]] = fromCell_(vals[r][i], c[2]); });
+    if (!o.message || normEmail_(o.email) !== want) continue;
+    const st = FB_STATUS.filter(function (x) { return x.toLowerCase() === String(o.status || '').trim().toLowerCase(); })[0] || 'New';
+    out.push({ id: o.id, created: o.created, kind: o.kind || 'Other', message: String(o.message), status: st, reply: String(o.reply || '') });
+  }
+  return out.reverse().slice(0, 20);
+}
+
 function cron_(req) {
   const props = PropertiesService.getScriptProperties();
   const want = props.getProperty('CRON_KEY');
@@ -1139,11 +1193,13 @@ function buildTab_(ss, sch) {
     if (type === 'listname') rng.setDataValidation(pick(LIST_NAMES));
     if (type === 'role') rng.setDataValidation(pick(ROLES));
     if (type === 'share') rng.setDataValidation(pick([SHARE_ME, SHARE_ALL]));
+    if (type === 'fbkind') rng.setDataValidation(pick(FB_KINDS));
+    if (type === 'fbstatus') rng.setDataValidation(pick(FB_STATUS));
     if (field === 'time') rng.setNumberFormat('@');
     if (type === 'date') rng.setNumberFormat('ddd mmm d, yyyy');
     if (type === 'datetime') rng.setNumberFormat('mmm d, yyyy h:mm am/pm');
     if (field === 'value') rng.setNumberFormat('@');
-    if (field === 'note' || field === 'notes' || field === 'live' || field === 'review' || field === 'description' || field === 'sections') rng.setWrap(true);
+    if (field === 'note' || field === 'notes' || field === 'live' || field === 'review' || field === 'description' || field === 'sections' || field === 'message' || field === 'reply') rng.setWrap(true);
     if (w) sh.setColumnWidth(col, w);
     // The password column stays visible so it can be cleared to reset someone; the salt is hidden.
     if (field === 'id' || field === 'salt') sh.hideColumns(col);
@@ -1216,7 +1272,7 @@ function seedLists_(ss) {
     ['Section', 'Kata / Kigu', '#6A3FB8', 'Yes'],
     ['Section', 'Kumite', '#B8372F', 'Yes'],
     ['Section', 'Final activity', '#157A6E', 'Yes'],
-    ['Class type', 'Regular'], ['Class type', 'Kids'], ['Class type', 'Advanced'],
+    ['Class type', 'Regular'], ['Class type', 'Junior program'], ['Class type', 'Advanced'],
     // Class lengths in minutes
     ['Class length', '90'], ['Class length', '105'], ['Class length', '120'],
     ['Attendance link', 'https://my.musterhall.app/today'],
