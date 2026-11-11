@@ -12,7 +12,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 | --- | --- |
 | Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Never put Gary's full name in a web address |
 | Database | Google Sheet **SKA Lesson Planner** (garyluo.gs@gmail.com), id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists, Instructors, Class notes |
-| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 11 (Execute as Gary, Anyone) |
+| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 12 (Execute as Gary, Anyone) |
 | Signing in | Exec URL in `API_URL` (`#api=` overrides). Email + password or Google. New accounts need the **dojo code** (Script Property `DOJO_CODE`; menus **Show app link and dojo code** / **Change the dojo code…**). Google button shows only once `GOOGLE_CLIENT_ID` is set |
 | Setup guide | `SETUP.md` |
 
@@ -59,9 +59,10 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Notifications (Gary, Oct 30)
 
-- Profile → **Notifications** (`sheetNotify`): turn on for this device (`pushOn`/`pushOff`, Send a test), **Classes I teach** (Timeslot chips), and three reminders with presets + **Custom**: Before class (30 min / 1 h / 2 h / custom h m), No plan yet (day before 7 p.m. / morning of / 3 h before / custom day + time; only when no plan exists at that date and start time), Assignments to follow up (with the class reminder / morning of / custom; open assignments from earlier plans in the same timeslot that are yours or shared). Settings save as you change them (`req.notify`).
+- Profile → **Notifications** (`sheetNotify`): turn on for this device (`pushOn`/`pushOff`, Send a test), **Classes I teach** (Timeslot chips), and three reminders with presets + **Custom**: Before class (30 min / 1 h / 2 h / custom h m), No plan yet (day before 7 p.m. / morning of / 3 h before / custom day + time; only when no plan exists at that date and start time), Assignments to follow up (with the class reminder / morning of / custom; open assignments from earlier plans in the same timeslot that are yours or shared). Settings save as you change them (`req.notify`). Picking **Custom** sets `custom:true` on that reminder (kept by `cleanWhen_`) so its time boxes stay open even when the time matches a preset.
 - Sending: Apps Script can't sign/encrypt Web Push, so `push/` is a Cloudflare Worker (`ska-lesson-planner-push`, cron every 5 min). It POSTs `{cron: CRON_KEY}`; `cron_` → `due_` returns every message due since `CRON_LAST` (max 2 h back), one per phone; the Worker sends them (VAPID ES256 + aes128gcm) and reports 404/410 addresses back as `{cron, gone}`. `POST <worker>/run` sends straight away (used after Send a test).
 - Setup (once): on Gary's PC, `cd push && node setup.mjs` (deploys the Worker, stores `VAPID_PRIVATE`/`VAPID_PUBLIC`/`CRON_KEY` as Worker secrets, prints a setup code) → sheet menu **Set up notifications…** → paste. Script Properties `VAPID_PUBLIC`, `PUSH_URL` (sent to the app by `auth:'config'`), `CRON_KEY`, `CRON_LAST`. Re-running setup makes new keys and clears the Push tab (phones turn on again).
+- Status-bar icon: `web/badge-96.png` (white torii on transparent; Android shows badges as a one-colour silhouette, so an opaque image is a white square).
 - Tapping a notification opens `./#plan=<id>` (service worker `notificationclick` → focuses the app and posts `{open}`, or opens it); `openFromLink`. iPhones need the app on the Home Screen.
 - Tests (not in repo): `push.test.mjs` decrypts a payload as a phone would and verifies the JWT; `notify.test.js` runs Code.gs on the mock for timing, privacy and sign-ups.
 
@@ -77,7 +78,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v23`; also bump `APP_VER` in index.html), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v24`; also bump `APP_VER` in index.html), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome (instance **GARYMAIN**): open script.google.com/home → SKA Lesson Planner, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Commits use author `Claude <noreply@anthropic.com>`.
 
@@ -115,7 +116,7 @@ Inside the `index.html` script, search for:
 - Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
 
 ## Status
-- Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v23. Web app v11 (Nov 10: Feedback tab; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
+- Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v24. Web app v12 (Nov 11: Custom reminder flag; v11 Feedback tab; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
 - Testers (Nov 10): Gary is inviting a few SKA instructors (role Instructor) with the app link + dojo code; sign-in is email + password (no `GOOGLE_CLIENT_ID` set).
 - Notifications: live (Nov 10). Worker `ska-lesson-planner-push` at ska-lesson-planner-push.garyluo-gs.workers.dev; sheet setup done; `/run` answers ok. Each phone turns them on in Profile → Notifications.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
@@ -129,6 +130,7 @@ Steps only Gary can do (App Atlas shows these as his to-dos). One line each; del
 - [ ] Send the tester invite (app link + dojo code)
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-11: Notifications: Custom timing now opens its boxes (was stuck when the time matched a preset); torii status-bar icon instead of a white square. sw v24
 - 2026-11-10: Tester Feedback (chip + profile row → Feedback tab, status and reply shown back); full SKA timetable in Lists, Kids type renamed Junior program, lengths 45/75; profile name hint uses your own name. sw v23
 - 2026-11-10: Merged teaching mode into main; Code.gs deployed as web app v10 for testers
 - 2026-11-05: Teaching mode: tick off exercises ("You are here", teaching bar with pace), tap a section to fold it, clock time per exercise, End class & review; class notes get Next week (carried to next class's Last class card) and Consolidate. Code.gs: Class notes `Next week` column. sw v22

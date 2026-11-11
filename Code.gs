@@ -729,6 +729,7 @@ function ensureCols_(sch) {
 function cleanWhen_(w, kind) {
   w = w || {};
   const out = { on: w.on !== false };
+  if (w.custom) out.custom = true; // picked Custom in the app, so the time boxes stay open even if they match a preset
   if (kind === 'asg' && w.same) { out.same = true; return out; }
   if (w.rel != null && w.rel !== '') { out.rel = Math.max(0, Math.min(24 * 60, Math.round(Number(w.rel) || 0))); return out; }
   const at = /^(\d{1,2}):(\d{2})$/.exec(String(w.at || ''));

@@ -1,8 +1,8 @@
 // SKA Lesson Planner service worker: makes the app installable and lets it open with bad signal.
 // Plans always live in the Google Sheet; only the app's own files are cached here.
 // Bump the version when you change files so phones pick up the update.
-const CACHE = 'ska-lesson-planner-v23';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './favicon-64.png', './logo-96.png', './apple-touch-icon.png'];
+const CACHE = 'ska-lesson-planner-v24';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './favicon-64.png', './logo-96.png', './apple-touch-icon.png', './badge-96.png'];
 
 self.addEventListener('install', (e) => {
   // cache: 'reload' skips the browser's own cache so the newest files are stored
@@ -35,7 +35,7 @@ self.addEventListener('push', (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) { d = { title: 'SKA Lesson Planner', body: e.data ? e.data.text() : '' }; }
   e.waitUntil(self.registration.showNotification(d.title || 'SKA Lesson Planner', {
-    body: d.body || '', icon: './icon-192.png', badge: './favicon-64.png', tag: d.tag || undefined, renotify: !!d.tag, data: { url: d.url || './' },
+    body: d.body || '', icon: './icon-192.png', badge: './badge-96.png', tag: d.tag || undefined, renotify: !!d.tag, data: { url: d.url || './' },
   }));
 });
 

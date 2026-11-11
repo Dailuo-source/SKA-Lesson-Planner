@@ -703,7 +703,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v23"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v24"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -1544,7 +1544,7 @@ const NPRE={
   asg:[["With the class reminder",{same:true}],["Morning of",{day:0,at:"08:00"}]]};
 const NKIND=[["before","Before class","Class name, focus, and whether the plan is ready"],["noplan","No plan yet","Only if your class still has no plan"],["asg","Assignments to follow up","Open assignments from last class at that time"]];
 const sameWhen=(a,b)=>!!a&&!!b&&(a.same?!!b.same:a.rel!=null?a.rel===b.rel&&b.rel!=null:(b.rel==null&&!b.same&&a.day===b.day&&a.at===b.at));
-const presetOf=(k,w)=>{const i=NPRE[k].findIndex(p=>sameWhen(p[1],w));return i<0?"custom":String(i);};
+const presetOf=(k,w)=>{if(w&&w.custom)return"custom";const i=NPRE[k].findIndex(p=>sameWhen(p[1],w));return i<0?"custom":String(i);};
 function nsInit(){if(!NS)NS=JSON.parse(JSON.stringify((ME&&ME.notify)||{slots:[],before:{on:true,rel:60},noplan:{on:true,day:-1,at:"19:00"},asg:{on:true,same:true}}));return NS;}
 function nsSave(){clearTimeout(nsT);nsT=setTimeout(()=>{callApi({token:TOKEN,ops:[],notify:NS}).then(r=>{if(r&&r.ok&&r.me){ME=r.me;LS.set("me",JSON.stringify(ME));}else if(r&&r.error==="bad_token")signOut("Please sign in again.");}).catch(()=>toast("Couldn’t save. Check your connection."));},500);}
 const slotVal=s=>{const r=S.lists.find(x=>x.id===s.id);return r?r.value.trim():"";};
@@ -2239,7 +2239,7 @@ document.addEventListener("click",e=>{
     case"nsSlot":{const n=nsInit(),v=t.dataset.v;n.slots=n.slots.some(x=>eqi(x,v))?n.slots.filter(x=>!eqi(x,v)):n.slots.concat(v);nsSave();renderSheet();break;}
     case"nsToggle":{const n=nsInit(),k=t.dataset.k;n[k].on=n[k].on===false;nsSave();renderSheet();break;}
     case"nsPick":{const n=nsInit(),k=t.dataset.k,v=t.dataset.v,on=n[k].on!==false;
-      if(v==="custom"){if(presetOf(k,n[k])==="custom")break;const was=n[k];n[k]=k==="before"?{rel:was.rel!=null?was.rel:90}:{day:was.day!=null?was.day:-1,at:was.at||"20:00"};}
+      if(v==="custom"){if(presetOf(k,n[k])==="custom")break;const was=n[k];n[k]=k==="before"?{rel:was.rel!=null?was.rel:90,custom:true}:{day:was.day!=null?was.day:-1,at:was.at||"20:00",custom:true};}
       else n[k]=Object.assign({},NPRE[k][+v][1]);
       n[k].on=on;nsSave();renderSheet();break;}
     case"nsDay":{const n=nsInit(),k=t.dataset.k;n[k].day=+t.dataset.v;nsSave();renderSheet();break;}
