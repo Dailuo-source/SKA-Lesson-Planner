@@ -12,7 +12,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 | --- | --- |
 | Live app | https://ska-lesson-planner.pages.dev/ (Cloudflare Pages from `main`, build output directory `web`, so only `web/` is published). Never put Gary's full name in a web address |
 | Database | Google Sheet **SKA Lesson Planner** (garyluo.gs@gmail.com), id `1YN23i8Fq3yK5B4G4xGRPkCelMMNFhAiC8ys9z_ZeClA`. Tabs: Plans, Plan items, Exercises, Lists, Instructors, Class notes |
-| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 11 (Execute as Gary, Anyone) |
+| Backend | Apps Script **SKA Lesson Planner** bound to the sheet; source is `Code.gs`. Web app version 12 (Execute as Gary, Anyone) |
 | Signing in | Exec URL in `API_URL` (`#api=` overrides). Email + password or Google. New accounts need the **dojo code** (Script Property `DOJO_CODE`; menus **Show app link and dojo code** / **Change the dojo code…**). Google button shows only once `GOOGLE_CLIENT_ID` is set |
 | Setup guide | `SETUP.md` |
 
@@ -116,7 +116,7 @@ Inside the `index.html` script, search for:
 - Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
 
 ## Status
-- Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v24. Web app v11 (Feedback tab; Code.gs `custom` flag from Nov 11 pushed but not deployed yet; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
+- Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v24. Web app v12 (Nov 12: Code.gs `custom` flag; v11 Feedback tab; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
 - Testers (Nov 10): Gary is inviting a few SKA instructors (role Instructor) with the app link + dojo code; sign-in is email + password (no `GOOGLE_CLIENT_ID` set).
 - Notifications: live (Nov 10). Worker `ska-lesson-planner-push` at ska-lesson-planner-push.garyluo-gs.workers.dev; sheet setup done; `/run` answers ok. Each phone turns them on in Profile → Notifications.
 - Watch: Gary once saw tapping a plan open the newest one (Oct 17); not reproducible, ask for steps if it returns.
@@ -134,6 +134,7 @@ Steps only Gary can do (App Atlas shows these as his to-dos). One line each; del
 - **Motion pack** (`window.MP`, same copy in every app; Climb Buddy is the model): the `<script>` block before `</body>` in `web/index.html`, set up by the `MP.init({...})` line under it. Panels rise from the bottom and slip back down, toasts rise and slip away (setting `.hidden = true` plays the slip-away first, then hides; the app still reads `.hidden` as true at once), a new screen's pieces rise in one after another, and a new row on the same screen rises in. Unhurried (Gary wants animations easy to see); off under reduced motion. If a close function empties or removes the panel, do it after `MP.ms` (or use `MP.out(el, done)`), or the panel slides away empty.
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-12: Deployed Code.gs (`custom` flag keeps Custom class length open) as web app v12
 - 2026-11-12: Motion pack: panels and toasts rise and slip away, new screens rise in, new rows rise in. sw v25, APP_VER v25
 - 2026-11-11: Notifications: Custom timing now opens its boxes (was stuck when the time matched a preset); torii status-bar icon instead of a white square. sw v24
 - 2026-11-10: Tester Feedback (chip + profile row → Feedback tab, status and reply shown back); full SKA timetable in Lists, Kids type renamed Junior program, lengths 45/75; profile name hint uses your own name. sw v23
