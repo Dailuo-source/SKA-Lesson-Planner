@@ -129,15 +129,14 @@ Steps only Gary can do (App Atlas shows these as his to-dos). One line each; del
 - [ ] Check the Feedback tab now and then (set Status to Seen / Done, type a Reply if useful)
 - [ ] Send the tester invite (app link + dojo code)
 
+## Motion
+
+- **Motion pack** (`window.MP`, same copy in every app; Climb Buddy is the model): the `<script>` block before `</body>` in `web/index.html`, set up by the `MP.init({...})` line under it. Panels rise from the bottom and slip back down, toasts rise and slip away (setting `.hidden = true` plays the slip-away first, then hides; the app still reads `.hidden` as true at once), a new screen's pieces rise in one after another, and a new row on the same screen rises in. Unhurried (Gary wants animations easy to see); off under reduced motion. If a close function empties or removes the panel, do it after `MP.ms` (or use `MP.out(el, done)`), or the panel slides away empty.
+
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-12: Motion pack: panels and toasts rise and slip away, new screens rise in, new rows rise in. sw v25, APP_VER v25
 - 2026-11-11: Notifications: Custom timing now opens its boxes (was stuck when the time matched a preset); torii status-bar icon instead of a white square. sw v24
 - 2026-11-10: Tester Feedback (chip + profile row → Feedback tab, status and reply shown back); full SKA timetable in Lists, Kids type renamed Junior program, lengths 45/75; profile name hint uses your own name. sw v23
 - 2026-11-10: Merged teaching mode into main; Code.gs deployed as web app v10 for testers
 - 2026-11-05: Teaching mode: tick off exercises ("You are here", teaching bar with pace), tap a section to fold it, clock time per exercise, End class & review; class notes get Next week (carried to next class's Last class card) and Consolidate. Code.gs: Class notes `Next week` column. sw v22
 - 2026-10-30: Notifications (settings, push Worker, setup), plan switcher dropdown with ‹ ›, bold class date. sw v21
-- 2026-10-30: Tap flash with a 0.1 s delay on every button. sw v20
-- 2026-10-30: Compact layout app-wide; desktop full width; Add a new student (via the Kata Tracker) with an instant list refresh. sw v19
-- 2026-10-21: Moved the site files into `web/`; only that folder is published
-- 2026-10-22: Trimmed this brief
-- 2026-10-21: Class notes, Last class card, Student notes, names from the Kata Tracker, tap feedback. sw v18
-- 2026-10-20: Plans tab is a week/month calendar; day filter; Class times button; desktop layout. sw v17

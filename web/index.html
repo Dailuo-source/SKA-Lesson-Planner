@@ -703,7 +703,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v24"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v25"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -2416,5 +2416,116 @@ function boot(){
 boot();
 })();
 </script>
+<script>
+/* ===== Motion pack: the same copy in each of Gary's apps (Climb Buddy is the model) =====
+   Panels rise from the bottom and slip back down, toasts rise and slip away, a new screen's
+   pieces rise in one after another, and a row that appears on the same screen rises in.
+   Unhurried on purpose; off when the phone asks for reduced motion.
+   Each app calls MP.init({...}) with its own selectors (see the call under this block).
+   - wrap:  the panel's outer element that the app shows/hides with .hidden (or adds/removes)
+   - panel: the panel inside wrap; scrim: the dim layer inside wrap ("self" = wrap is the dim layer)
+   - toast: elements the app shows/hides with .hidden (selector list)
+   - root:  where screens are drawn; items: what rises in on a new screen
+   MP.out(el, done) plays the slip-away, then calls done (for apps that remove elements).
+   MP.watch(el) gives any element the slip-away when the app sets el.hidden = true. */
+window.MP = (function () {
+  const ON = !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const IN = "cubic-bezier(.2,.8,.25,1)", OUT_MS = 380;
+  const HID = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "hidden");
+  const $$ = (s, r) => [...(r || document).querySelectorAll(s)];
+
+  function css(c) {
+    const W = c.wrap, P = c.panel ? W + " " + c.panel : "", self = c.scrim === "self";
+    const SC = c.scrim && !self ? W + " " + c.scrim : "", T = c.toast || "";
+    const rules = [
+      "@keyframes mpRise{from{opacity:0;translate:0 26px}to{opacity:1;translate:0 0}}",
+      "@keyframes mpUp{from{translate:0 100%}to{translate:0 0}}",
+      "@keyframes mpDown{from{translate:0 0}to{translate:0 105%}}",
+      "@keyframes mpSideIn{from{opacity:0;translate:56px 0}to{opacity:1;translate:0 0}}",
+      "@keyframes mpSideOut{from{opacity:1;translate:0 0}to{opacity:0;translate:56px 0}}",
+      "@keyframes mpIn{from{opacity:0}to{opacity:1}}",
+      "@keyframes mpOut{from{opacity:1}to{opacity:0}}",
+      "@keyframes mpToastIn{from{opacity:0;translate:0 64px}to{opacity:1;translate:0 0}}",
+      "@keyframes mpToastOut{from{opacity:1;translate:0 0}to{opacity:0;translate:0 64px}}",
+      `.mp-rise{animation:mpRise .55s ${IN} backwards}`,
+    ];
+    if (P) rules.push(`html ${P}{animation:mpUp .5s ${IN} backwards}`, `html ${W}.mp-out ${c.panel}{animation:mpDown ${OUT_MS}ms cubic-bezier(.5,0,.75,.2) forwards}`,
+      `@media (min-width:${c.wide || 900}px){html ${P}{animation-name:mpSideIn}html ${W}.mp-out ${c.panel}{animation-name:mpSideOut}}`);
+    if (SC) rules.push(`html ${SC}{animation:mpIn .4s ease backwards}`, `html ${W}.mp-out ${c.scrim}{animation:mpOut ${OUT_MS}ms ease forwards}`);
+    if (self) rules.push(`html ${W}{animation:mpIn .4s ease backwards}`, `html ${W}.mp-out{animation:mpOut ${OUT_MS}ms ease forwards}`);
+    if (W) rules.push(`${W}.mp-out{pointer-events:none}`);
+    if (T) T.split(",").forEach((t) => rules.push(`html ${t}:not([hidden]){animation:mpToastIn .45s ${IN} backwards}`, `html ${t}.mp-out{animation:mpToastOut ${OUT_MS - 20}ms ease forwards;pointer-events:none}`));
+    rules.push("@media (prefers-reduced-motion:reduce){.mp-rise,.mp-out,.mp-out *" + (P ? "," + P : "") + (SC ? "," + SC : "") + (self ? "," + W : "") + (T ? "," + T : "") + "{animation:none!important}}");
+    const s = document.createElement("style"); s.id = "mp-css"; s.textContent = rules.join("\n"); document.head.appendChild(s);
+  }
+
+  /** Setting el.hidden = true plays the slip-away first; the app still reads el.hidden as true straight away. */
+  function watch(el) {
+    if (!el || el.__mp) return el; el.__mp = 1;
+    let want = el.hasAttribute("hidden"), t = 0;
+    Object.defineProperty(el, "hidden", {
+      configurable: true,
+      get() { return want; },
+      set(v) {
+        v = !!v;
+        if (!v) { clearTimeout(t); want = false; el.classList.remove("mp-out"); HID.set.call(el, false); return; }
+        if (want) return; // already hiding: let the slip-away finish
+        want = true; clearTimeout(t);
+        if (!ON || HID.get.call(el)) { HID.set.call(el, true); return; }
+        el.classList.add("mp-out");
+        t = setTimeout(() => { el.classList.remove("mp-out"); HID.set.call(el, true); }, OUT_MS);
+      },
+    });
+    return el;
+  }
+  /** For apps that remove the element: play the slip-away, then done(). */
+  function out(el, done) {
+    if (!el || !ON) { if (done) done(); return; }
+    el.classList.add("mp-out");
+    setTimeout(() => { if (done) done(); }, OUT_MS);
+  }
+
+  /** A screen's identity: its heading (numbers ignored) and whichever tab or nav item is current. */
+  function sigOf(root) {
+    const h = root.querySelector("h1, h2");
+    return [location.hash, h ? h.textContent.replace(/[\d.,$%]+/g, "").trim() : "",
+      ...$$('[aria-current]:not([aria-current="date"]):not([aria-current="false"]), [aria-selected="true"], [role=tab].on, .tab.on')
+        .map((e) => (e.dataset.tab || e.dataset.v || e.dataset.sec || e.textContent || "").trim().slice(0, 30))].join("|");
+  }
+  function screens(c) {
+    const root = document.querySelector(c.root); if (!root) return;
+    const items = c.items || "main > *, :scope > header ~ *, .list > *";
+    let sig = null, ids = new Set();
+    const run = () => {
+      const s = c.sig ? String(c.sig()) : sigOf(root);
+      const now = $$("[data-id]", root);
+      if (ON) {
+        if (s !== sig) {
+          // A new screen: its pieces rise up one after another
+          $$(items, root).filter((el) => el.offsetParent !== null || getComputedStyle(el).position === "fixed").slice(0, 14)
+            .forEach((el, k) => { el.classList.remove("mp-rise"); void el.offsetWidth; el.classList.add("mp-rise"); el.style.animationDelay = k * 70 + "ms"; });
+        } else if (ids.size) {
+          // Same screen, something new (added here or synced in): just that row rises in
+          const fresh = new Set();
+          now.forEach((el) => { if (!ids.has(el.dataset.id)) fresh.add(el.closest(c.row || "li, tr, .card, .row, .item") || el); });
+          if (fresh.size && fresh.size < 6) fresh.forEach((el) => { el.style.animationDelay = ""; el.classList.add("mp-rise"); });
+        }
+      }
+      sig = s; ids = new Set(now.map((el) => el.dataset.id));
+    };
+    new MutationObserver(run).observe(root, { childList: true });
+    run();
+  }
+
+  function init(c) {
+    css(c);
+    if (c.wrap && c.hide !== "remove") $$(c.wrap).forEach(watch);
+    if (c.toast) $$(c.toast).forEach(watch);
+    if (c.root) screens(c);
+  }
+  return { init, out, watch, on: ON, ms: OUT_MS };
+})();
+</script>
+<script>MP.init({wrap:"#sheetWrap",panel:".sheet",scrim:".scrim",toast:"#toast",root:"#view"});</script>
 </body>
 </html>
