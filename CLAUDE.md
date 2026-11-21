@@ -122,7 +122,7 @@ Inside the `index.html` script, search for:
 - Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
 
 ## Status
-- Nov 21: skip, collapsing, class note panel (multi-student), belt groups, students (roster + here tonight). Cache v26.
+- Nov 21: skip, collapsing, class note panel (multi-student), belt groups, students (roster + here tonight). Cache v26. Code.gs saved in the Apps Script editor but NOT deployed yet (live web app still v12).
 - Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v24. Web app v12 (Nov 12: Code.gs `custom` flag; v11 Feedback tab; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
 - Testers (Nov 10): Gary is inviting a few SKA instructors (role Instructor) with the app link + dojo code; sign-in is email + password (no `GOOGLE_CLIENT_ID` set).
 - Notifications: live (Nov 10). Worker `ska-lesson-planner-push` at ska-lesson-planner-push.garyluo-gs.workers.dev; sheet setup done; `/run` answers ok. Each phone turns them on in Profile → Notifications.
@@ -132,6 +132,7 @@ Inside the `index.html` script, search for:
 
 Steps only Gary can do (App Atlas shows these as his to-dos). One line each; delete a line once it's done.
 
+- [ ] Deploy Code.gs (Nov 21; saved in the editor, Manage deployments → New version → Deploy). Until then class rosters, skips, belt groups and who's here don't save
 - [ ] Turn notifications on on your phone (Profile → Notifications) and pick your classes
 - [ ] Check the Feedback tab now and then (set Status to Seen / Done, type a Reply if useful)
 - [ ] Send the tester invite (app link + dojo code)
