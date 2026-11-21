@@ -639,6 +639,104 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .cnq .grow{min-width:0}
 .cnq .nm{font-size:12px;font-weight:700;color:var(--muted)}
 
+/* ---------- Nov 21: collapsing, skipping, belt groups, students ---------- */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ttg{display:flex;align-items:center;gap:6px;flex:1;min-width:0;border:0;background:none;padding:4px 0;text-align:left;color:var(--ink);font:inherit;min-height:36px}
+.ttg>svg{width:16px;height:16px;color:var(--ink2);flex:none}
+.ttg .nm{flex:1;min-width:0;font-size:15px;font-weight:800;line-height:1.25;overflow-wrap:anywhere;color:var(--ink);display:block}
+.ttg h2{margin:0;font-family:var(--f-d);font-size:16px;font-weight:800}
+.qnb{font-size:11px;font-weight:800;padding:1px 7px;border-radius:9px;background:#FFF7E0;color:#7A5A00;white-space:nowrap;flex:none}
+.cnt{font-size:12px;font-weight:800;color:var(--muted)}
+.chd{display:flex;align-items:center;gap:6px}
+.foldrow{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--muted)}
+.foldrow .chip.sm{height:30px;padding:0 10px;font-size:12px}
+.studstrip{display:flex;align-items:center;gap:8px;width:100%;min-height:42px;padding:4px 10px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left;color:var(--ink);font-size:13.5px}
+.studstrip>svg{width:18px;height:18px;color:var(--ink2);flex:none}
+.studstrip .m{color:var(--muted);font-weight:700}
+.sgs{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.sgs.wrap{justify-content:flex-start;margin-top:6px}
+.sg{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;color:var(--ink2)}
+.sg .kdot{width:10px;height:10px}
+.tcard{padding:4px 6px 4px 8px}
+.tcard .vex-top{gap:4px}
+.tcard .ttg .vtime{font-size:12px;padding:2px 6px}
+.tcard .vmin{font-size:13px}
+.tcard .nowtag{margin:2px 0 0 22px}
+.tcard .tchk{margin:-4px -4px -4px 0}
+.tskip{width:36px;height:36px;flex:none;border:1px solid var(--line2);border-radius:10px;background:#fff;color:var(--ink2);display:flex;align-items:center;justify-content:center}
+.tskip svg{width:16px;height:16px}
+.tbody{padding:0 4px 4px 22px}
+.tbody ol.vsteps{margin:2px 0 0}
+.tline{display:flex;align-items:center;gap:8px;min-height:40px;padding:2px 4px 2px 10px;border:1px solid var(--line);border-radius:12px;background:#FAFAFA;color:var(--muted)}
+.tline .nm{flex:1;min-width:0;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;color:var(--muted)}
+.tline .vtime{font-size:12px;padding:0}
+.tline .vmin{font-size:13px}
+.tline .tchk{margin:-4px -4px -4px 0}
+.tline.done .nm{text-decoration:line-through}
+.tline.skipped{border-style:dashed;background:#fff}
+.tline.skipped .nm{text-decoration:line-through}
+.tline .btn.small{min-height:32px;padding:0 10px}
+.sktag{font-size:11px;font-weight:800;padding:1px 7px;border-radius:7px;background:#EDEDED;color:var(--ink);flex:none}
+.notebtn{--c:var(--red);min-height:32px;padding:0 10px;border-radius:16px;border:1px solid var(--c);background:#fff;color:var(--c);font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:3px;flex:none}
+.notebtn svg{width:14px;height:14px}
+.notebtn.grey{border-color:var(--line2);color:var(--ink)}
+.tbody .notebtn{margin-top:4px}
+.iconbtn.round.red{background:var(--red);color:#fff;border:0}
+.lanehd{--c:var(--ink);display:flex;align-items:center;gap:5px;width:100%;min-height:34px;padding:3px 8px;border:0;border-radius:9px;font-size:12.5px;font-weight:800;color:var(--c);text-align:left}
+.lanehd>svg{width:15px;height:15px;flex:none}
+.lanehd .kdot{width:10px;height:10px}
+.lanehd .sm{font-size:12px;font-weight:800;color:var(--ink2)}
+.savebar.two{display:flex;gap:8px}
+.savebar.two .btn{flex:1;padding:0 10px}
+.savebar.two .btn.outline{background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.rrow{padding:2px 0 2px 2px;border-bottom:1px solid #F0F0F0}
+.rrow.sk .nm{text-decoration:line-through;color:var(--muted)}
+.rtop{display:flex;align-items:center;gap:6px}
+.skrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #ECECEC}
+.skrow .small{display:block}
+.skrow .btn.small{min-height:32px;padding:0 10px;font-size:12.5px}
+.dashedc{border-style:dashed}
+.gbox{border:1px solid var(--line);border-radius:12px;margin-top:6px;overflow:hidden}
+.gbh{display:flex;align-items:center;gap:6px;padding:2px 6px 2px 8px;background:#F7F7F7}
+.gbh .ttg .nm{font-size:13.5px}
+.gbh .chip.sm{height:30px;padding:0 10px;font-size:12px}
+.gbody{padding:6px 8px}
+.nbline{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.nbline .label{margin:0}
+.nbc{font-size:12px;font-weight:800;color:#5B3FA8;white-space:nowrap}
+.awayt{margin-top:6px;font-size:12.5px;color:var(--ink2);font-weight:800}
+.herechip{--c:#111}
+.herechip.away{text-decoration:line-through;color:var(--muted);border-style:dashed}
+.herechip svg{width:14px;height:14px}
+.pchip svg{width:14px;height:14px}
+.csum{padding:8px 12px}
+.csum .big{font-size:24px}
+.beltbar{display:flex;height:10px;border-radius:5px;overflow:hidden;border:1px solid var(--line2);margin-top:6px}
+.csrow{display:flex;align-items:center;gap:8px;min-height:38px;border-bottom:1px solid #F3F3F3}
+.csrow .iconbtn{width:34px;height:34px}
+.bgsw{--c:var(--red);flex:none;display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 4px 0 9px;border:1px solid var(--line2);border-radius:16px;background:#fff;font-size:11.5px;font-weight:800;color:var(--ink2)}
+.bgsw i{width:30px;height:18px;border-radius:9px;background:#CFCFCF;position:relative;transition:background .3s}
+.bgsw i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .3s}
+.bgsw[aria-checked=true]{border-color:var(--c)}
+.bgsw[aria-checked=true] i{background:var(--c)}
+.bgsw[aria-checked=true] i::after{left:14px}
+.shead .ttg h2{margin:0}
+.shead.ewrap{flex-wrap:wrap;row-gap:0;padding-bottom:4px}
+.shmeta{flex-basis:100%;display:flex;align-items:center;gap:8px;padding:0 4px 0 52px}
+.shmeta .bgsw{min-height:28px}
+.shead .ttg .badge{flex:none}
+.item.ecomp{padding:2px 4px 2px 8px}
+.item.ecomp.cornered{padding-top:22px}
+.item.ecomp .r1{display:flex;align-items:center;gap:4px}
+.item.ecomp .stepper button{width:34px;height:34px}
+.item.ecomp .stepper .v{min-width:46px;font-size:13.5px}
+.item.ecomp .tbody .meta{font-size:12px;font-weight:700;color:var(--muted)}
+.elane{border-left:3px solid var(--c);margin:4px 8px 4px 10px;padding-left:4px}
+.lanehint{margin:4px 12px 0}
+.mixc{padding:4px 10px 8px}
+.grow-row{padding:8px 10px}
+.grow-row .chip.sm{height:32px;padding:0 10px;font-size:13px}
+
 /* ---------- big screens (Gary, Oct 20): tabs in the red bar, wider pages, panels slide in from the right ---------- */
 @media (min-width:1000px){
   main{max-width:none;padding:18px 28px 32px}
@@ -703,7 +801,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v25"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v26"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -714,7 +812,7 @@ const svg=(p,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON={
   msg:svg('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',2.2), bug:svg('<path d="M8 9a4 4 0 0 1 8 0v5a4 4 0 0 1-8 0z"/><path d="M12 9v9M4 13h4M16 13h4M5 7l3 2M19 7l-3 2M5 19l3-2M19 19l-3-2"/>'), bulb:svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'), help:svg('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14"/><path d="M12 17.5h.01"/>'),
   plus:svg('<path d="M5 12h14M12 5v14"/>',2.5), minus:svg('<path d="M5 12h14"/>',2.5),
-  stop:svg('<rect x="5" y="5" width="14" height="14" rx="3"/>',2.4), fwd:svg('<path d="M5 12h12M13 7l5 5-5 5"/>',2.4),
+  stop:svg('<rect x="5" y="5" width="14" height="14" rx="3"/>',2.4), skip:svg('<path d="M5 5l10 7-10 7z"/><path d="M19 5v14"/>',2.2), fwd:svg('<path d="M5 12h12M13 7l5 5-5 5"/>',2.4),
   timer:svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M10 2h4"/>',2.2), lines:svg('<path d="M4 6h16M4 12h10M4 18h6"/>',2.2),
   edit:svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'),
   cal:svg('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
@@ -837,7 +935,7 @@ function addPointAfter(box,row){const tmp=document.createElement("div");tmp.inne
    SYNC — the Google Sheet is the source of truth.
    Changes show on screen right away, then go to the sheet in batches.
    ===================================================================== */
-let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[]};
+let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[],roster:[]};
 let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null,wantStudents=false;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
@@ -865,8 +963,9 @@ function normalize(st){
   st=st||{};const str=v=>String(v==null?"":v).trim();const num=(v,d)=>v==null||v===""||isNaN(+v)?d:+v;
   return{
     lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),inNew:str(r.inNew)})),
-    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
-    items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy)})),
+    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),split:strs(r.split),away:strs(r.away),dropins:strs(r.dropins),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
+    items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy),lane:str(r.lane),skip:/^y/i.test(str(r.skip))?"Yes":""})),
+    roster:(st.roster||[]).map(r=>({id:str(r.id),slot:str(r.slot),slotName:str(r.slotName),who:str(r.who)})).filter(r=>r.slot&&r.who),
     people:(st.people||[]).map(r=>({id:str(r.id),name:str(r.name),admin:!!r.admin})).filter(r=>r.id),
     notes:(st.notes||[]).map(r=>Object.assign({},r,{plan:str(r.plan),item:str(r.item),kind:str(r.kind)||"Class",who:str(r.who),text:str(r.text),done:str(r.done),next:str(r.next),share:r.share==="all"?"all":"me",addedBy:str(r.addedBy),created:num(r.created,0)||num(r.updated,0)})).filter(r=>r.text),
     students:(st.students||[]).map(r=>({name:str(r.name),belt:str(r.belt)})).filter(r=>r.name),
@@ -915,7 +1014,12 @@ function planSections(p){const out=[];const add=v=>{if(v&&!out.some(o=>eqi(o,v))
   (p.sections.length?p.sections:defaultSections()).forEach(add);itemsOf(p.id).forEach(i=>add(i.section));return out;}
 const isSkipped=(p,sec)=>p.skipped.some(s=>eqi(s,sec));
 const secItems=(p,sec)=>itemsOf(p.id).filter(i=>eqi(i.section,sec));
-const secTotal=(p,sec)=>isSkipped(p,sec)?0:secItems(p,sec).reduce((a,i)=>a+(i.minutes||0),0);
+const isSplit=(p,sec)=>(p.split||[]).some(s=>eqi(s,sec));
+const liveMin=i=>i.skip==="Yes"?0:(i.minutes||0);
+/* A section split by belt group runs its groups at the same time, so it takes as long as its longest group */
+const secTotal=(p,sec)=>{if(isSkipped(p,sec))return 0;const its=secItems(p,sec);
+  if(!isSplit(p,sec))return its.reduce((a,i)=>a+liveMin(i),0);
+  return secLanes(p,sec).reduce((m,l)=>Math.max(m,l.items.reduce((a,i)=>a+liveMin(i),0)),0);};
 const planTotal=p=>planSections(p).reduce((a,s)=>a+secTotal(p,s),0);
 const planTitle=p=>p.focus||(p.type?p.type+" class":"Class plan");
 /* Plan switcher (Gary, Oct 30): the title is a dropdown of every plan, with ‹ › to step to the previous/next one */
@@ -958,6 +1062,41 @@ function addItem(p,sec,ex,extra){
   const id=store.add("items",Object.assign({plan:p.id,section:sec,order,name:ex.name,minutes:ex.minutes||10,note:"",exercise:ex.id||"",addedBy:who(),editedBy:""},extra||{}));
   touchPlan(p.id);return id;
 }
+/* ---------- Belt groups, class rosters and who's here tonight (Gary, Nov 21) ----------
+   Belt groups live in Lists as "Name: Belt, Belt" rows (list "Belt group"); with none saved, SKA's usual three are used.
+   Each timeslot keeps a roster (Class roster tab) kept by hand, since Muster Hall can't be read. A plan's
+   "Here tonight" = its timeslot's roster minus Away tonight, plus Drop-ins. Belts come from the Kata Tracker. */
+const GROUP_DEFAULT=[["White–Yellow",["White","Yellow"]],["Green–Blue",["Green","Blue"]],["Purple+",["Purple","Brown","Black"]]];
+function beltGroups(){
+  const rows=listRows("Belt group").map(r=>{const m=/^\s*([^:]+?)\s*:\s*(.*)$/.exec(r.value);if(!m)return null;
+    return{id:r.id,name:m[1].trim(),belts:m[2].split(/[,;]+/).map(b=>BELTS.find(x=>eqi(x,b.trim()))).filter(Boolean)};}).filter(g=>g&&g.name);
+  return rows.length?rows:GROUP_DEFAULT.map(([name,belts])=>({id:"",name,belts}));
+}
+const beltIdxOf=name=>looseBelt(beltOf(name));
+const groupOf=name=>{const b=beltIdxOf(name);if(b<0)return"";const g=beltGroups().find(x=>x.belts.includes(BELTS[b]));return g?g.name:"";};
+const byBelt=(a,b)=>{const x=beltIdxOf(a),y=beltIdxOf(b);return((x<0?99:x)-(y<0?99:y))||a.localeCompare(b);};
+const groupDots=g=>g.belts.slice(0,2).map(b=>`<span class="kdot" style="background:${BELT_COL[b]}" aria-hidden="true"></span>`).join("");
+/* The timeslot a plan sits in: same weekday and start time */
+function slotOfPlan(p){if(!p||!p.date)return null;const t=parseTime(p.time);if(!t)return null;const d=new Date(p.date).getDay();
+  return slots().find(x=>x.day===d&&x.start===t.start)||null;}
+const slotText=x=>x?DAYS[x.day].slice(0,3)+" "+x.key+(x.label?" "+x.label:""):"";
+const slotLabel=x=>x?DAYS[x.day]+"s · "+fmtTime(x.key)+(x.label?" · "+x.label:""):"";
+const rosterOf=slotId=>slotId?[...new Set(S.roster.filter(r=>r.slot===slotId).map(r=>r.who))].sort(byBelt):[];
+function tonight(p){const sl=slotOfPlan(p),roster=rosterOf(sl&&sl.id);
+  const away=new Set((p.away||[]).map(x=>x.toLowerCase()));
+  const drop=(p.dropins||[]).filter(n=>!roster.some(r=>eqi(r,n)));
+  const here=roster.filter(n=>!away.has(n.toLowerCase())).concat(drop).sort(byBelt);
+  return{slot:sl,roster,here,away:roster.filter(n=>away.has(n.toLowerCase())),drop};}
+/* Belt-group lanes of a split section: each group in order, then any lane name no longer in the list, then "Everyone" */
+function secLanes(p,sec){
+  const its=secItems(p,sec),gs=beltGroups(),out=gs.map(g=>({name:g.name,group:g,items:its.filter(i=>eqi(i.lane,g.name))}));
+  its.forEach(i=>{if(i.lane&&!out.some(l=>eqi(l.name,i.lane)))out.push({name:i.lane,group:null,items:its.filter(x=>eqi(x.lane,i.lane))});});
+  const none=its.filter(i=>!i.lane);if(none.length)out.unshift({name:"",group:null,items:none});
+  return out;
+}
+const laneLabel=l=>l.name||"Everyone";
+const hereIn=(p,l)=>l.group?tonight(p).here.filter(n=>groupOf(n)===l.group.name).length:0;
+
 /* ---------- dojo kata, read from the SKA Kata Tracker (names, belts, how many students still need each) ---------- */
 let KATA=null;try{KATA=JSON.parse(LS.get("kata","null"));}catch(e){KATA=null;}
 let kataLoading=false;
@@ -1167,14 +1306,24 @@ function itemHTML(p,it,col){
   const lib=exById(it.exercise);
   const changed=lib&&it.minutes!==lib.minutes;
   const meta=changed?`${esc(it.editedBy||it.addedBy||"Someone")} changed to ${it.minutes} min · library ${lib.minutes}`:(it.addedBy?`Added by ${esc(it.addedBy)}`:(lib?"From the library":"One-off for this class"));
-  const creator=lib?lib.addedBy:"";
-  return`<div class="item${creator?" cornered":""}">${ctagHTML(creator)}
-    <div class="r1"><div class="iname">${esc(it.name)}</div><button type="button" class="iconbtn" data-act="editItem" data-id="${esc(it.id)}" aria-label="Edit ${esc(it.name)} for this class">${ICON.edit}</button></div>
-    ${ptsHTML(it.note)}
-    <div class="r2"><div class="meta" style="${changed?"color:"+col:""}">${meta}</div>
-      <div class="stepper"><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="-5" aria-label="5 minutes less for ${esc(it.name)}">${ICON.minus}</button><div class="v">${it.minutes} min</div><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="5" aria-label="5 minutes more for ${esc(it.name)}">${ICON.plus}</button></div>
-    </div>
+  const creator=lib?lib.addedBy:"",open=tGet("eexp",p.id).has(it.id),np=toPoints(it.note).length;
+  return`<div class="item ecomp${open&&creator?" cornered":""}">${open?ctagHTML(creator):""}
+    <div class="r1"><button type="button" class="ttg" data-act="eCard" data-id="${esc(it.id)}" aria-expanded="${open}">${open?ICON.down:ICON.go}<span class="nm">${esc(it.name)}</span>${!open&&np?`<span class="qnb">${np} ${np===1?"note":"notes"}</span>`:""}</button>
+      <div class="stepper"><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="-5" aria-label="5 minutes less for ${esc(it.name)}">${ICON.minus}</button><div class="v"${changed?` style="color:${col}"`:""}>${it.minutes} min</div><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="5" aria-label="5 minutes more for ${esc(it.name)}">${ICON.plus}</button></div>
+      <button type="button" class="iconbtn" data-act="editItem" data-id="${esc(it.id)}" aria-label="Edit ${esc(it.name)} for this class">${ICON.edit}</button></div>
+    ${open?`<div class="tbody">${ptsHTML(it.note)}<div class="meta" style="${changed?"color:"+col:""}">${meta}</div></div>`:""}
   </div>`;
+}
+/* Class mix (Gary, Nov 21): who's on this class's roster, by belt and belt group */
+function beltBarHTML(names){const n=names.length||1;const segs=BELTS.map(b=>{const k=names.filter(x=>beltIdxOf(x)===BELTS.indexOf(b)).length;return k?`<span style="width:${(k/n*100).toFixed(2)}%;background:${BELT_COL[b]}"></span>`:"";}).join("");
+  const none=names.filter(x=>beltIdxOf(x)<0).length;
+  return`<div class="beltbar">${segs}${none?`<span style="width:${(none/n*100).toFixed(2)}%;background:#E2E2E2"></span>`:""}</div>`;}
+function mixCard(p){
+  const T=tonight(p),names=T.roster.length?T.roster:T.here,open=!tGet("efold",p.id).has("c:mix");
+  if(!names.length)return`<button type="button" class="studstrip" data-act="classStudents">${ICON.people}<span class="grow"><b>Class mix</b> · ${T.slot?"set up who’s in this class":"special class, add who’s coming"}</span>${ICON.go}</button>`;
+  const gs=beltGroups().map(g=>{const k=names.filter(x=>groupOf(x)===g.name).length;return k?`<span class="sg">${groupDots(g)}${esc(g.name)} · <b>${k}</b></span>`:"";}).join("");
+  return`<section class="card mixc"><div class="chd"><button type="button" class="ttg" data-act="eFold" data-k="c:mix" aria-expanded="${open}">${open?ICON.down:ICON.go}<h2>Class mix</h2><span class="cnt">${names.length} ${T.roster.length?"on the roster":"coming"}</span></button><button type="button" class="notebtn grey" data-act="classStudents">${ICON.people}Students</button></div>
+    ${open?`${beltBarHTML(names)}<div class="sgs wrap">${gs}</div>`:""}</section>`;
 }
 function viewPlan(){
   const p=planById(PLAN);
@@ -1191,13 +1340,22 @@ function viewPlan(){
   const sum=diff>0?`${fmtHM(diff)} to spare`:diff===0?"Right on time":`${fmtHM(-diff)} over`;
   const sections=secs.map((s,i)=>{
     const col=secColour(s),sk=isSkipped(p,s),its=secItems(p,s),st=secTotal(p,s);
+    const ef=tGet("efold",p.id),fold=ef.has(s),split=isSplit(p,s);
+    let body="";
+    if(!sk&&!fold){
+      if(split)body=`<p class="small lanehint">Groups run at the same time. The section takes as long as its longest group.</p>`+secLanes(p,s).map(l=>{const k="L:"+s+"|"+l.name,lf=ef.has(k),lm=l.items.reduce((a,x)=>a+liveMin(x),0);
+        return`<div class="elane" style="--c:${col}"><button type="button" class="lanehd" data-act="eFold" data-k="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:transparent">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}</span><span class="sm">${l.items.length} · ${lm}m</span></button>
+          ${lf?"":l.items.map(it=>itemHTML(p,it,col)).join("")+`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" data-lane="${esc(l.name)}" style="color:${col}">${ICON.plus}Add for ${esc(laneLabel(l))}</button>`}</div>`;}).join("");
+      else body=its.map(it=>itemHTML(p,it,col)).join("")+`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" style="color:${col}">${ICON.plus}Add from library</button>`;
+    }
     return`<section class="card section">
-      <div class="shead" style="background:${sk?"#F5F5F5":tint(col)}">
-        <div class="badge" style="background:${sk?"#9A9A9A":col}">${i+1}</div>
-        <div class="grow"><h2 style="color:${sk?"#767676":"var(--ink)"}">${esc(s)}</h2><div class="small" style="color:${sk?"var(--muted)":col};font-weight:800">${sk?"Skipped this class":st+" min"+(its.length?"":" · nothing yet")}</div></div>
+      <div class="shead ewrap" style="background:${sk?"#F5F5F5":tint(col)}">
+        <button type="button" class="ttg grow" data-act="eFold" data-k="${esc(s)}" aria-expanded="${!fold}">${fold?ICON.go:ICON.down}<span class="badge" style="background:${sk?"#9A9A9A":col}">${i+1}</span><h2 style="color:${sk?"#767676":"var(--ink)"}">${esc(s)}</h2></button>
         <button type="button" class="textbtn" data-act="skip" data-sec="${esc(s)}">${sk?"Restore":"Skip"}</button>
+        <div class="shmeta"><span class="small grow" style="color:${sk?"var(--muted)":col};font-weight:800">${sk?"Skipped this class":(split?"Belt groups at once · ":"")+st+" min"+(its.length?"":" · nothing yet")}</span>
+        ${sk?"":`<button type="button" class="bgsw" role="switch" data-act="splitSec" data-sec="${esc(s)}" aria-checked="${split}" style="--c:${col}">Belt groups<i></i></button>`}</div>
       </div>
-      ${sk?"":its.map(it=>itemHTML(p,it,col)).join("")+`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" style="color:${col}">${ICON.plus}Add from library</button>`}
+      ${body}
     </section>`;
   }).join("");
   const edited=p.editedBy?`Last edited by ${esc(p.editedBy)}${p.updated?" · "+esc(fmtWhen(p.updated)):""}`:(p.addedBy?`Started by ${esc(p.addedBy)}`:"");
@@ -1205,6 +1363,7 @@ function viewPlan(){
     <div class="editbanner">${ICON.edit}<span>Editing. Changes save as you go; tap <b>Save plan</b> when you’re done.</span></div>
     ${planHead(p,esc(whenLine(p)),edited,"Plan options: date, time, focus, sharing, copy, delete")}
     ${recapHTML(p)}
+    ${mixCard(p)}
     <button type="button" class="pickrow" data-act="planInfo" style="margin:0"><span class="nm" style="font-weight:700">${parseTime(p.time)?`<b>${esc(fmtTime(p.time))}</b>`:"No set time"} · <span style="color:var(--muted)">change date or time</span></span>${ICON.clock}</button>
     ${canShareR(p)?`<button type="button" class="pickrow" data-act="sharePlan" style="margin:0"><span class="nm" style="font-weight:700">Who can see it: <b>${esc(shareLabel(p.share))}</b></span>${shareMode(p.share)==="me"?ICON.lock:shareMode(p.share)==="all"?ICON.globe:ICON.people}</button>`:""}
     <div><span class="label">Class type</span><div class="chips">${typeChips}</div></div>
@@ -1213,6 +1372,7 @@ function viewPlan(){
       <div class="row" style="align-items:baseline;gap:8px;flex-wrap:wrap"><div class="big">${fmtHM(tot)}</div><div class="grow" style="font-size:15px;font-weight:700;color:var(--muted)">of ${fmtHM(len)} planned</div><div class="pill${diff<0?" over":""}">${sum}</div></div>
       <div class="bar">${segs}</div>
     </div>
+    ${foldRow("Sections")}
     ${sections}
     <button type="button" class="dashed" data-act="addSection">${ICON.plus}Add a section</button>
     <div class="savebar"><button type="button" class="btn primary block" data-act="savePlan">${ICON.check}Save plan</button></div>
@@ -1232,50 +1392,84 @@ function tMap(k){let o={};try{o=JSON.parse(LS.get(k,"{}"))||{};}catch(e){o={};}r
 function tGet(k,pid){return new Set(tMap(k)[pid]||[]);}
 function tPut(k,pid,set){const o=tMap(k);delete o[pid];o[pid]=[...set];const ks=Object.keys(o);while(ks.length>30)delete o[ks.shift()];LS.set(k,JSON.stringify(o));}
 const hm12=(n,short)=>{n=((Math.round(n)%1440)+1440)%1440;const h=Math.floor(n/60),mm=n%60;return((h+11)%12+1)+":"+pad(mm)+(short?"":(h<12?" a.m.":" p.m."));};
+/* Collapsing (Gary, Nov 21): exercises fold to one line (tap the name); the one you're on opens by itself.
+   Phone-only, per plan: texp = opened by hand, tcol = closed by hand. Quick-note boxes open with + Note. */
+const QOPEN=new Set();
+const tExpanded=(p,id,isNow)=>{const e=tGet("texp",p.id),c=tGet("tcol",p.id);return e.has(id)||(isNow&&!c.has(id));};
 function teachList(p){let at=0;const out=[];
-  planSections(p).filter(s=>!isSkipped(p,s)).forEach(s=>secItems(p,s).forEach(it=>{out.push({it,sec:s,from:at});at+=it.minutes||0;}));
+  planSections(p).filter(s=>!isSkipped(p,s)).forEach(s=>{
+    if(isSplit(p,s)){const start=at;let longest=0;
+      secLanes(p,s).forEach(l=>{let off=0;l.items.forEach(it=>{out.push({it,sec:s,lane:l.name,from:start+off});off+=liveMin(it);});longest=Math.max(longest,off);});
+      at=start+longest;}
+    else secItems(p,s).forEach(it=>{out.push({it,sec:s,lane:"",from:at});at+=liveMin(it);});});
   return out;}
-function teachNow(p){const done=tGet("tdone",p.id),l=teachList(p);const n=l.find(x=>!done.has(x.it.id));return{done,list:l,now:n||null};}
+function teachNow(p){const done=tGet("tdone",p.id),l=teachList(p);const n=l.find(x=>!done.has(x.it.id)&&x.it.skip!=="Yes");return{done,list:l,now:n||null};}
 function teachBar(p){
-  const T=teachNow(p),n=T.list.length;if(!n)return"";
-  const d=T.list.filter(x=>T.done.has(x.it.id)).length;let pace="";
+  const T=teachNow(p),live=T.list.filter(x=>x.it.skip!=="Yes"),n=live.length,sk=T.list.length-n;if(!T.list.length)return"";
+  const d=live.filter(x=>T.done.has(x.it.id)).length;let pace="";
   const st=toMin(startOf(p));
   if(T.now&&st!=null&&p.date&&dayKey(p.date)===todayKey()){const d0=new Date(),nowM=d0.getHours()*60+d0.getMinutes(),diff=nowM-(st+T.now.from);
     if(nowM>=st-30&&nowM<=st+planTotal(p)+60)pace=Math.abs(diff)<=3?" · on time":diff>0?` · ${diff} min behind`:` · ${-diff} min ahead`;}
   return`<button type="button" class="tbar" data-act="tJump" aria-label="Go to the exercise you’re on">
     <span class="ring2" aria-hidden="true">${ICON.timer}</span>
-    <span class="grow"><b>${T.now?"Teaching · Now: "+esc(T.now.it.name):"Teaching · All done"}</b><span class="small">${d} of ${n} done${pace}</span></span>
+    <span class="grow"><b>${T.now?"Teaching · Now: "+esc(T.now.it.name):"Teaching · All done"}</b><span class="small">${d} of ${n} done${sk?` · ${sk} skipped`:""}${pace}</span></span>
   </button>`;
+}
+/* Who's here: count, belt groups, opens the Students panel */
+function studStrip(p){
+  const T=tonight(p);
+  if(!T.slot&&!T.drop.length)return`<button type="button" class="studstrip" data-act="classStudents">${ICON.people}<span class="grow"><b>Special class</b> · add who’s here</span>${ICON.go}</button>`;
+  if(!T.roster.length&&!T.drop.length)return`<button type="button" class="studstrip" data-act="classStudents">${ICON.people}<span class="grow"><b>Students</b> · set up who’s in this class</span>${ICON.go}</button>`;
+  const gs=beltGroups().map(g=>{const n=T.here.filter(x=>groupOf(x)===g.name).length;return n?`<span class="sg">${groupDots(g)}${n}</span>`:"";}).join("");
+  return`<button type="button" class="studstrip" data-act="classStudents" aria-label="Students: ${T.here.length} here">${ICON.people}<span class="grow"><b>${T.here.length} here</b><span class="m"> of ${T.roster.length}${T.drop.length?" + "+T.drop.length+" drop-in":""}</span></span><span class="sgs">${gs}</span>${ICON.go}</button>`;
+}
+const foldRow=(lbl)=>`<div class="foldrow"><span class="grow">${lbl||""}</span><button type="button" class="chip sm" data-act="foldAll">Collapse all</button><button type="button" class="chip sm" data-act="openAll">Expand all</button></div>`;
+function teachItemHTML(p,x,T,st){
+  const it=x.it,lib=exById(it.exercise),col=secColour(x.sec),ed=canEditR(p);
+  const isDoneT=T.done.has(it.id),skipped=it.skip==="Yes",isNow=!!T.now&&T.now.it.id===it.id;
+  const tm=st!=null?(isDoneT||skipped?"":"≈ ")+hm12(st+x.from,true):clock(x.from);
+  const chk=`<button type="button" class="tchk" data-act="tCheck" data-id="${esc(it.id)}" aria-pressed="${isDoneT}" aria-label="${isDoneT?"Untick":"Tick off"} ${esc(it.name)}"><i>${isDoneT?ICON.check:""}</i></button>`;
+  if(skipped)return`<div class="tline skipped" id="ex-${esc(it.id)}"><span class="sktag">Skipped</span><span class="nm">${esc(it.name)}</span><span class="vmin">${it.minutes}m</span>${ed?`<button type="button" class="btn small outline" data-act="tSkip" data-id="${esc(it.id)}">Undo</button>`:""}</div>`;
+  if(isDoneT)return`<div class="tline done" id="ex-${esc(it.id)}"><span class="vtime">${tm}</span><span class="nm">${esc(it.name)}</span><span class="vmin">${it.minutes}m</span>${chk}</div>`;
+  const open=tExpanded(p,it.id,isNow);
+  const steps=lib?toSteps(lib.description):[],libNotes=lib?toPoints(lib.notes):[],mine=toPoints(it.note),qn=qnLines(it.live);
+  const box=QOPEN.has(it.id)&&ed;
+  const body=open?`<div class="tbody">
+      ${steps.length?`<ol class="steps vsteps">${steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>`:(lib?"":(dk=>dk?`<p class="kmeta" style="margin:4px 0 0"><span class="kdot" style="background:${BELT_COL[kataBelt(dk)]||"#CCC"}"></span>Dojo kata · ${esc(kataWhen(dk))}</p>`:`<p class="small" style="margin:4px 0 0">One-off for this class.</p>`)(dojoKata(it.name)))}
+      ${libNotes.length?`<ul class="pts vpts">${libNotes.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
+      ${mine.length?`<div class="vlabel">For this class</div><ul class="pts vpts mine">${mine.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
+      ${qn.length?`<ul class="qnlist">${qn.map((q,i)=>{const m=splitQn(q);return`<li>${m.t?`<span class="qtime">${esc(m.t)}</span>`:""}<span class="grow">${esc(m.x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>`:""}</li>`;}).join("")}</ul>`:""}
+      ${ed?(box?`<form class="qform" data-id="${esc(it.id)}"><label for="qn-${esc(it.id)}" class="vh">Quick note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Jot a quick note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round red" aria-label="Save quick note">${ICON.plus}</button><button type="button" class="iconbtn" data-act="qnClose" data-id="${esc(it.id)}" aria-label="Hide the note box">${ICON.x}</button></form>`
+        :`<button type="button" class="notebtn" data-act="qnOpen" data-id="${esc(it.id)}" style="--c:${col}">${ICON.plus}Note</button>`):""}
+    </div>`:"";
+  return`<article class="card vex tcard${isNow?" now":""}" id="ex-${esc(it.id)}">
+    ${isNow?`<span class="nowtag">You are here</span>`:""}
+    <div class="vex-top"><button type="button" class="ttg" data-act="tCard" data-id="${esc(it.id)}" data-now="${isNow?1:""}" aria-expanded="${open}">${open?ICON.down:ICON.go}<span class="vtime" style="background:${tint(col)};color:${col}">${tm}</span><span class="nm">${esc(it.name)}</span>${!open&&qn.length?`<span class="qnb">${qn.length} ${qn.length===1?"note":"notes"}</span>`:""}<span class="vmin" style="color:${col}">${it.minutes}m</span></button>
+    ${ed?`<button type="button" class="tskip" data-act="tSkip" data-id="${esc(it.id)}" aria-label="Skip ${esc(it.name)}" title="Skip">${ICON.skip}</button>`:""}${chk}</div>
+    ${body}
+  </article>`;
 }
 function viewTeach(p){
   const len=p.length||105,tot=planTotal(p);
   const T=teachNow(p),folded=tGet("tfold",p.id),st=toMin(startOf(p));
-  let at=0,any=false;
+  const bySec={};T.list.forEach(x=>{(bySec[x.sec]=bySec[x.sec]||[]).push(x);});
+  let any=false;
   const secs=planSections(p).filter(s=>!isSkipped(p,s)).map((s,si)=>{
-    const col=secColour(s),its=secItems(p,s);if(!its.length)return"";any=true;
-    const start=at,secMin=its.reduce((a,i)=>a+(i.minutes||0),0),nDone=its.filter(i=>T.done.has(i.id)).length,fold=folded.has(s);
-    const cards=fold?(at+=secMin,""):its.map(it=>{
-      const lib=exById(it.exercise),from=at;at+=it.minutes||0;
-      const isDoneT=T.done.has(it.id),isNow=!!T.now&&T.now.it.id===it.id;
-      const steps=lib?toSteps(lib.description):[],libNotes=lib?toPoints(lib.notes):[],mine=toPoints(it.note),qn=qnLines(it.live);
-      const tm=st!=null?(isDoneT?"":"≈ ")+hm12(st+from):clock(from);
-      const chk=`<button type="button" class="tchk" data-act="tCheck" data-id="${esc(it.id)}" aria-pressed="${isDoneT}" aria-label="${isDoneT?"Untick":"Tick off"} ${esc(it.name)}"><i>${isDoneT?ICON.check:""}</i></button>`;
-      if(isDoneT)return`<article class="card vex done${lib&&lib.addedBy?" cornered":""}" id="ex-${esc(it.id)}">${ctagHTML(lib?lib.addedBy:"")}
-        <div class="vex-top"><span class="vtime" style="background:${tint(col)};color:${col}">${tm}</span><h3>${esc(it.name)}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span>${chk}</div></article>`;
-      return`<article class="card vex${isNow?" now":""}${lib&&lib.addedBy?" cornered":""}" id="ex-${esc(it.id)}">${ctagHTML(lib?lib.addedBy:"")}
-        <div class="vex-top"><span class="vtime" style="background:${tint(col)};color:${col}" title="Starts ${clock(from)} into class">${tm}</span><h3>${esc(it.name)}${isNow?`<span class="nowtag">You are here</span>`:""}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span>${chk}</div>
-        ${steps.length?`<div class="vlabel">Instructions</div><ol class="steps vsteps">${steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:(lib?"":(dk=>dk?`<p class="kmeta" style="margin:6px 0 0"><span class="kdot" style="background:${BELT_COL[kataBelt(dk)]||"#CCC"}"></span>Dojo kata · ${esc(kataWhen(dk))}</p>`:`<p class="small" style="margin:6px 0 0">One-off for this class.</p>`)(dojoKata(it.name)))}
-        ${libNotes.length?`<div class="vlabel">Notes</div><ul class="pts vpts">${libNotes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
-        ${mine.length?`<div class="vlabel">For this class</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
-        ${qn.length||canEditR(p)?`<div class="vlabel">Quick notes</div>`:""}
-        ${qn.length?`<ul class="qnlist">${qn.map((x,i)=>{const m=x.match(/^(\d{1,2}:\d{2}\s*[ap]\.?m\.?)\s*[·-]\s*(.*)$/i);
-          return`<li>${m?`<span class="qtime">${esc(m[1])}</span>`:""}<span class="grow">${esc(m?m[2]:x)}</span>${canEditR(p)?`<button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>`:""}</li>`;}).join("")}</ul>`:""}
-        ${canEditR(p)?`<form class="qform" data-id="${esc(it.id)}"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Quick note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Jot a quick note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Save quick note for ${esc(it.name)}">${ICON.plus}</button></form>`:""}
-      </article>`;
-    }).join("");
-    const all=nDone===its.length,when=fold&&!nDone?` · ≈ ${st!=null?hm12(st+start,true):clock(start)}`:"";
+    const col=secColour(s),xs=bySec[s]||[];if(!xs.length)return"";any=true;
+    const live=xs.filter(x=>x.it.skip!=="Yes"),nDone=live.filter(x=>T.done.has(x.it.id)).length,fold=folded.has(s);
+    const secMin=secTotal(p,s),all=nDone===live.length,start=xs.length?xs[0].from:0;
+    const when=fold&&!nDone?` · ≈ ${st!=null?hm12(st+start,true):clock(start)}`:"";
+    let cards="";
+    if(!fold){
+      if(isSplit(p,s)){
+        cards=secLanes(p,s).filter(l=>l.items.length).map(l=>{const k="L:"+s+"|"+l.name,lf=folded.has(k);
+          const lx=xs.filter(x=>eqi(x.lane,l.name)),ld=lx.filter(x=>T.done.has(x.it.id)||x.it.skip==="Yes").length,here=hereIn(p,l);
+          return`<button type="button" class="lanehd" data-act="tFold" data-sec="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}${here?` · ${here} here`:""}</span><span class="sm">${ld}/${lx.length} · ${lx.reduce((a,x)=>a+liveMin(x.it),0)}m</span></button>
+            ${lf?"":lx.map(x=>teachItemHTML(p,x,T,st)).join("")}`;}).join("");
+      }else cards=xs.map(x=>teachItemHTML(p,x,T,st)).join("");
+    }
     return`<section class="vsec">
-      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${nDone}/${its.length} · ${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
+      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${isSplit(p,s)?"Belt groups · ":nDone+"/"+live.length+" · "}${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
       ${cards}
     </section>`;
   }).join("");
@@ -1283,51 +1477,82 @@ function viewTeach(p){
   return`<div class="stack">
     ${viewOnlyNote(p)}
     ${planHead(p,esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}`,"Plan options: edit, date, focus, copy, delete")}
+    ${studStrip(p)}
     ${any?teachBar(p):""}
     ${recapHTML(p)}
-    ${any?secs+noteBoxHTML(p)+`<div class="savebar"><button type="button" class="btn primary block" data-act="setMode" data-m="review">${ICON.stop}End class &amp; review</button></div>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
+    ${any?foldRow("Plan")+secs+classNotesCard(p,"teach")+`<div class="savebar two"><button type="button" class="btn outline" data-act="noteNew">${ICON.plus}Class note</button><button type="button" class="btn primary" data-act="setMode" data-m="review">${ICON.stop}End class &amp; review</button></div>`:`<div class="card empty"><p>Nothing planned yet.</p>${canEditR(p)?`<button type="button" class="btn primary" data-act="editPlan">${ICON.edit}Edit plan</button>`:""}</div>`}
   </div>`;
 }
 
 /* ---------- Review: after class, every note from the class in one place ---------- */
+/* Collapsing (Gary, Nov 21): sections, belt groups and cards fold (rfold), exercises open with a tap (rexp). Phone-only, per plan. */
+const RVOPEN=new Set();
+const nextInSlot=p=>p&&p.date?S.plans.filter(x=>x.id!==p.id&&x.date&&x.date>p.date&&sameSlot(x,p)).sort((a,b)=>a.date-b.date)[0]||null:null;
+function reviewItemHTML(p,it,col){
+  const lib=exById(it.exercise),mine=toPoints(it.note),qn=qnLines(it.live),ed=canEditR(p),libEd=ed&&lib&&canEditR(lib);
+  const open=tGet("rexp",p.id).has(it.id)||QOPEN.has(it.id),sk=it.skip==="Yes",box=QOPEN.has(it.id)&&ed,n=qn.length+mine.length;
+  const inLib=new Set(lib?toPoints(lib.notes).map(x=>x.toLowerCase()):[]);
+  return`<div class="rrow${sk?" sk":""}">
+    <div class="rtop"><button type="button" class="ttg" data-act="rCard" data-id="${esc(it.id)}" aria-expanded="${open}">${open?ICON.down:ICON.go}<span class="nm">${esc(it.name)}</span>${sk?`<span class="sktag">Skipped</span>`:""}${!open&&n?`<span class="qnb">${n} ${n===1?"note":"notes"}</span>`:""}<span class="vmin" style="color:${col}">${it.minutes}m</span></button>
+    ${ed&&!box?`<button type="button" class="notebtn" data-act="qnOpen" data-id="${esc(it.id)}" style="--c:${col}">${ICON.plus}Note</button>`:""}</div>
+    ${open?`<div class="tbody">
+      ${mine.length?`<div class="vlabel">Planned notes</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+      ${qn.length?`<ul class="qnlist">${qn.map((x,i)=>{const q=splitQn(x),there=inLib.has(q.x.toLowerCase());
+        return`<li class="${libEd?"wrap":""}">${q.t?`<span class="qtime">${esc(q.t)}</span>`:""}<span class="grow">${esc(q.x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>`:""}
+          ${libEd?`<span class="qacts">${there?`<span class="qlib done">${ICON.check}In the library notes</span>`:`<button type="button" class="qlib" data-act="qnToLib" data-id="${esc(it.id)}" data-i="${i}">${ICON.book}Add to library notes</button>`}</span>`:""}</li>`;}).join("")}</ul>`:""}
+      ${!n&&!box?`<p class="small" style="margin:2px 0">No notes on this one.</p>`:""}
+      ${box?`<form class="qform" data-id="${esc(it.id)}"><label for="qn-${esc(it.id)}" class="vh">Add a note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Add a note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round red" aria-label="Save note">${ICON.plus}</button><button type="button" class="iconbtn" data-act="qnClose" data-id="${esc(it.id)}" aria-label="Hide the note box">${ICON.x}</button></form>`:""}
+    </div>`:""}
+  </div>`;
+}
+const cardHead=(k,open,title,count,btns)=>`<div class="chd"><button type="button" class="ttg" data-act="rFold" data-k="${esc(k)}" aria-expanded="${open}">${open?ICON.down:ICON.go}<h2>${title}</h2>${count!=null?`<span class="cnt">${count}</span>`:""}</button>${btns||""}</div>`;
 function viewReview(p){
-  const rv=ptLines(p.review);let qnTotal=0,withNotes=0;
+  const rv=ptLines(p.review),fold=tGet("rfold",p.id),ed=canEditR(p);let qnTotal=0;
+  const its=itemsOf(p.id).filter(i=>!isSkipped(p,i.section));its.forEach(i=>{qnTotal+=qnLines(i.live).length;});
+  const skipped=its.filter(i=>i.skip==="Yes");
   const secs=planSections(p).filter(s=>!isSkipped(p,s)).map((s,si)=>{
-    const col=secColour(s),its=secItems(p,s);if(!its.length)return"";
-    const cards=its.map(it=>{
-      const lib=exById(it.exercise),mine=toPoints(it.note),qn=qnLines(it.live);qnTotal+=qn.length;if(qn.length)withNotes++;
-      const inLib=new Set(lib?toPoints(lib.notes).map(x=>x.toLowerCase()):[]);const ed=canEditR(p),libEd=ed&&lib&&canEditR(lib);
-      return`<article class="card rex${qn.length||mine.length?"":" quiet"}" style="border-left-color:${col}">
-        <div class="vex-top"><h3>${esc(it.name)}</h3><span class="vmin" style="color:${col}">${it.minutes} min</span></div>
-        ${mine.length?`<div class="vlabel">Planned notes</div><ul class="pts vpts mine">${mine.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
-        ${qn.length?`<div class="vlabel">Quick notes</div><ul class="qnlist">${qn.map((x,i)=>{const q=splitQn(x),there=inLib.has(q.x.toLowerCase());
-          return`<li class="${libEd?"wrap":""}">${q.t?`<span class="qtime">${esc(q.t)}</span>`:""}<span class="grow">${esc(q.x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delQn" data-id="${esc(it.id)}" data-i="${i}" aria-label="Delete this quick note">${ICON.x}</button>`:""}
-            ${libEd?`<span class="qacts">${there?`<span class="qlib done">${ICON.check}In the library notes</span>`:`<button type="button" class="qlib" data-act="qnToLib" data-id="${esc(it.id)}" data-i="${i}">${ICON.book}Add to library notes</button>`}</span>`:""}</li>`;}).join("")}</ul>`:""}
-        ${ed?`<form class="qform" data-id="${esc(it.id)}" style="margin-top:8px"><label for="qn-${esc(it.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add a note for ${esc(it.name)}</label><input class="inp keepval" id="qn-${esc(it.id)}" name="q" type="text" placeholder="Add a note…" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add a note for ${esc(it.name)}">${ICON.plus}</button></form>`:""}
-      </article>`;}).join("");
+    const col=secColour(s),list=secItems(p,s);if(!list.length)return"";const f=fold.has(s);
+    const noted=list.filter(i=>qnLines(i.live).length).length;
+    let rows="";
+    if(!f){
+      if(isSplit(p,s))rows=secLanes(p,s).filter(l=>l.items.length).map(l=>{const k="L:"+s+"|"+l.name,lf=fold.has(k);
+        return`<button type="button" class="lanehd" data-act="rFold" data-k="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}</span><span class="sm">${l.items.length}</span></button>${lf?"":l.items.map(i=>reviewItemHTML(p,i,col)).join("")}`;}).join("");
+      else rows=list.map(i=>reviewItemHTML(p,i,col)).join("");
+    }
     return`<section class="vsec">
-      <div class="vsec-h" style="border-color:${col}"><div class="badge" style="background:${col}">${si+1}</div><h2 class="grow">${esc(s)}</h2></div>
-      ${cards}
+      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="rFold" data-k="${esc(s)}" aria-expanded="${!f}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${noted?noted+" with notes":""}</span>${f?ICON.go:ICON.down}</button>
+      ${rows}
     </section>`;
   }).join("");
   const tn=notesOf(p.id).length;
-  const sum=[`<span class="${tn?"on":""}">${tn} class ${tn===1?"note":"notes"}</span>`,`<span class="${qnTotal?"on":""}">${qnTotal} quick ${qnTotal===1?"note":"notes"}</span>`,`<span>${withNotes} of ${itemsOf(p.id).length} exercises noted</span>`,`<span class="${rv.length?"on":""}">${rv.length} after-class ${rv.length===1?"note":"notes"}</span>`].join("");
-  const ed=canEditR(p);
+  const sum=[`<span class="${tn?"on":""}">${tn} class ${tn===1?"note":"notes"}</span>`,`<span class="${qnTotal?"on":""}">${qnTotal} quick ${qnTotal===1?"note":"notes"}</span>`,skipped.length?`<span>${skipped.length} skipped</span>`:"",`<span class="${rv.length?"on":""}">${rv.length} after-class</span>`].join("");
+  const aOpen=!fold.has("c:after"),sOpen=!fold.has("c:skip");
+  const nx=nextInSlot(p),nxDay=p.date?DAYS[new Date(p.date).getDay()].slice(0,3):"class";
+  const skipCard=skipped.length?`<section class="card rvhead dashedc">
+      ${cardHead("c:skip",sOpen,"Skipped tonight",skipped.length)}
+      ${sOpen?skipped.map(i=>{const there=nx&&secItems(nx,i.section).some(x=>eqi(x.name,i.name));const c=secColour(i.section);
+        return`<div class="skrow"><span class="kdot" style="background:${c}"></span><span class="grow"><b>${esc(i.name)}</b><span class="small">${esc(i.section)} · ${i.minutes} min</span></span>
+          ${there?`<span class="qlib done">${ICON.check}In next ${esc(nxDay)}’s plan</span>`:ed||nx?`<button type="button" class="btn small outline" data-act="skipToNext" data-id="${esc(i.id)}">Add to next class</button>`:""}</div>`;}).join(""):""}
+    </section>`:"";
   return`<div class="stack">
     ${viewOnlyNote(p)}
-    ${planHead(p,"Class review · "+esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(planTotal(p))} planned`,"Plan options: teaching view, edit, copy, delete")}
+    ${planHead(p,"Class review · "+esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(planTotal(p))} taught`,"Plan options: teaching view, edit, copy, delete")}
+    ${studStrip(p)}
     <div class="rvsum">${sum}</div>
+    ${foldRow()}
     <section class="card rvhead">
-      <h2>After class</h2><p class="small" style="margin:0">How it went, and what to change next time.</p>
-      ${rv.length?`<ul class="rvlist">${rv.map((x,i)=>`<li><span class="grow">${esc(x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delRv" data-i="${i}" aria-label="Delete this note">${ICON.x}</button>`:""}</li>`).join("")}</ul>`:(ed?"":`<p class="small" style="margin:8px 0 0">No after-class notes.</p>`)}
-      ${ed?`<form class="rform qform" data-id="${esc(p.id)}" style="margin-top:10px"><label for="rv-${esc(p.id)}" class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Add an after-class note</label><input class="inp keepval" id="rv-${esc(p.id)}" name="q" type="text" placeholder="e.g. Kids need more kumite time" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add after-class note">${ICON.plus}</button></form>`:""}
+      ${cardHead("c:after",aOpen,"After class",rv.length,ed&&!RVOPEN.has(p.id)?`<button type="button" class="notebtn" data-act="rvOpen" style="--c:var(--red)">${ICON.plus}Add</button>`:"")}
+      ${aOpen?`${rv.length?`<ul class="rvlist">${rv.map((x,i)=>`<li><span class="grow">${esc(x)}</span>${ed?`<button type="button" class="iconbtn" data-act="delRv" data-i="${i}" aria-label="Delete this note">${ICON.x}</button>`:""}</li>`).join("")}</ul>`:`<p class="small" style="margin:2px 0 0">How it went, and what to change next time.</p>`}
+      ${ed&&RVOPEN.has(p.id)?`<form class="rform qform" data-id="${esc(p.id)}" style="margin-top:6px"><label for="rv-${esc(p.id)}" class="vh">Add an after-class note</label><input class="inp keepval" id="rv-${esc(p.id)}" name="q" type="text" placeholder="e.g. Juniors need more kumite time" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round red" aria-label="Add after-class note">${ICON.plus}</button><button type="button" class="iconbtn" data-act="rvClose" aria-label="Hide the box">${ICON.x}</button></form>`:""}`:""}
     </section>
-    ${noteBoxHTML(p)}
+    ${classNotesCard(p,"review")}
+    ${skipCard}
     ${kataUpdateHTML(p)}
     <button type="button" class="btn primary block" data-act="shareNotes">${ICON.share}Share or copy all notes</button>
     ${secs||`<div class="card empty"><p>No exercises in this plan.</p></div>`}
   </div>`;
 }
+
 /* After class: jump straight to the Kata Tracker for each dojo kata taught, to mark who has improved */
 function kataUpdateHTML(p){
   const names=[];itemsOf(p.id).forEach(it=>{if(isSkipped(p,it.section))return;const k=dojoKata(it.name);if(k&&!names.includes(k.name))names.push(k.name);});
@@ -1355,14 +1580,14 @@ function notesText(p){
 }
 
 /* ---------- Class notes (Gary, Oct 21) ----------
-   Typed notes: Told the class / Assignment / One student / Exercise feedback. Private to whoever wrote them
+   Typed notes: Told the class / Assignment / Student feedback / Exercise feedback. Private to whoever wrote them
    unless they share them with the instructors on that class. Student names come from the Kata Tracker's
    active members (S.students), and any name typed by hand is remembered from past notes.
    "Last class" recap: the plan before this one in the same timeslot (same weekday and start time). */
 const NOTE_KINDS=[
   {k:"Class",label:"Told the class",tag:"Class",col:"#111111",ph:"e.g. Grading is Sat, Nov 15"},
   {k:"Assignment",label:"Assignment",tag:"Assignment",col:"#8A4B00",ph:"e.g. Practise Heian Shodan 5 times at home"},
-  {k:"Person",label:"One student",tag:"Student",col:"#5B3FA8",ph:"e.g. Front stance too short"},
+  {k:"Person",label:"Student feedback",tag:"Student",col:"#5B3FA8",ph:"e.g. Front stance too short"},
   {k:"Feedback",label:"Exercise feedback",tag:"Feedback",col:"#0F6E6A",ph:"e.g. Too long for Kids, 10 min max"}];
 const kindOf=k=>NOTE_KINDS.find(x=>x.k===k)||NOTE_KINDS[0];
 const WHOLE="Whole class";
@@ -1384,42 +1609,76 @@ function allNames(){const out=[];const add=n=>{n=String(n||"").trim();if(n&&!isW
 function recentNames(){const out=[];S.notes.filter(n=>!isWhole(n.who)).sort((a,b)=>(b.created||0)-(a.created||0)).forEach(n=>{if(!out.some(o=>eqi(o,n.who)))out.push(n.who);});return out;}
 const notesAbout=name=>S.notes.filter(n=>eqi(n.who,name));
 
-/* The note box: in the teaching view and the review */
-let NB={kind:"Person",who:"",item:"",q:"",share:false};
-function nbNamesHTML(){
-  const K=kindOf(NB.kind),q=NB.q.trim().toLowerCase();let names;
-  if(q){names=allNames().filter(n=>n.toLowerCase().includes(q)).slice(0,12);
-    if(!names.some(n=>n.toLowerCase()===q))names.push(NB.q.trim());}
-  else{names=recentNames().slice(0,8);if(NB.who&&!isWhole(NB.who)&&!names.some(n=>eqi(n,NB.who)))names.unshift(NB.who);
-    if(NB.kind==="Assignment")names.unshift(WHOLE);}
-  const cur=NB.who||(NB.kind==="Assignment"?WHOLE:"");
-  const chips=names.map(n=>{const typed=q&&n===NB.q.trim()&&!allNames().some(x=>eqi(x,n));
-    return`<button type="button" class="pchip" data-act="nbWho" data-v="${esc(n)}" aria-pressed="${eqi(n,cur)}" style="--c:${K.col}">${beltDot(n)}${typed?"Use “"+esc(n)+"”":esc(n)}</button>`;}).join("");
-  return chips||`<span class="small">${S.students.length?"Find a student below.":"Type a student’s name below. Names you use are remembered."}</span>`;
-}
-function noteBoxHTML(p){
-  const K=kindOf(NB.kind);
-  const kinds=NOTE_KINDS.map(x=>`<button type="button" class="nkind" data-act="nbKind" data-v="${x.k}" aria-pressed="${x.k===NB.kind}" style="--c:${x.col}">${x.label}</button>`).join("");
-  let pick="";
-  if(NB.kind==="Person"||NB.kind==="Assignment"){
-    pick=`<div class="nbpick"><span class="label">${NB.kind==="Assignment"?"For whom?":"Which student?"}</span>
-      <div class="chips" id="nbNames">${nbNamesHTML()}</div>
-      <div class="findbox">${ICON.search}<input class="inp" id="nbFind" type="search" value="${esc(NB.q)}" placeholder="${S.students.length?"Find a student":"Type a name"}" autocomplete="off" aria-label="Find a student"></div></div>`;
-  }else if(NB.kind==="Feedback"){
-    const its=itemsOf(p.id).filter(i=>!isSkipped(p,i.section));
-    if(its.length)pick=`<div class="nbpick"><span class="label">Which exercise?</span><div class="chips">${its.map(i=>`<button type="button" class="pchip" data-act="nbItem" data-id="${esc(i.id)}" aria-pressed="${NB.item===i.id}" style="--c:${K.col}">${esc(i.name)}</button>`).join("")}</div></div>`;
-  }
-  const mine=notesOf(p.id);
+/* The class notes card (teaching and review) and the Class note panel (Gary, Nov 21).
+   Teaching: just the list, no Consolidate or Next week. Review: Consolidate, Next week and Follow up. */
+function classNotesCard(p,mode){
+  const ns=notesOf(p.id),rev=mode==="review",fold=tGet(rev?"rfold":"tfold",p.id),open=!fold.has("c:notes");
+  const btns=(rev?`<button type="button" class="notebtn grey" data-act="consolidate">${ICON.lines}Consolidate</button>`:"")+`<button type="button" class="notebtn" data-act="noteNew" style="--c:var(--red)">${ICON.plus}Add</button>`;
   return`<section class="card notebox" id="noteBox">
-    <div class="nbhd"><h2>Class notes</h2><button type="button" class="btn small ghost" data-act="consolidate">${ICON.lines}Consolidate</button></div><p class="small" style="margin:0 0 12px">Only you see a note unless you share it. Next class at this time shows them under <b>Last class</b>.</p>
-    <div class="nkinds" role="group" aria-label="What kind of note">${kinds}</div>
-    ${pick}
-    <form class="nform qform" data-id="${esc(p.id)}"><label for="nbText" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Note</label><input class="inp keepval" id="nbText" name="q" type="text" placeholder="${esc(K.ph)}" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round" aria-label="Add this note">${ICON.plus}</button></form>
-    <button type="button" class="nshare" data-act="nbShare" aria-pressed="${NB.share}">${NB.share?ICON.people+"Shared with instructors on this class":ICON.lock+"Only me · tap to share"}</button>
-    ${mine.length?`<ul class="nlist">${mine.map(n=>noteLi(n,{carry:true})).join("")}</ul>`:""}
-    ${mine.some(n=>n.mine&&n.kind!=="Assignment")?`<p class="small" style="margin:6px 0 0">Notes marked <b>Next week</b> show in next ${p.date?esc(DAYS[new Date(p.date).getDay()]):"class"}’s plan, under Last class.</p>`:""}
+    <div class="chd"><button type="button" class="ttg" data-act="${rev?"rFold":"tFold"}" data-${rev?"k":"sec"}="c:notes" aria-expanded="${open}">${open?ICON.down:ICON.go}<h2>Class notes</h2><span class="cnt">${ns.length}</span></button>${btns}</div>
+    ${open?(ns.length?`<ul class="nlist">${ns.map(n=>noteLi(n,{carry:rev})).join("")}</ul>${rev&&ns.some(n=>n.mine&&n.kind!=="Assignment")?`<p class="small" style="margin:4px 0 0">Notes marked <b>Next week</b> show in next ${p.date?esc(DAYS[new Date(p.date).getDay()]):"class"}’s plan, under Last class.</p>`:""}`
+      :`<p class="small" style="margin:4px 0 0">Only you see a note unless you share it. Tap <b>Add</b> or <b>Class note</b> to write one.</p>`):""}
   </section>`;
 }
+let NB={kind:"Person",picked:new Set(),whole:false,item:"",text:"",q:"",share:false,gopen:new Set(),awayOpen:false};
+/* Who can be picked: tonight's students (or every active member when the class has no roster), by belt group */
+function nbPool(p){const T=tonight(p);if(T.here.length)return{names:T.here,away:T.away,all:false};
+  return{names:S.students.map(s=>s.name).sort(byBelt),away:[],all:true};}
+function nbChip(n){const on=NB.picked.has(n);return`<button type="button" class="pchip" data-act="nbPick" data-v="${esc(n)}" aria-pressed="${on}">${beltDot(n)}${esc(n)}</button>`;}
+function nbFindHTML(p){const q=NB.q.trim().toLowerCase();if(!q)return"";
+  const pool=new Set(nbPool(p).names.map(n=>n.toLowerCase()));
+  const hits=allNames().filter(n=>n.toLowerCase().includes(q)&&!pool.has(n.toLowerCase())).slice(0,12);
+  const typed=NB.q.trim(),exact=allNames().some(n=>eqi(n,typed))||nbPool(p).names.some(n=>eqi(n,typed));
+  return`<div class="chips" style="margin-top:6px">${hits.map(nbChip).join("")}${exact?"":`<button type="button" class="pchip" data-act="nbPick" data-v="${esc(typed)}" aria-pressed="false">Use “${esc(typed)}”</button>`}</div>`;}
+function sheetNote(){
+  const p=planById(PLAN);if(!p)return sheetHead("Class note")+`<p>This class was removed.</p>`;
+  const K=kindOf(NB.kind),stu=NB.kind==="Person"||NB.kind==="Assignment";
+  const kinds=NOTE_KINDS.map(x=>`<button type="button" class="nkind" data-act="nbKind" data-v="${x.k}" aria-pressed="${x.k===NB.kind}" style="--c:${x.col}">${x.label}</button>`).join("");
+  let pick="";
+  if(stu){
+    const pool=nbPool(p),gs=beltGroups(),n=NB.picked.size;
+    const boxes=gs.map(g=>({name:g.name,g,names:pool.names.filter(x=>groupOf(x)===g.name)}))
+      .concat([{name:"No belt yet",g:null,names:pool.names.filter(x=>!groupOf(x))}]).filter(b=>b.names.length);
+    const auto=pool.all;
+    pick=`<div class="nbpick">
+      <div class="nbline"><span class="label grow">${NB.kind==="Assignment"?"For whom?":"Which students?"}${auto?` <span class="small">· all active members</span>`:""}</span><span class="nbc">${n?n+" picked":NB.kind==="Assignment"?"Whole class unless you pick":"Pick one or more"}</span>${n?`<button type="button" class="chip sm" data-act="nbClear">Clear</button>`:""}</div>
+      ${NB.kind==="Assignment"?`<div class="chips"><button type="button" class="pchip" data-act="nbWhole" aria-pressed="${NB.whole&&!n}" style="--c:#8A4B00">Whole class</button></div>`:""}
+      ${boxes.map(b=>{const open=auto?NB.gopen.has(b.name):!NB.gopen.has(b.name),k=b.names.filter(x=>NB.picked.has(x)).length,all=k===b.names.length;
+        return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="nbGroup" data-v="${esc(b.name)}" aria-expanded="${open}">${open?ICON.down:ICON.go}${b.g?groupDots(b.g):""}<span class="nm">${esc(b.name)} · ${b.names.length}${auto?"":" here"}</span>${k?`<span class="nbc">${k} picked</span>`:""}</button>
+          <button type="button" class="chip sm" data-act="nbGroupAll" data-v="${esc(b.name)}" aria-pressed="${all}">${all?"✓ All":"All"}</button></div>
+          ${open?`<div class="chips gbody">${b.names.map(nbChip).join("")}</div>`:""}</div>`;}).join("")}
+      ${pool.away.length?`<button type="button" class="ttg awayt" data-act="nbAway" aria-expanded="${NB.awayOpen}">${NB.awayOpen?ICON.down:ICON.go}Not here tonight · ${pool.away.length}</button>${NB.awayOpen?`<div class="chips">${pool.away.map(nbChip).join("")}</div>`:""}`:""}
+      <div class="findbox" style="margin-top:6px">${ICON.search}<input class="inp" id="nbFind" type="search" value="${esc(NB.q)}" placeholder="Someone else? Find or type a name" autocomplete="off" aria-label="Find a student"></div>
+      <div id="nbFindRes">${nbFindHTML(p)}</div>
+    </div>`;
+  }else if(NB.kind==="Feedback"){
+    const its=itemsOf(p.id).filter(i=>!isSkipped(p,i.section)&&i.skip!=="Yes");
+    if(its.length)pick=`<div class="nbpick"><span class="label">Which exercise?</span><div class="chips">${its.map(i=>`<button type="button" class="pchip" data-act="nbItem" data-id="${esc(i.id)}" aria-pressed="${NB.item===i.id}" style="--c:${K.col}">${esc(i.name)}</button>`).join("")}</div></div>`;
+  }
+  const mine=notesOf(p.id).filter(n=>n.mine).slice(-3).reverse();
+  return sheetHead("Class note",`<div class="small">${esc(planTitle(p))} · ${esc(whenLine(p))}</div>`)+
+    `<div class="nkinds" role="group" aria-label="What kind of note">${kinds}</div>
+    ${pick}
+    <form class="nform qform" data-id="${esc(p.id)}"><label for="nbText" class="vh">Note</label><input class="inp" id="nbText" name="q" type="text" value="${esc(NB.text)}" placeholder="${esc(K.ph)}" enterkeyhint="send" autocomplete="off"><button type="submit" class="iconbtn round red" aria-label="Add this note">${ICON.plus}</button></form>
+    <button type="button" class="nshare" data-act="nbShare" aria-pressed="${NB.share}">${NB.share?ICON.people+"Shared with instructors on this class":ICON.lock+"Only me · tap to share"}</button>
+    <p class="small" style="margin:6px 0 0">The box and the picked students clear after each note. A note for several students is saved once for each of them.</p>
+    ${mine.length?`<div class="cnhead">Your latest notes here</div><ul class="nlist" style="margin-top:2px">${mine.map(n=>noteLi(n,{readonly:true})).join("")}</ul>`:""}`;
+}
+function addClassNote(f){
+  const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim().slice(0,500);if(!p||!txt)return;
+  const K=NB.kind;let names=[""];
+  if(K==="Person"||K==="Assignment"){
+    names=[...NB.picked].map(n=>{const k=allNames().find(x=>eqi(x,n));return(k||n).slice(0,60);});
+    if(!names.length){if(K==="Assignment")names=[WHOLE];else{toast("Pick at least one student first.");return;}}}
+  // Clear first: adding re-draws the screen behind the panel (Gary, Nov 21: the text used to stay in the box)
+  inp.value="";NB.text="";NB.q="";
+  const base={plan:p.id,item:K==="Feedback"?NB.item:"",kind:K,text:txt,done:"",share:NB.share?"all":"me",addedBy:who(),created:Date.now()};
+  names.forEach(n=>store.add("notes",Object.assign({},base,{who:n})));
+  NB.picked=new Set();NB.whole=false;NB.share=false;if(K==="Feedback")NB.item="";
+  if(sheet&&sheet.type==="note")renderSheet();
+  setTimeout(()=>{const ni=$("#nbText");if(ni)ni.focus({preventScroll:true});},0);
+}
+
 const isNext=n=>/^y/i.test(n.next||"");
 const carryBtn=n=>`<button type="button" class="carry" data-act="noteNext" data-id="${esc(n.id)}" aria-pressed="${isNext(n)}" aria-label="${isNext(n)?"Stop carrying this note to next week":"Carry this note to next week’s class"}">${isNext(n)?ICON.check:ICON.fwd}Next week</button>`;
 function noteLi(n,opt){
@@ -1530,7 +1789,64 @@ function sheetStudent(s){
     (open.length?`<div class="openasg"><div class="w">Open ${open.length===1?"assignment":"assignments"}</div>${open.map(n=>`<div class="x">${esc(n.text)}</div>`).join("")}</div>`:"")+
     (plans.length?plans.map(pl=>`<div class="studay"><button type="button" class="stuh" data-act="openReview" data-id="${esc(pl.id)}"><span class="grow">${esc(fmtDay(pl.date))}${pl.type?" · "+esc(pl.type):""}${parseTime(pl.time)?" · "+esc(clock12(startOf(pl))):""}</span>${ICON.go}</button>
       <ul class="nlist">${byPlan[pl.id].sort((a,c)=>(a.created||0)-(c.created||0)).map(n=>noteLi(n,{readonly:true,noWho:true})).join("")}</ul></div>`).join("")
-      :`<p class="small">No notes about ${esc(name)} yet. In a class, choose <b>One student</b> in Class notes and pick their name.</p>`);
+      :`<p class="small">No notes about ${esc(name)} yet. In a class, tap <b>Class note</b>, choose <b>Student feedback</b> and pick their name.</p>`);
+}
+
+/* ---------- Students panel (Gary, Nov 21): Here tonight and Class roster ----------
+   Roster = Class roster rows for the plan's timeslot (any instructor can change it).
+   Here tonight is optional: everyone on the roster counts as here until you tap them away; drop-ins are added for one night. */
+const CSFOLD=new Set();
+function csFindHTML(p,s){
+  const q=String(s.q||"").trim().toLowerCase(),T=tonight(p),taken=new Set(T.roster.concat(T.drop).map(n=>n.toLowerCase()));
+  let list=S.students.map(x=>x.name).filter(n=>!taken.has(n.toLowerCase())&&(!q||n.toLowerCase().includes(q))).sort(byBelt);
+  const more=list.length>30;list=list.slice(0,30);
+  const act=s.tab==="roster"?"csAdd":"csDrop";
+  if(!S.students.length)return`<p class="small">Connect the Kata Tracker to pick from the dojo’s members.</p>`;
+  return(list.length?`<div class="chips">${list.map(n=>`<button type="button" class="pchip" data-act="${act}" data-v="${esc(n)}">${beltDot(n)}${esc(n)}${ICON.plus}</button>`).join("")}</div>`:`<p class="small">${q?"No member matches “"+esc(s.q)+"”.":"Everyone’s already on the list."}</p>`)+(more?`<p class="small">Type part of a name to see others.</p>`:"");
+}
+function csGroups(names){const gs=beltGroups();
+  return gs.map(g=>({name:g.name,g,names:names.filter(x=>groupOf(x)===g.name)})).concat([{name:"No belt yet",g:null,names:names.filter(x=>!groupOf(x))}]).filter(b=>b.names.length);}
+function sheetClassStu(s){
+  const p=planById(PLAN);if(!p)return sheetHead("Students")+`<p>This class was removed.</p>`;
+  const T=tonight(p),sl=T.slot,ed=canEditR(p),tab=sl?(s.tab||"tonight"):"tonight";
+  const tabs=sl?`<div class="segtabs" role="tablist"><button type="button" role="tab" aria-selected="${tab==="tonight"}" data-act="csTab" data-v="tonight"${tab==="tonight"?' style="background:#111;color:#fff"':""}>Here tonight · ${T.here.length}</button><button type="button" role="tab" aria-selected="${tab==="roster"}" data-act="csTab" data-v="roster"${tab==="roster"?' style="background:#111;color:#fff"':""}>Class roster · ${T.roster.length}</button></div>`:"";
+  const names=tab==="roster"?T.roster:T.here;
+  const big=`<div class="card csum"><div class="row" style="gap:6px;align-items:baseline"><b class="big">${names.length}</b><span class="small grow">${tab==="roster"?"on this class’s roster":sl?`here tonight, of ${T.roster.length} on the roster${T.drop.length?` + ${T.drop.length} drop-in`:""}`:"coming to this special class"}</span></div>${names.length?beltBarHTML(names):""}</div>`;
+  let body="";
+  if(tab==="tonight"){
+    const all=T.roster.concat(T.drop).sort(byBelt);
+    body=`<div class="nbline" style="margin:8px 0 4px"><span class="small grow">${sl?"Optional. Tap who’s away; skip it and the plan uses the whole roster.":"No class time matches this plan, so add who’s coming."}</span>${ed&&T.away.length?`<button type="button" class="chip sm" data-act="csAllHere">All here</button>`:""}</div>
+      ${!ed?`<p class="small">Only instructors who can edit this plan change who’s here.</p>`:""}
+      ${all.length?csGroups(all).map(b=>{const k="t:"+b.name,open=!CSFOLD.has(k),h=b.names.filter(n=>T.here.includes(n)).length;
+        return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="csFold" data-k="${esc(k)}" aria-expanded="${open}">${open?ICON.down:ICON.go}${b.g?groupDots(b.g):""}<span class="nm">${esc(b.name)}</span><span class="nbc">${h} of ${b.names.length} here</span></button></div>
+          ${open?`<div class="chips gbody">${b.names.map(n=>{const drop=T.drop.includes(n),here=T.here.includes(n);
+            return`<button type="button" class="pchip herechip${here?"":" away"}" data-act="${drop?"csDropDel":"csAway"}" data-v="${esc(n)}" aria-pressed="${here}"${ed?"":" disabled"}>${here?ICON.check:ICON.x}${esc(n)}${drop?` <span class="small">drop-in</span>`:""}</button>`;}).join("")}</div>`:""}</div>`;}).join("")
+        :`<p class="small">${sl?"No one on this class’s roster yet. Add students under Class roster.":"No one yet."}</p>`}
+      ${ed?`<button type="button" class="notebtn" data-act="csToggleFind" style="--c:var(--red);margin-top:8px" aria-expanded="${!!s.find}">${ICON.plus}Drop-in for tonight</button>`:""}`;
+  }else{
+    const gOpen=!CSFOLD.has("c:groups");
+    body=`<section class="card rvhead" style="margin-top:8px">${cardHead("c:groups",gOpen,"Belt groups",null,`<button type="button" class="notebtn grey" data-act="editGroups">${ICON.edit}Edit groups</button>`).replace('data-act="rFold"','data-act="csFold"')}
+      ${gOpen?`<p class="small" style="margin:0 0 4px">How a class splits when a section runs by belt group.</p>${beltGroups().map(g=>`<div class="skrow">${groupDots(g)}<span class="grow"><b>${esc(g.name)}</b><span class="small">${esc(g.belts.join(", "))}</span></span><b>${T.roster.filter(n=>groupOf(n)===g.name).length}</b></div>`).join("")}`:""}</section>
+      ${T.roster.length?csGroups(T.roster).map(b=>{const k="r:"+b.name,open=!CSFOLD.has(k);
+        return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="csFold" data-k="${esc(k)}" aria-expanded="${open}">${open?ICON.down:ICON.go}${b.g?groupDots(b.g):""}<span class="nm">${esc(b.name)}</span><span class="nbc">${b.names.length}</span></button></div>
+          ${open?`<div class="gbody">${b.names.map(n=>`<div class="csrow">${beltDot(n)}<span class="grow">${esc(n)}</span><span class="small">${esc(beltOf(n)||"No belt")}</span><button type="button" class="iconbtn" data-act="csRemove" data-v="${esc(n)}" aria-label="Take ${esc(n)} off this class">${ICON.x}</button></div>`).join("")}</div>`:""}</div>`;}).join("")
+        :`<p class="small" style="margin-top:8px">No one on the roster for ${esc(slotLabel(sl))} yet.</p>`}
+      <button type="button" class="notebtn" data-act="csToggleFind" style="--c:var(--red);margin-top:8px" aria-expanded="${!!s.find}">${ICON.plus}Add a student to this class</button>`;
+  }
+  const find=s.find?`<div class="findbox" style="margin-top:8px">${ICON.search}<input class="inp" id="csFind" type="search" value="${esc(s.q||"")}" placeholder="Find a member" autocomplete="off" aria-label="Find a member"></div><div id="csRes" style="margin-top:6px">${csFindHTML(p,s)}</div>
+    <p class="small" style="margin:6px 0 0">New to the dojo? <button type="button" class="linkbtn" data-act="addStudent" style="display:inline;min-height:0;font-size:12px">Add them in the Kata Tracker</button> first.</p>`:"";
+  return sheetHead("Students",`<div class="small">${sl?esc(slotLabel(sl)):esc(planTitle(p))+" · special class"}</div>`)+tabs+big+body+find+
+    `<p class="small" style="margin:10px 0 0">Belts come from the Kata Tracker. Attendance itself stays in Muster Hall.</p>`;
+}
+/* Belt groups editor: "Name: Belt, Belt" rows in Lists. Each belt sits in one group. */
+function sheetGroups(s){
+  if(!s.rows)s.rows=beltGroups().map(g=>({name:g.name,belts:g.belts.slice()}));
+  const rows=s.rows.map((r,i)=>`<div class="grow-row card"><div class="row" style="gap:6px"><label for="gname-${i}" class="vh">Group name</label><input class="inp" id="gname-${i}" type="text" maxlength="30" value="${esc(r.name)}" placeholder="e.g. Beginners" autocomplete="off"><button type="button" class="iconbtn" data-act="grpDel" data-i="${i}" aria-label="Remove this group">${ICON.trash}</button></div>
+      <div class="chips" style="margin-top:6px">${BELTS.map(b=>`<button type="button" class="chip sm" data-act="grpBelt" data-i="${i}" data-v="${b}" aria-pressed="${r.belts.includes(b)}"><span class="kdot" style="background:${BELT_COL[b]};margin-right:5px"></span>${b}</button>`).join("")}</div></div>`).join("");
+  return sheetHead("Belt groups",`<div class="small">For the whole dojo</div>`)+
+    `<p class="small" style="margin:-4px 0 8px">Tap belts to put them in a group. A belt can only be in one group.</p><div class="stack">${rows}</div>
+    <button type="button" class="btn outline small" data-act="grpAdd" style="margin-top:8px">${ICON.plus}Add a group</button>
+    <div class="btnrow" style="margin-top:12px"><button type="button" class="btn outline" data-act="grpBack">Cancel</button><button type="button" class="btn primary" data-act="grpSave">Save groups</button></div>`;
 }
 
 /* ---------- Notifications (Gary, Oct 30): Profile → Notifications ----------
@@ -1858,6 +2174,9 @@ function renderSheet(){
       h=sheetHead("Who can see it",`<div class="small">${esc(s.coll==="plans"?planTitle(r):r.name)}</div>`)+`<form id="shareForm" data-coll="${s.coll}" data-id="${esc(r.id)}">${shareField("sh",r.share,s.coll==="plans"?"this plan":"this exercise")}<button class="btn primary block" type="submit">Save</button></form>`;break;}
     case"slots":h=sheetSlots();break;
     case"students":h=sheetStudents(s);break;
+    case"note":h=sheetNote();break;
+    case"classStu":h=sheetClassStu(s);break;
+    case"groups":h=sheetGroups(s);break;
     case"consol":h=sheetConsol();break;
     case"notify":h=sheetNotify();break;
     case"feedback":h=sheetFeedback();break;
@@ -1908,6 +2227,7 @@ function sheetItem(s){
   return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
   `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
   ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.addedBy?`<p style="margin:8px 0 0"><span class="tag creator">${ICON.user}${esc(lib.addedBy)}</span></p>`:""}${lib.description?`<h3>Instructions</h3>${stepsHTML(lib.description)}`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
+  ${p&&isSplit(p,it.section)?`<div class="field"><span class="label">Belt group</span><div class="chips">${beltGroups().map(g=>`<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="${esc(g.name)}" aria-pressed="${eqi(it.lane,g.name)}">${groupDots(g)}<span style="margin-left:4px">${esc(g.name)}</span></button>`).join("")}<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">Everyone</button></div></div>`:""}
   <form id="itemForm" data-id="${esc(it.id)}">
     <div class="field"><label for="fMin">Minutes for this class</label>
       <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
@@ -1930,7 +2250,7 @@ function kataPickHTML(s){
   if(!KATA)return`<p class="small" style="margin:8px 4px 14px">Loading the dojo’s kata from the Kata Tracker…</p>`;
   const p=planById(s.plan);if(!p)return"";
   const col=secColour(s.sec);
-  const have=new Set(secItems(p,s.sec).map(i=>i.name.toLowerCase()));
+  const have=new Set(pickItems(p,s).map(i=>i.name.toLowerCase()));
   const q=(s.q||"").trim().toLowerCase();
   const cat=s.cat||"All",bf=s.belt||"All";
   const list=KATA.filter(k=>(cat==="All"||kataCat(k)===cat)&&(bf==="All"||kataBeltIdx(k)===BELTS.indexOf(bf))&&(!q||(k.name+" "+(k.meaning||"")).toLowerCase().includes(q)));
@@ -1952,11 +2272,13 @@ function kataPickHTML(s){
   });
   return html;
 }
+const pickItems=(p,s)=>s.lane!=null?secItems(p,s.sec).filter(i=>eqi(i.lane,s.lane)):secItems(p,s.sec);
+const pickTitle=s=>"Add to "+esc(s.sec)+(s.lane?" · "+esc(s.lane):"");
 function pickListHTML(s){
   if(s.mode==="kata")return kataPickHTML(s);
   const p=planById(s.plan);if(!p)return"";
   const q=(s.q||"").trim().toLowerCase();
-  const inPlan=new Set(secItems(p,s.sec).map(i=>i.exercise).filter(Boolean));
+  const inPlan=new Set(pickItems(p,s).map(i=>i.exercise).filter(Boolean));
   const list=S.exercises.filter(e=>(s.all||eqi(e.section,s.sec))&&(!q||(e.name+" "+e.description+" "+e.notes).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name));
   if(!list.length)return`<p class="small" style="margin:8px 4px 14px">${S.exercises.some(e=>eqi(e.section,s.sec))||s.all?"Nothing matches.":"No "+esc(s.sec)+" exercises in the library yet."}</p>`;
   return list.map(e=>{const c=secColour(e.section);return`<button type="button" class="pickrow${e.addedBy?" cornered":""}" data-act="addEx" data-id="${esc(e.id)}">${ctagHTML(e.addedBy)}
@@ -1975,14 +2297,14 @@ function sheetPick(s){
     const catChips=cats.map(c=>{const on=(s.cat||"All")===c;return`<button type="button" class="chip sm" data-act="pickCat" data-v="${esc(c)}" aria-pressed="${on}"${chipOn(on)}>${esc(c)}</button>`;}).join("");
     const beltChips=beltsHere.map(b=>{const on=(s.belt||"All")===b;return`<button type="button" class="chip sm" data-act="pickBelt" data-v="${esc(b)}" aria-pressed="${on}"${chipOn(on)}>${b==="All"?"All belts":`<span class="kdot" style="background:${BELT_COL[b]}"></span>${esc(b)}`}</button>`;}).join("");
     const chips=`<div class="chips" role="group" aria-label="Kata type" style="margin-bottom:8px">${catChips}</div><div class="chips kbelts" role="group" aria-label="Belt">${beltChips}</div>`;
-    return sheetHead("Add to "+esc(s.sec),`<div class="small">From the dojo’s kata list</div>`)+tabs+
+    return sheetHead(pickTitle(s),`<div class="small">From the dojo’s kata list</div>`)+tabs+
     `<div class="search" style="margin-bottom:10px">${ICON.search}<input id="pickSearch" type="search" placeholder="Search kata" aria-label="Search the dojo’s kata" value="${esc(s.q||"")}" autocomplete="off"></div>
     ${chips}
     <p class="small" style="margin:10px 4px 4px">Grouped like the Kata Tracker: solo, multi-person, then weapon kata, each by belt.</p>
     <div id="pickList">${pickListHTML(s)}</div>
     <div class="btnrow" style="margin-top:6px"><button type="button" class="btn primary" data-act="closeSheet">Done</button></div>`;
   }
-  return sheetHead("Add to "+esc(s.sec),`<div class="small">From the library</div>`)+tabs+
+  return sheetHead(pickTitle(s),`<div class="small">From the library</div>`)+tabs+
   `<div class="search" style="margin-bottom:10px">${ICON.search}<input id="pickSearch" type="search" placeholder="Search" aria-label="Search the library" value="${esc(s.q||"")}" autocomplete="off"></div>
   <div class="chips" style="margin-bottom:12px"><button type="button" class="chip sm" data-act="pickAll" aria-pressed="${!!s.all}">Show all sections</button></div>
   <div id="pickList">${pickListHTML(s)}</div>
@@ -2184,35 +2506,95 @@ document.addEventListener("click",e=>{
     case"removeItem":{const form=$("#itemForm");const it=form&&itemById(form.dataset.id);if(!it)break;
       const copy=Object.assign({},it);delete copy.id;store.del("items",it.id);touchPlan(it.plan);closeSheet();
       toast(`Removed ${it.name}`,[{label:"Undo",fn:()=>{store.add("items",copy);touchPlan(copy.plan);}}]);break;}
-    case"pick":if(p)openSheet({type:"pick",plan:p.id,sec:t.dataset.sec,q:"",all:false});break;
+    case"pick":if(p)openSheet({type:"pick",plan:p.id,sec:t.dataset.sec,lane:t.dataset.lane,q:"",all:false});break;
     case"pickAll":if(sheet&&sheet.type==="pick"){sheet.all=!sheet.all;t.setAttribute("aria-pressed",sheet.all);$("#pickList").innerHTML=pickListHTML(sheet);}break;
     case"addEx":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),ex=exById(t.dataset.id);if(!pp||!ex)break;
-      addItem(pp,sheet.sec,ex);$("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-id="${ex.id}"]`);if(b)b.focus({preventScroll:true});break;}
+      addItem(pp,sheet.sec,ex,sheet.lane!=null?{lane:sheet.lane}:undefined);$("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-id="${ex.id}"]`);if(b)b.focus({preventScroll:true});break;}
     case"pickMode":if(sheet&&sheet.type==="pick"){sheet.mode=t.dataset.m;sheet.q="";renderSheet();}break;
     case"pickBelt":if(sheet&&sheet.type==="pick"){sheet.belt=t.dataset.v;renderSheet();}break;
     case"pickCat":if(sheet&&sheet.type==="pick"){sheet.cat=t.dataset.v;renderSheet();}break;
     case"addKata":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),k=dojoKata(t.dataset.name);if(!pp||!k)break;
-      const there=secItems(pp,sheet.sec).filter(i=>eqi(i.name,k.name));
+      const there=pickItems(pp,sheet).filter(i=>eqi(i.name,k.name));
       if(there.length){const it=there[there.length-1];store.del("items",it.id);touchPlan(pp.id);}
-      else addItem(pp,sheet.sec,{id:"",name:k.name,minutes:10});
+      else addItem(pp,sheet.sec,{id:"",name:k.name,minutes:10},sheet.lane!=null?{lane:sheet.lane}:undefined);
       $("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-name="${CSS.escape(k.name)}"]`);if(b)b.focus({preventScroll:true});break;}
-    case"nbKind":NB.kind=t.dataset.v;NB.who="";NB.item="";NB.q="";renderView();break;
-    case"nbWho":{const v=t.dataset.v;NB.who=eqi(NB.who,v)&&!isWhole(v)?"":v;NB.q="";renderView();break;}
-    case"nbItem":NB.item=NB.item===t.dataset.id?"":t.dataset.id;renderView();break;
-    case"nbShare":NB.share=!NB.share;renderView();break;
+    case"noteNew":if(sheet)swapSheet({type:"note"});else openSheet({type:"note"});break;
+    case"nbKind":NB.kind=t.dataset.v;NB.item="";if(NB.kind!=="Person"&&NB.kind!=="Assignment"){NB.picked=new Set();NB.whole=false;}renderSheet();break;
+    case"nbPick":{const v=t.dataset.v;if(NB.picked.has(v))NB.picked.delete(v);else NB.picked.add(v);NB.whole=false;
+      if(NB.q&&!nbPool(planById(PLAN)||{}).names.some(n=>eqi(n,v))){NB.q="";}renderSheet();break;}
+    case"nbClear":NB.picked=new Set();renderSheet();break;
+    case"nbWhole":NB.whole=!NB.whole;NB.picked=new Set();renderSheet();break;
+    case"nbGroup":{const v=t.dataset.v;if(NB.gopen.has(v))NB.gopen.delete(v);else NB.gopen.add(v);renderSheet();break;}
+    case"nbGroupAll":{const p0=planById(PLAN);if(!p0)break;const v=t.dataset.v,names=nbPool(p0).names.filter(x=>(groupOf(x)||"No belt yet")===v);
+      const all=names.every(x=>NB.picked.has(x));names.forEach(x=>{if(all)NB.picked.delete(x);else NB.picked.add(x);});NB.whole=false;renderSheet();break;}
+    case"nbAway":NB.awayOpen=!NB.awayOpen;renderSheet();break;
+    case"nbItem":NB.item=NB.item===t.dataset.id?"":t.dataset.id;renderSheet();break;
+    case"nbShare":NB.share=!NB.share;renderSheet();break;
     case"noteDone":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;store.update("notes",n.id,{done:isDone(n)?"":"Yes"});if(sheet&&(sheet.type==="student"||sheet.type==="consol"))renderSheet();break;}
     case"noteShare":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const sh=n.share==="all"?"me":"all";store.update("notes",n.id,{share:sh});toast(sh==="all"?"Shared with the instructors on this class":"Only you can see this note now");if(sheet&&sheet.type==="consol")renderSheet();break;}
     case"delNote":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const copy=Object.assign({},n);["id","mine","ownerId","canEdit","canShare"].forEach(k=>delete copy[k]);store.del("notes",n.id);
       const rs=()=>{if(sheet&&sheet.type==="consol")renderSheet();};rs();
       toast("Note deleted",[{label:"Undo",fn:()=>{store.add("notes",copy);rs();}}]);break;}
     case"tCheck":{if(!p)break;const id=t.dataset.id,set=tGet("tdone",p.id);const on=!set.has(id);if(on)set.add(id);else set.delete(id);tPut("tdone",p.id,set);
-      const it=itemById(id);if(on&&it){const its=secItems(p,it.section);if(its.every(i=>set.has(i.id))){const f=tGet("tfold",p.id);f.add(it.section);tPut("tfold",p.id,f);}}
+      const it=itemById(id);if(on&&it){const its=secItems(p,it.section);if(its.every(i=>set.has(i.id)||i.skip==="Yes")){const f=tGet("tfold",p.id);f.add(it.section);tPut("tfold",p.id,f);}}
       renderView();break;}
     case"tFold":{if(!p)break;const f=tGet("tfold",p.id),sec=t.dataset.sec;if(f.has(sec))f.delete(sec);else f.add(sec);tPut("tfold",p.id,f);renderView();break;}
     case"tJump":{if(!p)break;const T=teachNow(p);if(!T.now){toast("Everything’s ticked off. Tap End class & review when you’re done.");break;}
       const f=tGet("tfold",p.id);if(f.has(T.now.sec)){f.delete(T.now.sec);tPut("tfold",p.id,f);renderView();}
       const el=document.getElementById("ex-"+T.now.it.id);if(el)el.scrollIntoView({behavior:"smooth",block:"center"});break;}
     case"consolidate":openSheet({type:"consol"});break;
+    case"tCard":{if(!p)break;const id=t.dataset.id,e=tGet("texp",p.id),c=tGet("tcol",p.id);const open=tExpanded(p,id,!!t.dataset.now);
+      if(open){e.delete(id);c.add(id);QOPEN.delete(id);}else{e.add(id);c.delete(id);}tPut("texp",p.id,e);tPut("tcol",p.id,c);renderView();break;}
+    case"tSkip":{const it=itemById(t.dataset.id);if(!it||!p||!canEditR(p))break;const on=it.skip!=="Yes";
+      store.update("items",it.id,{skip:on?"Yes":""});if(on){const d=tGet("tdone",p.id);d.delete(it.id);tPut("tdone",p.id,d);QOPEN.delete(it.id);}
+      if(on)toast(`Skipped ${it.name}`,[{label:"Undo",fn:()=>store.update("items",it.id,{skip:""})}]);break;}
+    case"qnOpen":{const id=t.dataset.id;if(!p)break;QOPEN.add(id);if(planMode==="review"){const r=tGet("rexp",p.id);r.add(id);tPut("rexp",p.id,r);}
+      else{const e=tGet("texp",p.id),c=tGet("tcol",p.id);e.add(id);c.delete(id);tPut("texp",p.id,e);tPut("tcol",p.id,c);}
+      renderView();const el=document.getElementById("qn-"+id);if(el)el.focus();break;} // the one box that opens the keyboard by itself (Gary, Nov 20)
+    case"qnClose":QOPEN.delete(t.dataset.id);renderView();break;
+    case"foldAll":case"openAll":{if(!p)break;const shut=act==="foldAll",secs=planSections(p);
+      const keys=secs.slice();secs.forEach(s=>{if(isSplit(p,s))secLanes(p,s).forEach(l=>keys.push("L:"+s+"|"+l.name));});
+      const ids=itemsOf(p.id).map(i=>i.id);
+      if(planMode==="review"){tPut("rfold",p.id,new Set(shut?keys.concat(["c:after","c:skip","c:notes"]):[]));tPut("rexp",p.id,new Set(shut?[]:ids));}
+      else if(planMode==="edit"){tPut("efold",p.id,new Set(shut?keys.concat(["c:mix"]):[]));tPut("eexp",p.id,new Set(shut?[]:ids));}
+      else{tPut("tfold",p.id,new Set(shut?keys.concat(["c:notes"]):[]));tPut("texp",p.id,new Set(shut?[]:ids));tPut("tcol",p.id,new Set(shut?ids:[]));}
+      if(shut)QOPEN.clear();renderView();break;}
+    case"rFold":case"eFold":{if(!p)break;const key=act==="rFold"?"rfold":"efold",f=tGet(key,p.id),k=t.dataset.k;if(f.has(k))f.delete(k);else f.add(k);tPut(key,p.id,f);renderView();break;}
+    case"rCard":case"eCard":{if(!p)break;const key=act==="rCard"?"rexp":"eexp",f=tGet(key,p.id),id=t.dataset.id;if(f.has(id)){f.delete(id);QOPEN.delete(id);}else f.add(id);tPut(key,p.id,f);renderView();break;}
+    case"rvOpen":{if(!p)break;RVOPEN.add(p.id);const f=tGet("rfold",p.id);f.delete("c:after");tPut("rfold",p.id,f);renderView();break;}
+    case"rvClose":if(p){RVOPEN.delete(p.id);renderView();}break;
+    case"skipToNext":{const it=itemById(t.dataset.id);if(!it||!p)break;const nx=nextInSlot(p);const day=p.date?DAYS[new Date(p.date).getDay()]:"";
+      if(!nx){toast(`Next ${day}’s class has no plan yet. Make it first, then tap this again.`);break;}
+      if(!canEditR(nx)){toast("You can’t edit next week’s plan. Ask its owner to add it.");break;}
+      addItem(nx,it.section,{id:it.exercise,name:it.name,minutes:it.minutes},{note:it.note,lane:it.lane||""});toast(`Added to ${fmtDay(nx.date)}`);break;}
+    case"splitSec":{if(!p||!canEditR(p))break;const sec=t.dataset.sec,on=!isSplit(p,sec);
+      store.update("plans",p.id,{split:on?(p.split||[]).concat(sec):(p.split||[]).filter(x=>!eqi(x,sec)),editedBy:who(),updated:Date.now()});
+      if(on){const g=beltGroups()[0];if(g)secItems(p,sec).filter(i=>!i.lane).forEach(i=>store.update("items",i.id,{lane:g.name}));
+        toast("Each belt group now has its own exercises. Tap Add for a group to fill it.");}
+      break;}
+    case"itemLane":{const it=itemById(t.dataset.id);if(!it)break;store.update("items",it.id,{lane:t.dataset.v});touchPlan(it.plan);renderSheet();break;}
+    case"classStudents":if(!p)break;if(sheet)swapSheet({type:"classStu",tab:"tonight",q:""});else openSheet({type:"classStu",tab:"tonight",q:""});break;
+    case"csTab":if(sheet){sheet.tab=t.dataset.v;sheet.find=false;sheet.q="";renderSheet();}break;
+    case"csFold":{const k=t.dataset.k;if(CSFOLD.has(k))CSFOLD.delete(k);else CSFOLD.add(k);renderSheet();break;}
+    case"csToggleFind":if(sheet){sheet.find=!sheet.find;sheet.q="";renderSheet();}break;
+    case"csAway":{if(!p||!canEditR(p))break;const v=t.dataset.v,away=(p.away||[]).filter(x=>!eqi(x,v));if(away.length===(p.away||[]).length)away.push(v);
+      store.update("plans",p.id,{away});renderSheet();break;}
+    case"csAllHere":if(p&&canEditR(p)){store.update("plans",p.id,{away:[]});renderSheet();}break;
+    case"csDrop":{if(!p||!canEditR(p))break;const v=t.dataset.v;if(!(p.dropins||[]).some(x=>eqi(x,v)))store.update("plans",p.id,{dropins:(p.dropins||[]).concat(v)});renderSheet();break;}
+    case"csDropDel":{if(!p||!canEditR(p))break;const v=t.dataset.v;store.update("plans",p.id,{dropins:(p.dropins||[]).filter(x=>!eqi(x,v))});renderSheet();break;}
+    case"csAdd":{const sl=slotOfPlan(p);if(!sl)break;const v=t.dataset.v;if(!rosterOf(sl.id).some(x=>eqi(x,v)))store.add("roster",{slot:sl.id,slotName:slotText(sl),who:v,addedBy:who()});renderSheet();break;}
+    case"csRemove":{const sl=slotOfPlan(p);if(!sl)break;const v=t.dataset.v,rows=S.roster.filter(r=>r.slot===sl.id&&eqi(r.who,v));rows.forEach(r=>store.del("roster",r.id));renderSheet();
+      toast(`${v} is off this class`,[{label:"Undo",fn:()=>{store.add("roster",{slot:sl.id,slotName:slotText(sl),who:v,addedBy:who()});if(sheet&&sheet.type==="classStu")renderSheet();}}]);break;}
+    case"editGroups":swapSheet({type:"groups",back:sheet&&sheet.type==="classStu"?Object.assign({},sheet):null});break;
+    case"grpBelt":if(sheet&&sheet.rows){const i=+t.dataset.i,b=t.dataset.v,r=sheet.rows[i];if(!r)break;const had=r.belts.includes(b);
+      sheet.rows.forEach(x=>{x.belts=x.belts.filter(y=>y!==b);});if(!had)r.belts.push(b);r.belts.sort((a,c)=>BELTS.indexOf(a)-BELTS.indexOf(c));renderSheet();}break;
+    case"grpDel":if(sheet&&sheet.rows){sheet.rows.splice(+t.dataset.i,1);renderSheet();}break;
+    case"grpAdd":if(sheet&&sheet.rows){sheet.rows.push({name:"",belts:[]});renderSheet();}break;
+    case"grpBack":if(sheet&&sheet.back)swapSheet(sheet.back);else closeSheet();break;
+    case"grpSave":{if(!sheet||!sheet.rows)break;const rows=sheet.rows.map(r=>({name:String(r.name||"").replace(/[:,]/g," ").replace(/\s+/g," ").trim().slice(0,30),belts:r.belts})).filter(r=>r.name&&r.belts.length);
+      if(!rows.length){toast("Give at least one group a name and a belt.");break;}
+      listRows("Belt group").forEach(r=>store.del("lists",r.id));rows.forEach(r=>store.add("lists",{list:"Belt group",value:r.name+": "+r.belts.join(", "),colour:"",inNew:""}));
+      toast("Belt groups saved");if(sheet.back)swapSheet(sheet.back);else closeSheet();break;}
     case"noteNext":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const on=!isNext(n);store.update("notes",n.id,{next:on?"Yes":""});
       toast(on?"Shows under Last class next week":"Won’t carry to next week");if(sheet&&sheet.type==="consol")renderSheet();break;}
     case"qnNext":case"rvNext":{if(!p)break;let item="",txt="";
@@ -2291,7 +2673,10 @@ document.addEventListener("input",e=>{
     if(f==="at"){if(/^\d{2}:\d{2}$/.test(e.target.value))n[k].at=e.target.value;}
     else{const h=Math.max(0,Math.min(23,parseInt(($("#ns-"+k+"-h")||{}).value,10)||0)),m=Math.max(0,Math.min(59,parseInt(($("#ns-"+k+"-m")||{}).value,10)||0));n[k].rel=h*60+m;}
     const sm=$("#ns-"+k+"-sum");if(sm)sm.textContent=nsSum(k,n[k]);nsSave();return;}
-  if(id==="nbFind"){NB.q=e.target.value;const box=$("#nbNames");if(box)box.innerHTML=nbNamesHTML();return;}
+  if(id==="nbFind"){NB.q=e.target.value;const box=$("#nbFindRes"),p0=planById(PLAN);if(box&&p0)box.innerHTML=nbFindHTML(p0);return;}
+  if(id==="nbText"){NB.text=e.target.value;return;}
+  if(id==="csFind"&&sheet&&sheet.type==="classStu"){sheet.q=e.target.value;const p0=planById(PLAN),box=$("#csRes");if(box&&p0)box.innerHTML=csFindHTML(p0,sheet);return;}
+  if(/^gname-\d+$/.test(id)&&sheet&&sheet.rows){const r=sheet.rows[+id.slice(6)];if(r)r.name=e.target.value;return;}
   if(id==="stuFind"&&sheet&&sheet.type==="students"){sheet.q=e.target.value;$("#stuList").innerHTML=studentListHTML(sheet.q);return;}
   if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
   if(id==="pickSearch"&&sheet&&sheet.type==="pick"){sheet.q=e.target.value;$("#pickList").innerHTML=pickListHTML(sheet);}
@@ -2331,15 +2716,7 @@ document.addEventListener("submit",e=>{
       $("#pwMsg").textContent=(res&&res.message)||"Couldn’t save. Try again.";
     }).catch(()=>{btn.disabled=false;$("#pwMsg").textContent="Can’t reach the dojo sheet. Check your connection and try again.";});
     return;}
-  if(f.classList.contains("nform")){const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!p||!txt)return;
-    const K=NB.kind;let whoName="";
-    if(K==="Person"||K==="Assignment"){whoName=(NB.who||NB.q||"").replace(/\s+/g," ").trim().slice(0,60);
-      if(K==="Assignment"&&!whoName)whoName=WHOLE;
-      if(K==="Person"&&!whoName){toast("Pick the student first.");const fb=$("#nbFind");if(fb)fb.focus();return;}
-      const known=allNames().find(n=>eqi(n,whoName));if(known)whoName=known;}
-    store.add("notes",{plan:p.id,item:K==="Feedback"?NB.item:"",kind:K,who:whoName,text:txt.slice(0,500),done:"",share:NB.share?"all":"me",addedBy:who(),created:Date.now()});
-    inp.value="";NB.q="";NB.share=false;if(K==="Person")NB.who="";renderView();
-    setTimeout(()=>{const ni=$("#nbText");if(ni)ni.focus({preventScroll:true});},0);return;}
+  if(f.classList.contains("nform")){addClassNote(f);return;}
   if(f.classList.contains("rform")){const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!p||!txt)return;
     const lines=ptLines(p.review);lines.push(txt);inp.value="";store.update("plans",p.id,{review:ptJoin(lines)});
     setTimeout(()=>{const ni=document.getElementById("rv-"+p.id);if(ni)ni.focus({preventScroll:true});},0);return;}
@@ -2361,7 +2738,7 @@ document.addEventListener("submit",e=>{
     if(f.querySelector(".sharebox"))data.share=readShare(f,"sh");
     if(s.id){const ex=exById(s.id);if(ex&&!canShareR(ex))delete data.share;store.update("exercises",s.id,Object.assign(data,{addedBy:creator,editedBy:who()}));closeSheet();toast("Saved to the library");return;}
     const exId=store.add("exercises",Object.assign(data,{addedBy:creator,editedBy:""}));
-    if(s.addTo){const pp=planById(s.addTo);if(pp)addItem(pp,data.section,Object.assign({id:exId},data));
+    if(s.addTo){const pp=planById(s.addTo);const ln=s.back&&s.back.lane!=null&&eqi(s.back.sec,data.section)?{lane:s.back.lane}:undefined;if(pp)addItem(pp,data.section,Object.assign({id:exId},data),ln);
       if(s.back){swapSheet(Object.assign({},s.back,{sec:s.back.sec}));toast(`Added ${data.name}`);return;}}
     closeSheet();toast(`Added ${data.name} to the library`);return;}
   if(id==="newPlanForm"){
@@ -2374,8 +2751,8 @@ document.addEventListener("submit",e=>{
     const time=readTime(fd);if(String(fd.get("slot"))==="custom"&&!time){toast("Set a start and end time, with the end after the start.");return;}
     saveSlotIf(fd,time);
     const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),time,focus:val("focus").slice(0,60),type:val("type")||src.type,length:readLength(fd,src.length||105),
-      sections:planSections(src),skipped:src.skipped.slice(),share:readShare(f,"sh"),addedBy:who(),editedBy:who(),updated:Date.now()});
-    itemsOf(src.id).forEach(i=>store.add("items",{plan:pid,section:i.section,order:i.order,name:i.name,minutes:i.minutes,note:i.note,exercise:i.exercise,addedBy:i.addedBy,editedBy:i.editedBy}));
+      sections:planSections(src),skipped:src.skipped.slice(),split:(src.split||[]).slice(),share:readShare(f,"sh"),addedBy:who(),editedBy:who(),updated:Date.now()});
+    itemsOf(src.id).forEach(i=>store.add("items",{plan:pid,section:i.section,order:i.order,name:i.name,minutes:i.minutes,note:i.note,exercise:i.exercise,addedBy:i.addedBy,editedBy:i.editedBy,lane:i.lane||""}));
     editFromView=false;finishSheet("plan",pid,"edit");toast("Copied. Make any changes, then tap Save plan.");return;}
   if(id==="infoForm"){const p=planById(PLAN);if(!p){closeSheet();return;}
     const time=readTime(fd);if(String(fd.get("slot"))==="custom"&&!time){toast("Set a start and end time, with the end after the start.");return;}

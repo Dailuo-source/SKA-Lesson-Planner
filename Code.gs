@@ -26,7 +26,7 @@ const APP_NAME = 'SKA Lesson Planner';
 const APP_SITE = 'https://ska-lesson-planner.pages.dev/';
 
 const CLASS_TYPES = ['Regular', 'Junior program', 'Advanced'];
-const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Timeslot', 'Attendance link'];
+const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Timeslot', 'Attendance link', 'Belt group'];
 const ROLES = ['Admin', 'Instructor'];
 const SHARE_ME = 'Only me', SHARE_ALL = 'Everyone';
 const TOKEN_DAYS = 400; // how long a sign-in lasts on a phone before asking again
@@ -109,6 +109,10 @@ const SCHEMA = {
       ['addedBy', 'Added by', 'text', 120],
       ['editedBy', 'Last edited by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
+      // Belt groups and who's here (Gary, Nov 21). Older sheets get these columns on first use.
+      ['split', 'Sections split by belt group', 'list', 220],
+      ['away', 'Away tonight', 'list', 200],
+      ['dropins', 'Drop-ins tonight', 'list', 180],
     ],
   },
   items: {
@@ -126,6 +130,8 @@ const SCHEMA = {
       ['addedBy', 'Added by', 'text', 120],
       ['editedBy', 'Time changed by', 'text', 130],
       ['updated', 'Updated', 'datetime', 160],
+      ['lane', 'Belt group', 'text', 130],
+      ['skip', 'Skipped in class (Yes/blank)', 'text', 150],
     ],
   },
   exercises: {
@@ -162,6 +168,19 @@ const SCHEMA = {
       ['next', 'Next week (Yes/blank)', 'text', 120],
       ['addedBy', 'Added by', 'text', 120],
       ['created', 'Created', 'datetime', 160],
+      ['updated', 'Updated', 'datetime', 160],
+    ],
+  },
+  // Who's in each class time (Gary, Nov 21): one row per student per timeslot. Muster Hall has no export,
+  // so instructors keep this by hand; belts come from the Kata Tracker. Any instructor can change it.
+  roster: {
+    sheet: 'Class roster', key: 'who',
+    cols: [
+      ['id', 'ID', 'id', 90],
+      ['slot', 'Timeslot ID', 'text', 110],
+      ['slotName', 'Class time', 'text', 230],
+      ['who', 'Student', 'text', 180],
+      ['addedBy', 'Added by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
     ],
   },
@@ -245,8 +264,10 @@ function api(body) {
     if (req.notifyTest) props.setProperty('TEST_' + me.id, String(Date.now()));
     if (req.feedback) addFeedback_(me, req.feedback);
     if (req.ops && req.ops.length) {
-      // "Next week" on class notes (Nov 5): older sheets get the column on first use
-      if (req.ops.some(function (o) { return o && o.coll === 'notes' && o.data && 'next' in o.data; })) ensureCols_(SCHEMA.notes);
+      // Newer columns (Next week, Nov 5; belt groups and skips, Nov 21): older sheets get them on first use
+      Object.keys(NEW_COLS).forEach(function (coll) {
+        if (req.ops.some(function (o) { return o && o.coll === coll && o.data && NEW_COLS[coll].some(function (k) { return k in o.data; }); })) ensureCols_(SCHEMA[coll]);
+      });
       const acc = access_(me, people, readRaw_());
       req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });
       SpreadsheetApp.flush();
@@ -265,6 +286,7 @@ function api(body) {
 /* Instructor accounts                                                 */
 /* ------------------------------------------------------------------ */
 
+const NEW_COLS = { notes: ['next'], plans: ['split', 'away', 'dropins'], items: ['lane', 'skip'] };
 const fail_ = function (error, message) { return { ok: false, error: error, message: message }; };
 const normEmail_ = function (e) { return String(e || '').trim().toLowerCase(); };
 
@@ -650,6 +672,7 @@ function allowOp_(acc, op) {
     delete data.plan;
     return out;
   }
+  if (op.coll === 'roster') return out; // any instructor keeps the class lists
   if (op.coll === 'items') {
     const pid = acc.items[op.id] || data.plan;
     if (!canEdit_(acc, acc.plans[pid])) return null;
@@ -702,6 +725,7 @@ function stateFor_(me, people) {
     items: raw.items.filter(function (i) { return seen[i.plan]; }),
     exercises: dress(raw.exercises, acc.exercises),
     lists: raw.lists,
+    roster: (raw.roster || []).map(function (r) { return { id: r.id, slot: r.slot, slotName: r.slotName, who: r.who }; }),
     people: people.map(function (p) { return { id: p.id, name: nameOf_(p), admin: isAdmin_(p, people) }; }),
   };
 }
