@@ -749,6 +749,7 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .tblock{border-left:3px solid var(--c);padding-left:6px;margin-top:6px}
 .tblock-h{font-size:11.5px;font-weight:800;color:var(--c);margin:0 0 2px}
 .tblock .lanehd{margin-top:4px}
+.lane{display:block}
 #laneForm .inp{flex:1;min-width:0}
 .segtabs.sm{margin:6px 0 0}
 .segtabs.sm button{height:34px;font-size:13px;border-radius:14px}
@@ -822,7 +823,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v28"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v29"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -1479,6 +1480,47 @@ function studStrip(p){
   const gs=groupsFor(p).map(g=>{const n=T.here.filter(x=>inGroup(g,x)).length;return n?`<span class="sg">${groupDots(g)}${n}</span>`:"";}).join("");
   return`<button type="button" class="studstrip" data-act="classStudents" aria-label="Students: ${T.here.length} here">${ICON.people}<span class="grow"><b>${T.here.length} here</b><span class="m"> of ${T.roster.length}${T.drop.length?" + "+T.drop.length+" drop-in":""}</span></span><span class="sgs">${gs}</span>${ICON.go}</button>`;
 }
+/* ---------- Folding slides open and shut (Gary, Nov 23): every fold toggle, in views and panels ----------
+   Before a fold re-renders, note each fold's box and height; afterwards, a box that opened grows from its old
+   height while its contents ease in, and a box that shut keeps its old contents on screen while it slides closed. */
+const FOLD_ACTS=new Set(["tFold","rFold","eFold","tCard","rCard","eCard","nbGroup","csFold","cgFold"]);
+const FOLD_TRIG=new Set([...FOLD_ACTS,"foldAll","openAll"]);
+const FOLD_MS=380,FOLD_EASE="cubic-bezier(.2,.8,.25,1)";
+const foldKey=b=>{const d=b.dataset;return d.act+"|"+(d.k??d.sec??d.id??d.v??d.i??"");};
+const foldBox=b=>b.closest(".lane,.gbox,.ecomp,.rrow,.card,section,article");
+const foldBtns=r=>[...r.querySelectorAll("button[aria-expanded][data-act]")].filter(b=>FOLD_ACTS.has(b.dataset.act));
+const headOf=(c,b)=>{let h=b;while(h.parentElement&&h.parentElement!==c)h=h.parentElement;return h;};
+const after=h=>{const o=[];for(let n=h.nextElementSibling;n;n=n.nextElementSibling)o.push(n);return o;};
+function foldSnap(t){
+  if(!window.MP||!MP.on)return null;
+  const sel=t.closest("#sheetBody")?"#sheetBody":"#view",root=$(sel);if(!root)return null;
+  const m=new Map();foldBtns(root).forEach(b=>{const c=foldBox(b);if(c)m.set(foldKey(b),{c,b,open:b.getAttribute("aria-expanded")==="true",h:c.offsetHeight});});
+  return{sel,m};
+}
+function foldPlay(s){
+  if(!s)return;const root=$(s.sel);if(!root)return;
+  const jobs=[];
+  foldBtns(root).forEach(b=>{const o=s.m.get(foldKey(b));if(!o)return;const open=b.getAttribute("aria-expanded")==="true";if(open===o.open)return;
+    const c=foldBox(b);if(c&&c!==o.c)jobs.push({o,b,c,open});});
+  jobs.filter(j=>!jobs.some(k=>k!==j&&k.c.contains(j.c))).slice(0,40).forEach(j=>j.open?slideOpen(j):slideShut(j));
+  setTimeout(()=>jobs.forEach(j=>j.c.querySelectorAll(".mp-rise").forEach(e=>e.classList.remove("mp-rise"))),0);
+}
+function slideOpen(j){
+  const c=j.c,h1=c.offsetHeight,h0=Math.min(j.o.h,h1);if(h1-h0<2)return;
+  c.style.overflow="hidden";
+  const a=c.animate([{height:h0+"px"},{height:h1+"px"}],{duration:FOLD_MS,easing:FOLD_EASE});
+  after(headOf(c,j.b)).forEach(e=>e.animate([{opacity:0,transform:"translateY(-10px)"},{opacity:1,transform:"none"}],{duration:FOLD_MS,easing:"ease-out"}));
+  a.onfinish=a.oncancel=()=>{c.style.overflow="";};
+}
+function slideShut(j){
+  const c=j.c,old=j.o.c,h1=c.offsetHeight,h0=j.o.h;if(h0-h1<2)return;
+  const nh=headOf(c,j.b).cloneNode(true);headOf(old,j.o.b).replaceWith(nh);
+  old.style.overflow="hidden";old.style.pointerEvents="none";
+  c.replaceWith(old);
+  const a=old.animate([{height:h0+"px"},{height:h1+"px"}],{duration:FOLD_MS-40,easing:FOLD_EASE});
+  after(nh).forEach(e=>e.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(-10px)"}],{duration:FOLD_MS-120,easing:"ease-in",fill:"forwards"}));
+  a.onfinish=a.oncancel=()=>{if(old.isConnected)old.replaceWith(c);};
+}
 const foldRow=(lbl)=>`<div class="foldrow"><span class="grow">${lbl||""}</span><button type="button" class="chip sm" data-act="foldAll">Collapse all</button><button type="button" class="chip sm" data-act="openAll">Expand all</button></div>`;
 function teachItemHTML(p,x,T,st){
   const it=x.it,lib=exById(it.exercise),col=secColour(x.sec),ed=canEditR(p);
@@ -1521,8 +1563,8 @@ function viewTeach(p){
       cards=secBlocks(p,s).map(b=>{if(b.one)return xById[b.one.id]?teachItemHTML(p,xById[b.one.id],T,st):"";
         return`<div class="tblock" style="--c:${col}"><div class="tblock-h">At the same time · ${blockMin(b)}m</div>`+b.lanes.map(l=>{const k=laneKey(s,b,l),lf=folded.has(k);
           const lx=l.items.map(i=>xById[i.id]).filter(Boolean),ld=lx.filter(x=>T.done.has(x.it.id)||x.it.skip==="Yes").length,here=hereIn(p,l);
-          return`<button type="button" class="lanehd" data-act="tFold" data-sec="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}${here?` · ${here} here`:""}</span><span class="sm">${ld}/${lx.length} · ${laneMin(l)}m</span></button>
-            ${lf?"":lx.map(x=>teachItemHTML(p,x,T,st)).join("")}`;}).join("")+`</div>`;}).join("");
+          return`<div class="lane"><button type="button" class="lanehd" data-act="tFold" data-sec="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}${here?` · ${here} here`:""}</span><span class="sm">${ld}/${lx.length} · ${laneMin(l)}m</span></button>
+            ${lf?"":lx.map(x=>teachItemHTML(p,x,T,st)).join("")}</div>`;}).join("")+`</div>`;}).join("");
     }
     return`<section class="vsec">
       <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${nDone}/${live.length} · ${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
@@ -1572,7 +1614,7 @@ function viewReview(p){
     let rows="";
     if(!f){
       rows=secBlocks(p,s).map(b=>b.one?reviewItemHTML(p,b.one,col):`<div class="tblock" style="--c:${col}"><div class="tblock-h">At the same time</div>`+b.lanes.map(l=>{const k=laneKey(s,b,l),lf=fold.has(k);
-        return`<button type="button" class="lanehd" data-act="rFold" data-k="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}</span><span class="sm">${l.items.length}</span></button>${lf?"":l.items.map(i=>reviewItemHTML(p,i,col)).join("")}`;}).join("")+`</div>`).join("");
+        return`<div class="lane"><button type="button" class="lanehd" data-act="rFold" data-k="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}</span><span class="sm">${l.items.length}</span></button>${lf?"":l.items.map(i=>reviewItemHTML(p,i,col)).join("")}</div>`;}).join("")+`</div>`).join("");
     }
     return`<section class="vsec">
       <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="rFold" data-k="${esc(s)}" aria-expanded="${!f}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${noted?noted+" with notes":""}</span>${f?ICON.go:ICON.down}</button>
@@ -2551,7 +2593,8 @@ document.addEventListener("click",e=>{
   const t=e.target.closest("[data-act]");if(!t)return;
   const act=t.dataset.act;
   if(act!=="attendGo")e.preventDefault();
-  const p=planById(PLAN);
+  const p=planById(PLAN),fsnap=FOLD_TRIG.has(act)?foldSnap(t):null;
+  if(fsnap)queueMicrotask(()=>foldPlay(fsnap));
   switch(act){
     case"tab":{const k=t.dataset.tab;if(k==="attend"){openSheet({type:"attend",center:true});break;}go(k);break;}
     case"profile":draft=null;go("profile");break;
