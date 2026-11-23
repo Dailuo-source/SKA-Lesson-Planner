@@ -26,7 +26,7 @@ const APP_NAME = 'SKA Lesson Planner';
 const APP_SITE = 'https://ska-lesson-planner.pages.dev/';
 
 const CLASS_TYPES = ['Regular', 'Junior program', 'Advanced'];
-const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Timeslot', 'Attendance link', 'Belt group'];
+const LIST_NAMES = ['Section', 'Class type', 'Class length', 'Timeslot', 'Attendance link', 'Belt group', 'Custom groups'];
 const ROLES = ['Admin', 'Instructor'];
 const SHARE_ME = 'Only me', SHARE_ALL = 'Everyone';
 const TOKEN_DAYS = 400; // how long a sign-in lasts on a phone before asking again
@@ -180,6 +180,21 @@ const SCHEMA = {
       ['slot', 'Timeslot ID', 'text', 110],
       ['slotName', 'Class time', 'text', 230],
       ['who', 'Student', 'text', 180],
+      ['addedBy', 'Added by', 'text', 120],
+      ['updated', 'Updated', 'datetime', 160],
+    ],
+  },
+  // Custom groups per class time (Gary, Nov 23): hand-picked students, a student may be in several.
+  // A class uses them instead of belt groups when Lists has a "Custom groups" row naming the class time.
+  cgroups: {
+    sheet: 'Class groups', key: 'name',
+    cols: [
+      ['id', 'ID', 'id', 90],
+      ['slot', 'Timeslot ID', 'text', 110],
+      ['slotName', 'Class time', 'text', 230],
+      ['name', 'Group', 'text', 160],
+      ['members', 'Students', 'list', 320],
+      ['order', 'Order', 'num', 60],
       ['addedBy', 'Added by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
     ],
@@ -672,7 +687,7 @@ function allowOp_(acc, op) {
     delete data.plan;
     return out;
   }
-  if (op.coll === 'roster') return out; // any instructor keeps the class lists
+  if (op.coll === 'roster' || op.coll === 'cgroups') return out; // any instructor keeps the class lists and groups
   if (op.coll === 'items') {
     const pid = acc.items[op.id] || data.plan;
     if (!canEdit_(acc, acc.plans[pid])) return null;
@@ -726,6 +741,7 @@ function stateFor_(me, people) {
     exercises: dress(raw.exercises, acc.exercises),
     lists: raw.lists,
     roster: (raw.roster || []).map(function (r) { return { id: r.id, slot: r.slot, slotName: r.slotName, who: r.who }; }),
+    cgroups: (raw.cgroups || []).map(function (r) { return { id: r.id, slot: r.slot, name: r.name, members: r.members, order: r.order }; }),
     people: people.map(function (p) { return { id: p.id, name: nameOf_(p), admin: isAdmin_(p, people) }; }),
   };
 }

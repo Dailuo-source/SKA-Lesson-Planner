@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#C8102E">
 <meta name="color-scheme" content="light only">
 <title>SKA Lesson Planner</title>
@@ -735,6 +735,12 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .lanehint{margin:4px 12px 0}
 .mixc{padding:4px 10px 8px}
 .grow-row{padding:8px 10px}
+.segtabs.sm{margin:6px 0 0}
+.segtabs.sm button{height:34px;font-size:13px;border-radius:14px}
+.csfind{padding:8px 10px;margin-top:6px;border-color:var(--red)}
+/* Keyboard (Gary, Nov 23): panels stay above it, and a search box scrolls to the top with its names below */
+.sheet:not(.center){max-height:min(92dvh,calc(100% - 16px))}
+.sheet.finding{padding-bottom:70vh}
 .grow-row .chip.sm{height:32px;padding:0 10px;font-size:13px}
 
 /* ---------- big screens (Gary, Oct 20): tabs in the red bar, wider pages, panels slide in from the right ---------- */
@@ -801,7 +807,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v26"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v27"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -935,7 +941,7 @@ function addPointAfter(box,row){const tmp=document.createElement("div");tmp.inne
    SYNC — the Google Sheet is the source of truth.
    Changes show on screen right away, then go to the sheet in batches.
    ===================================================================== */
-let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[],roster:[]};
+let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[],roster:[],cgroups:[]};
 let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null,wantStudents=false;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
@@ -966,6 +972,7 @@ function normalize(st){
     plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),split:strs(r.split),away:strs(r.away),dropins:strs(r.dropins),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
     items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy),lane:str(r.lane),skip:/^y/i.test(str(r.skip))?"Yes":""})),
     roster:(st.roster||[]).map(r=>({id:str(r.id),slot:str(r.slot),slotName:str(r.slotName),who:str(r.who)})).filter(r=>r.slot&&r.who),
+    cgroups:(st.cgroups||[]).map(r=>({id:str(r.id),slot:str(r.slot),name:str(r.name),members:strs(r.members),order:+r.order||0})).filter(r=>r.slot&&r.name),
     people:(st.people||[]).map(r=>({id:str(r.id),name:str(r.name),admin:!!r.admin})).filter(r=>r.id),
     notes:(st.notes||[]).map(r=>Object.assign({},r,{plan:str(r.plan),item:str(r.item),kind:str(r.kind)||"Class",who:str(r.who),text:str(r.text),done:str(r.done),next:str(r.next),share:r.share==="all"?"all":"me",addedBy:str(r.addedBy),created:num(r.created,0)||num(r.updated,0)})).filter(r=>r.text),
     students:(st.students||[]).map(r=>({name:str(r.name),belt:str(r.belt)})).filter(r=>r.name),
@@ -1073,9 +1080,20 @@ function beltGroups(){
   return rows.length?rows:GROUP_DEFAULT.map(([name,belts])=>({id:"",name,belts}));
 }
 const beltIdxOf=name=>looseBelt(beltOf(name));
-const groupOf=name=>{const b=beltIdxOf(name);if(b<0)return"";const g=beltGroups().find(x=>x.belts.includes(BELTS[b]));return g?g.name:"";};
+/* Custom groups (Gary, Nov 23): per class time, hand-picked students, someone can be in several.
+   A class uses them instead of belt groups while Lists has a "Custom groups" row naming the class time. */
+const CG_COL=["#5B3FA8","#0F6E6A","#B85A14","#2F5DC0","#A00D25","#8A4B00","#157A6E","#6A3FB8"];
+const customOn=sl=>!!sl&&listRows("Custom groups").some(r=>r.value===sl.id||eqi(r.value,slotText(sl)));
+const customGroups=sl=>sl?S.cgroups.filter(g=>g.slot===sl.id).sort((a,b)=>a.order-b.order).map((g,i)=>({id:g.id,name:g.name,members:g.members,col:CG_COL[i%CG_COL.length]})):[];
+const groupsFor=p=>{const sl=slotOfPlan(p);return customOn(sl)?customGroups(sl):beltGroups();};
+const isCustom=p=>customOn(slotOfPlan(p));
+const inGroup=(g,n)=>g.members?g.members.some(m=>eqi(m,n)):(b=>b>=0&&g.belts.includes(BELTS[b]))(beltIdxOf(n));
+/* Names sorted into group boxes; with custom groups a name can sit in several. Whoever is in none goes last. */
+function bucket(names,gs){const rest=gs.length&&gs[0].members?"Not in a group":"No belt yet";
+  return gs.map(g=>({name:g.name,g,names:names.filter(n=>inGroup(g,n))})).concat([{name:rest,g:null,names:names.filter(n=>!gs.some(g=>inGroup(g,n)))}]).filter(b=>b.names.length);}
+const groupsWord=p=>isCustom(p)?"Groups":"Belt groups";
 const byBelt=(a,b)=>{const x=beltIdxOf(a),y=beltIdxOf(b);return((x<0?99:x)-(y<0?99:y))||a.localeCompare(b);};
-const groupDots=g=>g.belts.slice(0,2).map(b=>`<span class="kdot" style="background:${BELT_COL[b]}" aria-hidden="true"></span>`).join("");
+const groupDots=g=>g.members?`<span class="kdot" style="background:${g.col}" aria-hidden="true"></span>`:g.belts.slice(0,2).map(b=>`<span class="kdot" style="background:${BELT_COL[b]}" aria-hidden="true"></span>`).join("");
 /* The timeslot a plan sits in: same weekday and start time */
 function slotOfPlan(p){if(!p||!p.date)return null;const t=parseTime(p.time);if(!t)return null;const d=new Date(p.date).getDay();
   return slots().find(x=>x.day===d&&x.start===t.start)||null;}
@@ -1089,13 +1107,13 @@ function tonight(p){const sl=slotOfPlan(p),roster=rosterOf(sl&&sl.id);
   return{slot:sl,roster,here,away:roster.filter(n=>away.has(n.toLowerCase())),drop};}
 /* Belt-group lanes of a split section: each group in order, then any lane name no longer in the list, then "Everyone" */
 function secLanes(p,sec){
-  const its=secItems(p,sec),gs=beltGroups(),out=gs.map(g=>({name:g.name,group:g,items:its.filter(i=>eqi(i.lane,g.name))}));
+  const its=secItems(p,sec),gs=groupsFor(p),out=gs.map(g=>({name:g.name,group:g,items:its.filter(i=>eqi(i.lane,g.name))}));
   its.forEach(i=>{if(i.lane&&!out.some(l=>eqi(l.name,i.lane)))out.push({name:i.lane,group:null,items:its.filter(x=>eqi(x.lane,i.lane))});});
   const none=its.filter(i=>!i.lane);if(none.length)out.unshift({name:"",group:null,items:none});
   return out;
 }
 const laneLabel=l=>l.name||"Everyone";
-const hereIn=(p,l)=>l.group?tonight(p).here.filter(n=>groupOf(n)===l.group.name).length:0;
+const hereIn=(p,l)=>l.group?tonight(p).here.filter(n=>inGroup(l.group,n)).length:0;
 
 /* ---------- dojo kata, read from the SKA Kata Tracker (names, belts, how many students still need each) ---------- */
 let KATA=null;try{KATA=JSON.parse(LS.get("kata","null"));}catch(e){KATA=null;}
@@ -1321,7 +1339,7 @@ function beltBarHTML(names){const n=names.length||1;const segs=BELTS.map(b=>{con
 function mixCard(p){
   const T=tonight(p),names=T.roster.length?T.roster:T.here,open=!tGet("efold",p.id).has("c:mix");
   if(!names.length)return`<button type="button" class="studstrip" data-act="classStudents">${ICON.people}<span class="grow"><b>Class mix</b> · ${T.slot?"set up who’s in this class":"special class, add who’s coming"}</span>${ICON.go}</button>`;
-  const gs=beltGroups().map(g=>{const k=names.filter(x=>groupOf(x)===g.name).length;return k?`<span class="sg">${groupDots(g)}${esc(g.name)} · <b>${k}</b></span>`:"";}).join("");
+  const gs=groupsFor(p).map(g=>{const k=names.filter(x=>inGroup(g,x)).length;return k?`<span class="sg">${groupDots(g)}${esc(g.name)} · <b>${k}</b></span>`:"";}).join("");
   return`<section class="card mixc"><div class="chd"><button type="button" class="ttg" data-act="eFold" data-k="c:mix" aria-expanded="${open}">${open?ICON.down:ICON.go}<h2>Class mix</h2><span class="cnt">${names.length} ${T.roster.length?"on the roster":"coming"}</span></button><button type="button" class="notebtn grey" data-act="classStudents">${ICON.people}Students</button></div>
     ${open?`${beltBarHTML(names)}<div class="sgs wrap">${gs}</div>`:""}</section>`;
 }
@@ -1352,8 +1370,8 @@ function viewPlan(){
       <div class="shead ewrap" style="background:${sk?"#F5F5F5":tint(col)}">
         <button type="button" class="ttg grow" data-act="eFold" data-k="${esc(s)}" aria-expanded="${!fold}">${fold?ICON.go:ICON.down}<span class="badge" style="background:${sk?"#9A9A9A":col}">${i+1}</span><h2 style="color:${sk?"#767676":"var(--ink)"}">${esc(s)}</h2></button>
         <button type="button" class="textbtn" data-act="skip" data-sec="${esc(s)}">${sk?"Restore":"Skip"}</button>
-        <div class="shmeta"><span class="small grow" style="color:${sk?"var(--muted)":col};font-weight:800">${sk?"Skipped this class":(split?"Belt groups at once · ":"")+st+" min"+(its.length?"":" · nothing yet")}</span>
-        ${sk?"":`<button type="button" class="bgsw" role="switch" data-act="splitSec" data-sec="${esc(s)}" aria-checked="${split}" style="--c:${col}">Belt groups<i></i></button>`}</div>
+        <div class="shmeta"><span class="small grow" style="color:${sk?"var(--muted)":col};font-weight:800">${sk?"Skipped this class":(split?groupsWord(p)+" at once · ":"")+st+" min"+(its.length?"":" · nothing yet")}</span>
+        ${sk?"":`<button type="button" class="bgsw" role="switch" data-act="splitSec" data-sec="${esc(s)}" aria-checked="${split}" style="--c:${col}">${groupsWord(p)}<i></i></button>`}</div>
       </div>
       ${body}
     </section>`;
@@ -1420,7 +1438,7 @@ function studStrip(p){
   const T=tonight(p);
   if(!T.slot&&!T.drop.length)return`<button type="button" class="studstrip" data-act="classStudents">${ICON.people}<span class="grow"><b>Special class</b> · add who’s here</span>${ICON.go}</button>`;
   if(!T.roster.length&&!T.drop.length)return`<button type="button" class="studstrip" data-act="classStudents">${ICON.people}<span class="grow"><b>Students</b> · set up who’s in this class</span>${ICON.go}</button>`;
-  const gs=beltGroups().map(g=>{const n=T.here.filter(x=>groupOf(x)===g.name).length;return n?`<span class="sg">${groupDots(g)}${n}</span>`:"";}).join("");
+  const gs=groupsFor(p).map(g=>{const n=T.here.filter(x=>inGroup(g,x)).length;return n?`<span class="sg">${groupDots(g)}${n}</span>`:"";}).join("");
   return`<button type="button" class="studstrip" data-act="classStudents" aria-label="Students: ${T.here.length} here">${ICON.people}<span class="grow"><b>${T.here.length} here</b><span class="m"> of ${T.roster.length}${T.drop.length?" + "+T.drop.length+" drop-in":""}</span></span><span class="sgs">${gs}</span>${ICON.go}</button>`;
 }
 const foldRow=(lbl)=>`<div class="foldrow"><span class="grow">${lbl||""}</span><button type="button" class="chip sm" data-act="foldAll">Collapse all</button><button type="button" class="chip sm" data-act="openAll">Expand all</button></div>`;
@@ -1469,7 +1487,7 @@ function viewTeach(p){
       }else cards=xs.map(x=>teachItemHTML(p,x,T,st)).join("");
     }
     return`<section class="vsec">
-      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${isSplit(p,s)?"Belt groups · ":nDone+"/"+live.length+" · "}${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
+      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${isSplit(p,s)?groupsWord(p)+" · ":nDone+"/"+live.length+" · "}${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
       ${cards}
     </section>`;
   }).join("");
@@ -1636,9 +1654,8 @@ function sheetNote(){
   const kinds=NOTE_KINDS.map(x=>`<button type="button" class="nkind" data-act="nbKind" data-v="${x.k}" aria-pressed="${x.k===NB.kind}" style="--c:${x.col}">${x.label}</button>`).join("");
   let pick="";
   if(stu){
-    const pool=nbPool(p),gs=beltGroups(),n=NB.picked.size;
-    const boxes=gs.map(g=>({name:g.name,g,names:pool.names.filter(x=>groupOf(x)===g.name)}))
-      .concat([{name:"No belt yet",g:null,names:pool.names.filter(x=>!groupOf(x))}]).filter(b=>b.names.length);
+    const pool=nbPool(p),n=NB.picked.size;
+    const boxes=bucket(pool.names,groupsFor(p));
     const auto=pool.all;
     pick=`<div class="nbpick">
       <div class="nbline"><span class="label grow">${NB.kind==="Assignment"?"For whom?":"Which students?"}${auto?` <span class="small">· all active members</span>`:""}</span><span class="nbc">${n?n+" picked":NB.kind==="Assignment"?"Whole class unless you pick":"Pick one or more"}</span>${n?`<button type="button" class="chip sm" data-act="nbClear">Clear</button>`:""}</div>
@@ -1804,8 +1821,7 @@ function csFindHTML(p,s){
   if(!S.students.length)return`<p class="small">Connect the Kata Tracker to pick from the dojo’s members.</p>`;
   return(list.length?`<div class="chips">${list.map(n=>`<button type="button" class="pchip" data-act="${act}" data-v="${esc(n)}">${beltDot(n)}${esc(n)}${ICON.plus}</button>`).join("")}</div>`:`<p class="small">${q?"No member matches “"+esc(s.q)+"”.":"Everyone’s already on the list."}</p>`)+(more?`<p class="small">Type part of a name to see others.</p>`:"");
 }
-function csGroups(names){const gs=beltGroups();
-  return gs.map(g=>({name:g.name,g,names:names.filter(x=>groupOf(x)===g.name)})).concat([{name:"No belt yet",g:null,names:names.filter(x=>!groupOf(x))}]).filter(b=>b.names.length);}
+const csGroups=(p,names)=>bucket(names,groupsFor(p));
 function sheetClassStu(s){
   const p=planById(PLAN);if(!p)return sheetHead("Students")+`<p>This class was removed.</p>`;
   const T=tonight(p),sl=T.slot,ed=canEditR(p),tab=sl?(s.tab||"tonight"):"tonight";
@@ -1817,7 +1833,7 @@ function sheetClassStu(s){
     const all=T.roster.concat(T.drop).sort(byBelt);
     body=`<div class="nbline" style="margin:8px 0 4px"><span class="small grow">${sl?"Optional. Tap who’s away; skip it and the plan uses the whole roster.":"No class time matches this plan, so add who’s coming."}</span>${ed&&T.away.length?`<button type="button" class="chip sm" data-act="csAllHere">All here</button>`:""}</div>
       ${!ed?`<p class="small">Only instructors who can edit this plan change who’s here.</p>`:""}
-      ${all.length?csGroups(all).map(b=>{const k="t:"+b.name,open=!CSFOLD.has(k),h=b.names.filter(n=>T.here.includes(n)).length;
+      ${all.length?csGroups(p,all).map(b=>{const k="t:"+b.name,open=!CSFOLD.has(k),h=b.names.filter(n=>T.here.includes(n)).length;
         return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="csFold" data-k="${esc(k)}" aria-expanded="${open}">${open?ICON.down:ICON.go}${b.g?groupDots(b.g):""}<span class="nm">${esc(b.name)}</span><span class="nbc">${h} of ${b.names.length} here</span></button></div>
           ${open?`<div class="chips gbody">${b.names.map(n=>{const drop=T.drop.includes(n),here=T.here.includes(n);
             return`<button type="button" class="pchip herechip${here?"":" away"}" data-act="${drop?"csDropDel":"csAway"}" data-v="${esc(n)}" aria-pressed="${here}"${ed?"":" disabled"}>${here?ICON.check:ICON.x}${esc(n)}${drop?` <span class="small">drop-in</span>`:""}</button>`;}).join("")}</div>`:""}</div>`;}).join("")
@@ -1825,18 +1841,46 @@ function sheetClassStu(s){
       ${ed?`<button type="button" class="notebtn" data-act="csToggleFind" style="--c:var(--red);margin-top:8px" aria-expanded="${!!s.find}">${ICON.plus}Drop-in for tonight</button>`:""}`;
   }else{
     const gOpen=!CSFOLD.has("c:groups");
-    body=`<section class="card rvhead" style="margin-top:8px">${cardHead("c:groups",gOpen,"Belt groups",null,`<button type="button" class="notebtn grey" data-act="editGroups">${ICON.edit}Edit groups</button>`).replace('data-act="rFold"','data-act="csFold"')}
-      ${gOpen?`<p class="small" style="margin:0 0 4px">How a class splits when a section runs by belt group.</p>${beltGroups().map(g=>`<div class="skrow">${groupDots(g)}<span class="grow"><b>${esc(g.name)}</b><span class="small">${esc(g.belts.join(", "))}</span></span><b>${T.roster.filter(n=>groupOf(n)===g.name).length}</b></div>`).join("")}`:""}</section>
-      ${T.roster.length?csGroups(T.roster).map(b=>{const k="r:"+b.name,open=!CSFOLD.has(k);
+    const cust=customOn(sl),cgs=customGroups(sl);
+    const gList=cust?(cgs.length?cgs.map(g=>{const k=T.roster.filter(n=>inGroup(g,n));return`<div class="skrow">${groupDots(g)}<span class="grow"><b>${esc(g.name)}</b><span class="small">${k.length?esc(k.slice(0,4).join(", "))+(k.length>4?` +${k.length-4}`:""):"No one yet"}</span></span><b>${k.length}</b></div>`;}).join(""):`<p class="small" style="margin:4px 0">No groups for this class yet.</p>`)
+      :beltGroups().map(g=>`<div class="skrow">${groupDots(g)}<span class="grow"><b>${esc(g.name)}</b><span class="small">${esc(g.belts.join(", "))}</span></span><b>${T.roster.filter(n=>inGroup(g,n)).length}</b></div>`).join("");
+    body=`<section class="card rvhead" style="margin-top:8px">${cardHead("c:groups",gOpen,"Groups",null,`<button type="button" class="notebtn grey" data-act="${cust?"editCGroups":"editGroups"}">${ICON.edit}Edit</button>`).replace('data-act="rFold"','data-act="csFold"')}
+      ${gOpen?`<div class="segtabs sm" role="radiogroup" aria-label="How this class splits"><button type="button" role="radio" aria-checked="${!cust}" data-act="cgMode" data-v="belt"${!cust?' style="background:#111;color:#fff"':""}>Belt groups</button><button type="button" role="radio" aria-checked="${cust}" data-act="cgMode" data-v="custom"${cust?' style="background:#111;color:#fff"':""}>Custom groups</button></div>
+      <p class="small" style="margin:6px 0 4px">${cust?"Groups you pick for this class. Someone can be in more than one.":"Belt groups are the same for every class."}</p>${gList}`:""}</section>
+      ${T.roster.length?csGroups(p,T.roster).map(b=>{const k="r:"+b.name,open=!CSFOLD.has(k);
         return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="csFold" data-k="${esc(k)}" aria-expanded="${open}">${open?ICON.down:ICON.go}${b.g?groupDots(b.g):""}<span class="nm">${esc(b.name)}</span><span class="nbc">${b.names.length}</span></button></div>
           ${open?`<div class="gbody">${b.names.map(n=>`<div class="csrow">${beltDot(n)}<span class="grow">${esc(n)}</span><span class="small">${esc(beltOf(n)||"No belt")}</span><button type="button" class="iconbtn" data-act="csRemove" data-v="${esc(n)}" aria-label="Take ${esc(n)} off this class">${ICON.x}</button></div>`).join("")}</div>`:""}</div>`;}).join("")
         :`<p class="small" style="margin-top:8px">No one on the roster for ${esc(slotLabel(sl))} yet.</p>`}
       <button type="button" class="notebtn" data-act="csToggleFind" style="--c:var(--red);margin-top:8px" aria-expanded="${!!s.find}">${ICON.plus}Add a student to this class</button>`;
   }
-  const find=s.find?`<div class="findbox" style="margin-top:8px">${ICON.search}<input class="inp" id="csFind" type="search" value="${esc(s.q||"")}" placeholder="Find a member" autocomplete="off" aria-label="Find a member"></div><div id="csRes" style="margin-top:6px">${csFindHTML(p,s)}</div>
-    <p class="small" style="margin:6px 0 0">New to the dojo? <button type="button" class="linkbtn" data-act="addStudent" style="display:inline;min-height:0;font-size:12px">Add them in the Kata Tracker</button> first.</p>`:"";
-  return sheetHead("Students",`<div class="small">${sl?esc(slotLabel(sl)):esc(planTitle(p))+" · special class"}</div>`)+tabs+big+body+find+
+  /* Finding sits at the top, so the names stay above the phone keyboard (Gary, Nov 23) */
+  const find=s.find?`<section class="card csfind"><div class="nbline"><b class="grow">${tab==="roster"?"Add to this class":"Drop-in for tonight"}</b><button type="button" class="chip sm" data-act="csToggleFind">Done</button></div>
+    <div class="findbox">${ICON.search}<input class="inp" id="csFind" type="search" value="${esc(s.q||"")}" placeholder="Find a member" autocomplete="off" aria-label="Find a member"></div><div id="csRes" style="margin-top:6px">${csFindHTML(p,s)}</div>
+    <p class="small" style="margin:6px 0 0">New to the dojo? <button type="button" class="linkbtn" data-act="addStudent" style="display:inline;min-height:0;font-size:12px">Add them in the Kata Tracker</button> first.</p></section>`:"";
+  return sheetHead("Students",`<div class="small">${sl?esc(slotLabel(sl)):esc(planTitle(p))+" · special class"}</div>`)+tabs+find+big+body+
     `<p class="small" style="margin:10px 0 0">Belts come from the Kata Tracker. Attendance itself stays in Muster Hall.</p>`;
+}
+/* After adding someone from the find list: redraw, then put the cursor back so the keyboard stays up */
+function csRefind(){if(!sheet||sheet.type!=="classStu")return;const b=$("#sheetBox"),top=b?b.scrollTop:0;renderSheet();if(b)b.scrollTop=top;
+  const f=$("#csFind");if(f){f.focus({preventScroll:true});const v=f.value;f.setSelectionRange(v.length,v.length);}}
+/* Custom groups for one class time (Gary, Nov 23): pick students from the roster; someone can be in several groups */
+function sheetCGroups(s){
+  const p=planById(PLAN),sl=slotOfPlan(p);if(!sl)return sheetHead("Custom groups")+`<p>This plan isn’t at a class time, so it has no groups.</p>`;
+  const roster=rosterOf(sl.id);
+  if(!s.rows)s.rows=customGroups(sl).map((g,i)=>({id:g.id,name:g.name,members:g.members.slice(),open:false}));
+  if(!s.rows.length)s.rows.push({id:"",name:"",members:[],open:true});
+  const none=roster.filter(n=>!s.rows.some(r=>r.members.some(m=>eqi(m,n))));
+  const rows=s.rows.map((r,i)=>{const col=CG_COL[i%CG_COL.length],gone=r.members.filter(m=>!roster.some(n=>eqi(n,m)));
+    return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="cgFold" data-i="${i}" aria-expanded="${!!r.open}">${r.open?ICON.down:ICON.go}<span class="kdot" style="background:${col}"></span><span class="nm" id="cgh-${i}">${esc(r.name||"New group")}</span><span class="nbc">${r.members.length}</span></button>
+      <button type="button" class="iconbtn" data-act="cgDel" data-i="${i}" aria-label="Remove this group">${ICON.trash}</button></div>
+      ${r.open?`<div class="gbody"><label for="cgname-${i}" class="vh">Group name</label><input class="inp" id="cgname-${i}" type="text" maxlength="30" value="${esc(r.name)}" placeholder="Group name, e.g. Competition team" autocomplete="off">
+        <div class="chips" style="margin-top:6px">${roster.concat(gone).map(n=>`<button type="button" class="pchip" data-act="cgPick" data-i="${i}" data-v="${esc(n)}" aria-pressed="${r.members.some(m=>eqi(m,n))}">${beltDot(n)}${esc(n)}</button>`).join("")}</div>
+        ${roster.length?"":`<p class="small">Add students to this class’s roster first.</p>`}</div>`:""}</div>`;}).join("");
+  return sheetHead("Custom groups",`<div class="small">${esc(slotLabel(sl))}</div>`)+
+    `<p class="small" style="margin:-4px 0 6px">Tap students to put them in a group. Someone can be in more than one.</p>${rows}
+    <button type="button" class="btn outline small" data-act="cgAdd" style="margin-top:8px">${ICON.plus}Add a group</button>
+    ${none.length&&roster.length?`<p class="small" style="margin:8px 0 0">Not in a group: ${esc(none.join(", "))}</p>`:""}
+    <div class="btnrow" style="margin-top:12px"><button type="button" class="btn outline" data-act="grpBack">Cancel</button><button type="button" class="btn primary" data-act="cgSave">Save groups</button></div>`;
 }
 /* Belt groups editor: "Name: Belt, Belt" rows in Lists. Each belt sits in one group. */
 function sheetGroups(s){
@@ -2177,6 +2221,7 @@ function renderSheet(){
     case"note":h=sheetNote();break;
     case"classStu":h=sheetClassStu(s);break;
     case"groups":h=sheetGroups(s);break;
+    case"cgroups":h=sheetCGroups(s);break;
     case"consol":h=sheetConsol();break;
     case"notify":h=sheetNotify();break;
     case"feedback":h=sheetFeedback();break;
@@ -2227,7 +2272,7 @@ function sheetItem(s){
   return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
   `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
   ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.addedBy?`<p style="margin:8px 0 0"><span class="tag creator">${ICON.user}${esc(lib.addedBy)}</span></p>`:""}${lib.description?`<h3>Instructions</h3>${stepsHTML(lib.description)}`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
-  ${p&&isSplit(p,it.section)?`<div class="field"><span class="label">Belt group</span><div class="chips">${beltGroups().map(g=>`<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="${esc(g.name)}" aria-pressed="${eqi(it.lane,g.name)}">${groupDots(g)}<span style="margin-left:4px">${esc(g.name)}</span></button>`).join("")}<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">Everyone</button></div></div>`:""}
+  ${p&&isSplit(p,it.section)?`<div class="field"><span class="label">${groupsWord(p)==="Groups"?"Group":"Belt group"}</span><div class="chips">${groupsFor(p).map(g=>`<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="${esc(g.name)}" aria-pressed="${eqi(it.lane,g.name)}">${groupDots(g)}<span style="margin-left:4px">${esc(g.name)}</span></button>`).join("")}<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">Everyone</button></div></div>`:""}
   <form id="itemForm" data-id="${esc(it.id)}">
     <div class="field"><label for="fMin">Minutes for this class</label>
       <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
@@ -2525,7 +2570,7 @@ document.addEventListener("click",e=>{
     case"nbClear":NB.picked=new Set();renderSheet();break;
     case"nbWhole":NB.whole=!NB.whole;NB.picked=new Set();renderSheet();break;
     case"nbGroup":{const v=t.dataset.v;if(NB.gopen.has(v))NB.gopen.delete(v);else NB.gopen.add(v);renderSheet();break;}
-    case"nbGroupAll":{const p0=planById(PLAN);if(!p0)break;const v=t.dataset.v,names=nbPool(p0).names.filter(x=>(groupOf(x)||"No belt yet")===v);
+    case"nbGroupAll":{const p0=planById(PLAN);if(!p0)break;const v=t.dataset.v,bx=bucket(nbPool(p0).names,groupsFor(p0)).find(b=>b.name===v),names=bx?bx.names:[];
       const all=names.every(x=>NB.picked.has(x));names.forEach(x=>{if(all)NB.picked.delete(x);else NB.picked.add(x);});NB.whole=false;renderSheet();break;}
     case"nbAway":NB.awayOpen=!NB.awayOpen;renderSheet();break;
     case"nbItem":NB.item=NB.item===t.dataset.id?"":t.dataset.id;renderSheet();break;
@@ -2569,20 +2614,36 @@ document.addEventListener("click",e=>{
       addItem(nx,it.section,{id:it.exercise,name:it.name,minutes:it.minutes},{note:it.note,lane:it.lane||""});toast(`Added to ${fmtDay(nx.date)}`);break;}
     case"splitSec":{if(!p||!canEditR(p))break;const sec=t.dataset.sec,on=!isSplit(p,sec);
       store.update("plans",p.id,{split:on?(p.split||[]).concat(sec):(p.split||[]).filter(x=>!eqi(x,sec)),editedBy:who(),updated:Date.now()});
-      if(on){const g=beltGroups()[0];if(g)secItems(p,sec).filter(i=>!i.lane).forEach(i=>store.update("items",i.id,{lane:g.name}));
-        toast("Each belt group now has its own exercises. Tap Add for a group to fill it.");}
+      if(on){const g=groupsFor(p)[0];if(g)secItems(p,sec).filter(i=>!i.lane).forEach(i=>store.update("items",i.id,{lane:g.name}));
+        toast(g?"Each group now has its own exercises. Tap Add for a group to fill it.":"This class has no groups yet. Make them under Students → Class roster.");}
       break;}
     case"itemLane":{const it=itemById(t.dataset.id);if(!it)break;store.update("items",it.id,{lane:t.dataset.v});touchPlan(it.plan);renderSheet();break;}
     case"classStudents":if(!p)break;if(sheet)swapSheet({type:"classStu",tab:"tonight",q:""});else openSheet({type:"classStu",tab:"tonight",q:""});break;
     case"csTab":if(sheet){sheet.tab=t.dataset.v;sheet.find=false;sheet.q="";renderSheet();}break;
     case"csFold":{const k=t.dataset.k;if(CSFOLD.has(k))CSFOLD.delete(k);else CSFOLD.add(k);renderSheet();break;}
-    case"csToggleFind":if(sheet){sheet.find=!sheet.find;sheet.q="";renderSheet();}break;
+    case"csToggleFind":if(sheet){sheet.find=!sheet.find;sheet.q="";renderSheet();const b=$("#sheetBox");if(b)b.scrollTop=0;}break;
     case"csAway":{if(!p||!canEditR(p))break;const v=t.dataset.v,away=(p.away||[]).filter(x=>!eqi(x,v));if(away.length===(p.away||[]).length)away.push(v);
       store.update("plans",p.id,{away});renderSheet();break;}
     case"csAllHere":if(p&&canEditR(p)){store.update("plans",p.id,{away:[]});renderSheet();}break;
-    case"csDrop":{if(!p||!canEditR(p))break;const v=t.dataset.v;if(!(p.dropins||[]).some(x=>eqi(x,v)))store.update("plans",p.id,{dropins:(p.dropins||[]).concat(v)});renderSheet();break;}
+    case"csDrop":{if(!p||!canEditR(p))break;const v=t.dataset.v;if(!(p.dropins||[]).some(x=>eqi(x,v)))store.update("plans",p.id,{dropins:(p.dropins||[]).concat(v)});csRefind();break;}
     case"csDropDel":{if(!p||!canEditR(p))break;const v=t.dataset.v;store.update("plans",p.id,{dropins:(p.dropins||[]).filter(x=>!eqi(x,v))});renderSheet();break;}
-    case"csAdd":{const sl=slotOfPlan(p);if(!sl)break;const v=t.dataset.v;if(!rosterOf(sl.id).some(x=>eqi(x,v)))store.add("roster",{slot:sl.id,slotName:slotText(sl),who:v,addedBy:who()});renderSheet();break;}
+    case"csAdd":{const sl=slotOfPlan(p);if(!sl)break;const v=t.dataset.v;if(!rosterOf(sl.id).some(x=>eqi(x,v)))store.add("roster",{slot:sl.id,slotName:slotText(sl),who:v,addedBy:who()});toast(`Added ${v}`);csRefind();break;}
+    case"cgMode":{const sl=slotOfPlan(p);if(!sl)break;const want=t.dataset.v==="custom";if(want===customOn(sl))break;
+      if(want){store.add("lists",{list:"Custom groups",value:slotText(sl),colour:"",inNew:""});if(!customGroups(sl).length){swapSheet({type:"cgroups",back:Object.assign({},sheet)});break;}}
+      else listRows("Custom groups").filter(r=>r.value===sl.id||eqi(r.value,slotText(sl))).forEach(r=>store.del("lists",r.id));
+      renderSheet();break;}
+    case"editCGroups":swapSheet({type:"cgroups",back:sheet&&sheet.type==="classStu"?Object.assign({},sheet):null});break;
+    case"cgFold":if(sheet&&sheet.rows){const r=sheet.rows[+t.dataset.i];if(r){r.open=!r.open;renderSheet();}}break;
+    case"cgPick":if(sheet&&sheet.rows){const r=sheet.rows[+t.dataset.i],v=t.dataset.v;if(!r)break;const has=r.members.some(m=>eqi(m,v));r.members=has?r.members.filter(m=>!eqi(m,v)):r.members.concat(v);renderSheet();}break;
+    case"cgDel":if(sheet&&sheet.rows){sheet.rows.splice(+t.dataset.i,1);renderSheet();}break;
+    case"cgAdd":if(sheet&&sheet.rows){sheet.rows.forEach(r=>{r.open=false;});sheet.rows.push({id:"",name:"",members:[],open:true});renderSheet();}break;
+    case"cgSave":{if(!sheet||!sheet.rows)break;const sl=slotOfPlan(planById(PLAN));if(!sl)break;
+      const rows=sheet.rows.map(r=>({id:r.id,name:String(r.name||"").replace(/,/g," ").replace(/\s+/g," ").trim().slice(0,30),members:r.members})).filter(r=>r.name);
+      if(new Set(rows.map(r=>r.name.toLowerCase())).size<rows.length){toast("Two groups have the same name. Give each its own.");break;}
+      const keep=new Set(rows.map(r=>r.id).filter(Boolean));
+      S.cgroups.filter(g=>g.slot===sl.id&&!keep.has(g.id)).forEach(g=>store.del("cgroups",g.id));
+      rows.forEach((r,i)=>{const d={slot:sl.id,slotName:slotText(sl),name:r.name,members:r.members,order:i+1};if(r.id)store.update("cgroups",r.id,d);else store.add("cgroups",Object.assign({addedBy:who()},d));});
+      toast("Groups saved");if(sheet.back)swapSheet(sheet.back);else closeSheet();break;}
     case"csRemove":{const sl=slotOfPlan(p);if(!sl)break;const v=t.dataset.v,rows=S.roster.filter(r=>r.slot===sl.id&&eqi(r.who,v));rows.forEach(r=>store.del("roster",r.id));renderSheet();
       toast(`${v} is off this class`,[{label:"Undo",fn:()=>{store.add("roster",{slot:sl.id,slotName:slotText(sl),who:v,addedBy:who()});if(sheet&&sheet.type==="classStu")renderSheet();}}]);break;}
     case"editGroups":swapSheet({type:"groups",back:sheet&&sheet.type==="classStu"?Object.assign({},sheet):null});break;
@@ -2677,6 +2738,7 @@ document.addEventListener("input",e=>{
   if(id==="nbText"){NB.text=e.target.value;return;}
   if(id==="csFind"&&sheet&&sheet.type==="classStu"){sheet.q=e.target.value;const p0=planById(PLAN),box=$("#csRes");if(box&&p0)box.innerHTML=csFindHTML(p0,sheet);return;}
   if(/^gname-\d+$/.test(id)&&sheet&&sheet.rows){const r=sheet.rows[+id.slice(6)];if(r)r.name=e.target.value;return;}
+  if(/^cgname-\d+$/.test(id)&&sheet&&sheet.rows){const r=sheet.rows[+id.slice(7)];if(r){r.name=e.target.value;const h=document.getElementById("cgh-"+id.slice(7));if(h)h.textContent=r.name||"New group";}return;}
   if(id==="stuFind"&&sheet&&sheet.type==="students"){sheet.q=e.target.value;$("#stuList").innerHTML=studentListHTML(sheet.q);return;}
   if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
   if(id==="pickSearch"&&sheet&&sheet.type==="pick"){sheet.q=e.target.value;$("#pickList").innerHTML=pickListHTML(sheet);}
@@ -2901,6 +2963,20 @@ window.MP = (function () {
     if (c.root) screens(c);
   }
   return { init, out, watch, on: ON, ms: OUT_MS };
+})();
+</script>
+<script>
+/* Keep panels above the phone keyboard. Android Chrome resizes the page (interactive-widget); iPhones only shrink
+   the visual viewport, so lift the panel by the keyboard's height, then bring a focused search box to the top. */
+(function(){
+  const wrap=document.getElementById("sheetWrap"),vv=window.visualViewport;
+  function lift(inp){const sh=inp&&inp.closest(".sheet:not(.center)");if(!sh)return;sh.classList.add("finding");
+    requestAnimationFrame(()=>{sh.scrollTop+=inp.getBoundingClientRect().top-sh.getBoundingClientRect().top-10;});}
+  function fit(){if(!vv||!wrap)return;const kb=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+    wrap.style.bottom=kb>60?kb+"px":"";wrap.style.top=kb>60?vv.offsetTop+"px":"";
+    const a=document.activeElement;if(kb>60&&a&&a.matches&&a.matches(".sheet input[type=search]"))lift(a);}
+  if(vv){vv.addEventListener("resize",fit);vv.addEventListener("scroll",fit);}
+  document.addEventListener("focusin",e=>{const t=e.target;if(t&&t.matches&&t.matches(".sheet input[type=search]")){lift(t);setTimeout(()=>lift(t),400);}});
 })();
 </script>
 <script>MP.init({wrap:"#sheetWrap",panel:".sheet",scrim:".scrim",toast:"#toast",root:"#view"});</script>
