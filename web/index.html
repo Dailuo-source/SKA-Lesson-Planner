@@ -687,7 +687,7 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .lanehd .kdot{width:10px;height:10px}
 .lanehd .sm{font-size:12px;font-weight:800;color:var(--ink2)}
 .savebar.two{display:flex;gap:8px}
-.savebar.two .btn{flex:1;padding:0 10px}
+.savebar.two .btn{flex:1;padding:0 8px;white-space:nowrap;font-size:14.5px;gap:5px}
 .savebar.two .btn.outline{background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.12)}
 .rrow{padding:2px 0 2px 2px;border-bottom:1px solid #F0F0F0}
 .rrow.sk .nm{text-decoration:line-through;color:var(--muted)}
@@ -735,6 +735,21 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .lanehint{margin:4px 12px 0}
 .mixc{padding:4px 10px 8px}
 .grow-row{padding:8px 10px}
+/* Nov 23: groups per exercise, drag to reorder */
+.dragh{flex:none;width:30px;height:44px;margin-left:-6px;border:0;background:none;color:#8A8A8A;display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;padding:0}
+.dragh svg{width:18px;height:18px}
+.item.ecomp{position:relative;background:#fff}
+.item.ecomp.dragging{z-index:20;box-shadow:0 10px 28px rgba(0,0,0,.22);border-radius:12px;transition:none!important;cursor:grabbing}
+.item.ecomp .r1 .ttg{min-height:28px;padding:2px 0 0}
+.gchip{display:inline-flex;align-items:center;gap:4px;min-height:26px;margin:1px 0 2px;padding:0 8px;border:1px dashed var(--line2);border-radius:13px;background:#fff;font-size:12px;font-weight:800;color:var(--muted)}
+.gchip svg{width:13px;height:13px}
+.gchip .kdot{width:9px;height:9px}
+.gchip.on{border-style:solid;color:var(--ink);background:#F5F5F5}
+.eblockl{margin:6px 12px 0;padding:2px 8px;border-left:3px solid var(--c);font-size:11.5px;font-weight:800;color:var(--c)}
+.tblock{border-left:3px solid var(--c);padding-left:6px;margin-top:6px}
+.tblock-h{font-size:11.5px;font-weight:800;color:var(--c);margin:0 0 2px}
+.tblock .lanehd{margin-top:4px}
+#laneForm .inp{flex:1;min-width:0}
 .segtabs.sm{margin:6px 0 0}
 .segtabs.sm button{height:34px;font-size:13px;border-radius:14px}
 .csfind{padding:8px 10px;margin-top:6px;border-color:var(--red)}
@@ -807,7 +822,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v27"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v28"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -818,7 +833,7 @@ const svg=(p,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON={
   msg:svg('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',2.2), bug:svg('<path d="M8 9a4 4 0 0 1 8 0v5a4 4 0 0 1-8 0z"/><path d="M12 9v9M4 13h4M16 13h4M5 7l3 2M19 7l-3 2M5 19l3-2M19 19l-3-2"/>'), bulb:svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'), help:svg('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14"/><path d="M12 17.5h.01"/>'),
   plus:svg('<path d="M5 12h14M12 5v14"/>',2.5), minus:svg('<path d="M5 12h14"/>',2.5),
-  stop:svg('<rect x="5" y="5" width="14" height="14" rx="3"/>',2.4), skip:svg('<path d="M5 5l10 7-10 7z"/><path d="M19 5v14"/>',2.2), fwd:svg('<path d="M5 12h12M13 7l5 5-5 5"/>',2.4),
+  stop:svg('<rect x="5" y="5" width="14" height="14" rx="3"/>',2.4), skip:svg('<path d="M5 5l10 7-10 7z"/><path d="M19 5v14"/>',2.2), grip:svg('<circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/>',2.4), fwd:svg('<path d="M5 12h12M13 7l5 5-5 5"/>',2.4),
   timer:svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M10 2h4"/>',2.2), lines:svg('<path d="M4 6h16M4 12h10M4 18h6"/>',2.2),
   edit:svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'),
   cal:svg('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
@@ -1021,12 +1036,10 @@ function planSections(p){const out=[];const add=v=>{if(v&&!out.some(o=>eqi(o,v))
   (p.sections.length?p.sections:defaultSections()).forEach(add);itemsOf(p.id).forEach(i=>add(i.section));return out;}
 const isSkipped=(p,sec)=>p.skipped.some(s=>eqi(s,sec));
 const secItems=(p,sec)=>itemsOf(p.id).filter(i=>eqi(i.section,sec));
-const isSplit=(p,sec)=>(p.split||[]).some(s=>eqi(s,sec));
 const liveMin=i=>i.skip==="Yes"?0:(i.minutes||0);
 /* A section split by belt group runs its groups at the same time, so it takes as long as its longest group */
 const secTotal=(p,sec)=>{if(isSkipped(p,sec))return 0;const its=secItems(p,sec);
-  if(!isSplit(p,sec))return its.reduce((a,i)=>a+liveMin(i),0);
-  return secLanes(p,sec).reduce((m,l)=>Math.max(m,l.items.reduce((a,i)=>a+liveMin(i),0)),0);};
+  return secBlocks(p,sec).reduce((a,b)=>a+blockMin(b),0);};
 const planTotal=p=>planSections(p).reduce((a,s)=>a+secTotal(p,s),0);
 const planTitle=p=>p.focus||(p.type?p.type+" class":"Class plan");
 /* Plan switcher (Gary, Oct 30): the title is a dropdown of every plan, with ‹ › to step to the previous/next one */
@@ -1106,12 +1119,25 @@ function tonight(p){const sl=slotOfPlan(p),roster=rosterOf(sl&&sl.id);
   const here=roster.filter(n=>!away.has(n.toLowerCase())).concat(drop).sort(byBelt);
   return{slot:sl,roster,here,away:roster.filter(n=>away.has(n.toLowerCase())),drop};}
 /* Belt-group lanes of a split section: each group in order, then any lane name no longer in the list, then "Everyone" */
-function secLanes(p,sec){
-  const its=secItems(p,sec),gs=groupsFor(p),out=gs.map(g=>({name:g.name,group:g,items:its.filter(i=>eqi(i.lane,g.name))}));
-  its.forEach(i=>{if(i.lane&&!out.some(l=>eqi(l.name,i.lane)))out.push({name:i.lane,group:null,items:its.filter(x=>eqi(x.lane,i.lane))});});
-  const none=its.filter(i=>!i.lane);if(none.length)out.unshift({name:"",group:null,items:none});
-  return out;
-}
+/* Groups per exercise (Gary, Nov 23): each exercise is for Everyone or for one group (items lane; any name).
+   Back-to-back exercises that have groups run at the same time, each group going through its own in order;
+   that block takes as long as its longest group. Order comes from dragging in Edit plan. */
+/* Every group an exercise can use: this class's groups first, then the other kind (belt or custom) */
+const allGroups=p=>{const sl=slotOfPlan(p),a=groupsFor(p),b=isCustom(p)?beltGroups():customGroups(sl);return a.concat(b.filter(g=>!a.some(x=>eqi(x.name,g.name))));};
+function secBlocks(p,sec){const its=secItems(p,sec),gs=allGroups(p),out=[];
+  its.forEach(it=>{if(!it.lane){out.push({one:it,idx:out.length});return;}
+    let b=out[out.length-1];if(!b||!b.lanes){b={lanes:[],idx:out.length};out.push(b);}
+    let l=b.lanes.find(x=>eqi(x.name,it.lane));if(!l){l={name:it.lane,group:gs.find(g=>eqi(g.name,it.lane))||null,items:[]};b.lanes.push(l);}
+    l.items.push(it);});
+  out.forEach(b=>{if(b.lanes){const rank=l=>{const i=gs.findIndex(g=>eqi(g.name,l.name));return i<0?99:i;};b.lanes.sort((x,y)=>rank(x)-rank(y));}});
+  return out;}
+const laneMin=l=>l.items.reduce((a,i)=>a+liveMin(i),0);
+const blockMin=b=>b.one?liveMin(b.one):b.lanes.reduce((m,l)=>Math.max(m,laneMin(l)),0);
+const laneKey=(sec,b,l)=>"L:"+sec+"|"+b.idx+"|"+l.name;
+const laneKeys=(p,sec)=>secBlocks(p,sec).filter(b=>b.lanes).flatMap(b=>b.lanes.map(l=>laneKey(sec,b,l)));
+/* Group names offered for an exercise: this class's groups, then any other name already used in the plan */
+const laneOptions=p=>{const gs=allGroups(p),names=gs.map(g=>g.name);itemsOf(p.id).forEach(i=>{if(i.lane&&!names.some(n=>eqi(n,i.lane)))names.push(i.lane);});return names.map(n=>({name:n,group:gs.find(g=>eqi(g.name,n))||null}));};
+const laneChip=(p,name)=>{const g=allGroups(p).find(x=>eqi(x.name,name));return(g?groupDots(g):`<span class="kdot" style="background:#9A9A9A" aria-hidden="true"></span>`)+esc(name);};
 const laneLabel=l=>l.name||"Everyone";
 const hereIn=(p,l)=>l.group?tonight(p).here.filter(n=>inGroup(l.group,n)).length:0;
 
@@ -1320,17 +1346,31 @@ function viewPlans(){
 }
 
 /* ---------- This class ---------- */
+/* Edit plan row (Gary, Nov 23): drag handle, name (tap to open), group chip, minutes, delete (asks first) */
 function itemHTML(p,it,col){
   const lib=exById(it.exercise);
   const changed=lib&&it.minutes!==lib.minutes;
   const meta=changed?`${esc(it.editedBy||it.addedBy||"Someone")} changed to ${it.minutes} min · library ${lib.minutes}`:(it.addedBy?`Added by ${esc(it.addedBy)}`:(lib?"From the library":"One-off for this class"));
   const creator=lib?lib.addedBy:"",open=tGet("eexp",p.id).has(it.id),np=toPoints(it.note).length;
-  return`<div class="item ecomp${open&&creator?" cornered":""}">${open?ctagHTML(creator):""}
-    <div class="r1"><button type="button" class="ttg" data-act="eCard" data-id="${esc(it.id)}" aria-expanded="${open}">${open?ICON.down:ICON.go}<span class="nm">${esc(it.name)}</span>${!open&&np?`<span class="qnb">${np} ${np===1?"note":"notes"}</span>`:""}</button>
-      <div class="stepper"><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="-5" aria-label="5 minutes less for ${esc(it.name)}">${ICON.minus}</button><div class="v"${changed?` style="color:${col}"`:""}>${it.minutes} min</div><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="5" aria-label="5 minutes more for ${esc(it.name)}">${ICON.plus}</button></div>
-      <button type="button" class="iconbtn" data-act="editItem" data-id="${esc(it.id)}" aria-label="Edit ${esc(it.name)} for this class">${ICON.edit}</button></div>
-    ${open?`<div class="tbody">${ptsHTML(it.note)}<div class="meta" style="${changed?"color:"+col:""}">${meta}</div></div>`:""}
+  return`<div class="item ecomp${open&&creator?" cornered":""}" data-id="${esc(it.id)}">${open?ctagHTML(creator):""}
+    <div class="r1"><button type="button" class="dragh" aria-label="Drag to move ${esc(it.name)}" title="Drag to move">${ICON.grip}</button>
+      <div class="grow" style="min-width:0"><button type="button" class="ttg" data-act="eCard" data-id="${esc(it.id)}" aria-expanded="${open}"><span class="nm">${esc(it.name)}</span>${!open&&np?`<span class="qnb">${np} ${np===1?"note":"notes"}</span>`:""}</button>
+        <button type="button" class="gchip${it.lane?" on":""}" data-act="laneOpen" data-id="${esc(it.id)}" aria-label="Group for ${esc(it.name)}: ${esc(it.lane||"Everyone")}">${it.lane?laneChip(p,it.lane):ICON.people+"Everyone"}${ICON.down}</button></div>
+      <div class="stepper"><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="-5" aria-label="5 minutes less for ${esc(it.name)}">${ICON.minus}</button><div class="v"${changed?` style="color:${col}"`:""}>${it.minutes}m</div><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="5" aria-label="5 minutes more for ${esc(it.name)}">${ICON.plus}</button></div>
+      <button type="button" class="iconbtn" data-act="askDelItem" data-id="${esc(it.id)}" aria-label="Delete ${esc(it.name)} from this plan">${ICON.trash}</button></div>
+    ${open?`<div class="tbody">${ptsHTML(it.note)}<div class="meta" style="${changed?"color:"+col:""}">${meta}</div><button type="button" class="notebtn grey" data-act="editItem" data-id="${esc(it.id)}">${ICON.edit}Edit for this class</button></div>`:""}
   </div>`;
+}
+/* Group for one exercise: this class's groups, names already used, or a new name */
+function sheetLane(s){
+  const it=itemById(s.id),p=it&&planById(it.plan);if(!it||!p)return sheetHead("Group")+`<p>This exercise was removed.</p>`;
+  const opts=laneOptions(p);
+  return sheetHead("Who does it?",`<div class="small">${esc(it.name)}</div>`)+
+    `<div class="chips"><button type="button" class="pchip" data-act="laneSet" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">${ICON.people}Everyone</button>
+      ${opts.map(o=>`<button type="button" class="pchip" data-act="laneSet" data-id="${esc(it.id)}" data-v="${esc(o.name)}" aria-pressed="${eqi(it.lane,o.name)}">${o.group?groupDots(o.group):""}${esc(o.name)}</button>`).join("")}</div>
+    <form id="laneForm" data-id="${esc(it.id)}" style="margin-top:10px;display:flex;gap:6px;align-items:center"><label for="laneNew" class="vh">New group name</label><input class="inp" id="laneNew" type="text" maxlength="30" placeholder="New group, e.g. Sparring team" autocomplete="off"><button type="submit" class="iconbtn round red" aria-label="Use this group">${ICON.plus}</button></form>
+    <p class="small" style="margin:8px 0 0">Exercises next to each other that have groups run at the same time, each group doing its own. Drag them in Edit plan to line them up.</p>
+    ${isCustom(p)?"":`<p class="small" style="margin:6px 0 0">Want named groups of students? Make them under Students → Class roster → Groups → Custom groups.</p>`}`;
 }
 /* Class mix (Gary, Nov 21): who's on this class's roster, by belt and belt group */
 function beltBarHTML(names){const n=names.length||1;const segs=BELTS.map(b=>{const k=names.filter(x=>beltIdxOf(x)===BELTS.indexOf(b)).length;return k?`<span style="width:${(k/n*100).toFixed(2)}%;background:${BELT_COL[b]}"></span>`:"";}).join("");
@@ -1358,20 +1398,18 @@ function viewPlan(){
   const sum=diff>0?`${fmtHM(diff)} to spare`:diff===0?"Right on time":`${fmtHM(-diff)} over`;
   const sections=secs.map((s,i)=>{
     const col=secColour(s),sk=isSkipped(p,s),its=secItems(p,s),st=secTotal(p,s);
-    const ef=tGet("efold",p.id),fold=ef.has(s),split=isSplit(p,s);
+    const ef=tGet("efold",p.id),fold=ef.has(s);
     let body="";
     if(!sk&&!fold){
-      if(split)body=`<p class="small lanehint">Groups run at the same time. The section takes as long as its longest group.</p>`+secLanes(p,s).map(l=>{const k="L:"+s+"|"+l.name,lf=ef.has(k),lm=l.items.reduce((a,x)=>a+liveMin(x),0);
-        return`<div class="elane" style="--c:${col}"><button type="button" class="lanehd" data-act="eFold" data-k="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:transparent">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}</span><span class="sm">${l.items.length} · ${lm}m</span></button>
-          ${lf?"":l.items.map(it=>itemHTML(p,it,col)).join("")+`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" data-lane="${esc(l.name)}" style="color:${col}">${ICON.plus}Add for ${esc(laneLabel(l))}</button>`}</div>`;}).join("");
-      else body=its.map(it=>itemHTML(p,it,col)).join("")+`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" style="color:${col}">${ICON.plus}Add from library</button>`;
+      /* one flat list you can drag; a thin line marks exercises that run at the same time */
+      body=secBlocks(p,s).map(b=>b.one?itemHTML(p,b.one,col):`<div class="eblockl" style="--c:${col}">At the same time · ${blockMin(b)} min</div>`+b.lanes.map(l=>l.items).flat().sort((x,y)=>x.order-y.order).map(it=>itemHTML(p,it,col)).join("")).join("")
+        +`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" style="color:${col}">${ICON.plus}Add from library</button>`;
     }
     return`<section class="card section">
       <div class="shead ewrap" style="background:${sk?"#F5F5F5":tint(col)}">
         <button type="button" class="ttg grow" data-act="eFold" data-k="${esc(s)}" aria-expanded="${!fold}">${fold?ICON.go:ICON.down}<span class="badge" style="background:${sk?"#9A9A9A":col}">${i+1}</span><h2 style="color:${sk?"#767676":"var(--ink)"}">${esc(s)}</h2></button>
         <button type="button" class="textbtn" data-act="skip" data-sec="${esc(s)}">${sk?"Restore":"Skip"}</button>
-        <div class="shmeta"><span class="small grow" style="color:${sk?"var(--muted)":col};font-weight:800">${sk?"Skipped this class":(split?groupsWord(p)+" at once · ":"")+st+" min"+(its.length?"":" · nothing yet")}</span>
-        ${sk?"":`<button type="button" class="bgsw" role="switch" data-act="splitSec" data-sec="${esc(s)}" aria-checked="${split}" style="--c:${col}">${groupsWord(p)}<i></i></button>`}</div>
+        <div class="shmeta"><span class="small grow" style="color:${sk?"var(--muted)":col};font-weight:800">${sk?"Skipped this class":st+" min"+(its.length?"":" · nothing yet")}</span></div>
       </div>
       ${body}
     </section>`;
@@ -1416,10 +1454,10 @@ const QOPEN=new Set();
 const tExpanded=(p,id,isNow)=>{const e=tGet("texp",p.id),c=tGet("tcol",p.id);return e.has(id)||(isNow&&!c.has(id));};
 function teachList(p){let at=0;const out=[];
   planSections(p).filter(s=>!isSkipped(p,s)).forEach(s=>{
-    if(isSplit(p,s)){const start=at;let longest=0;
-      secLanes(p,s).forEach(l=>{let off=0;l.items.forEach(it=>{out.push({it,sec:s,lane:l.name,from:start+off});off+=liveMin(it);});longest=Math.max(longest,off);});
-      at=start+longest;}
-    else secItems(p,s).forEach(it=>{out.push({it,sec:s,lane:"",from:at});at+=liveMin(it);});});
+    secBlocks(p,s).forEach(b=>{
+      if(b.one){out.push({it:b.one,sec:s,lane:"",from:at});at+=liveMin(b.one);return;}
+      const start=at;b.lanes.forEach(l=>{let off=0;l.items.forEach(it=>{out.push({it,sec:s,lane:l.name,block:b.idx,from:start+off});off+=liveMin(it);});});
+      at=start+blockMin(b);});});
   return out;}
 function teachNow(p){const done=tGet("tdone",p.id),l=teachList(p);const n=l.find(x=>!done.has(x.it.id)&&x.it.skip!=="Yes");return{done,list:l,now:n||null};}
 function teachBar(p){
@@ -1479,15 +1517,15 @@ function viewTeach(p){
     const when=fold&&!nDone?` · ≈ ${st!=null?hm12(st+start,true):clock(start)}`:"";
     let cards="";
     if(!fold){
-      if(isSplit(p,s)){
-        cards=secLanes(p,s).filter(l=>l.items.length).map(l=>{const k="L:"+s+"|"+l.name,lf=folded.has(k);
-          const lx=xs.filter(x=>eqi(x.lane,l.name)),ld=lx.filter(x=>T.done.has(x.it.id)||x.it.skip==="Yes").length,here=hereIn(p,l);
-          return`<button type="button" class="lanehd" data-act="tFold" data-sec="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}${here?` · ${here} here`:""}</span><span class="sm">${ld}/${lx.length} · ${lx.reduce((a,x)=>a+liveMin(x.it),0)}m</span></button>
-            ${lf?"":lx.map(x=>teachItemHTML(p,x,T,st)).join("")}`;}).join("");
-      }else cards=xs.map(x=>teachItemHTML(p,x,T,st)).join("");
+      const xById={};xs.forEach(x=>{xById[x.it.id]=x;});
+      cards=secBlocks(p,s).map(b=>{if(b.one)return xById[b.one.id]?teachItemHTML(p,xById[b.one.id],T,st):"";
+        return`<div class="tblock" style="--c:${col}"><div class="tblock-h">At the same time · ${blockMin(b)}m</div>`+b.lanes.map(l=>{const k=laneKey(s,b,l),lf=folded.has(k);
+          const lx=l.items.map(i=>xById[i.id]).filter(Boolean),ld=lx.filter(x=>T.done.has(x.it.id)||x.it.skip==="Yes").length,here=hereIn(p,l);
+          return`<button type="button" class="lanehd" data-act="tFold" data-sec="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}${here?` · ${here} here`:""}</span><span class="sm">${ld}/${lx.length} · ${laneMin(l)}m</span></button>
+            ${lf?"":lx.map(x=>teachItemHTML(p,x,T,st)).join("")}`;}).join("")+`</div>`;}).join("");
     }
     return`<section class="vsec">
-      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${isSplit(p,s)?groupsWord(p)+" · ":nDone+"/"+live.length+" · "}${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
+      <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="tFold" data-sec="${esc(s)}" aria-expanded="${!fold}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${all?"✓ ":""}${nDone}/${live.length} · ${secMin}m${when}</span>${fold?ICON.go:ICON.down}</button>
       ${cards}
     </section>`;
   }).join("");
@@ -1533,9 +1571,8 @@ function viewReview(p){
     const noted=list.filter(i=>qnLines(i.live).length).length;
     let rows="";
     if(!f){
-      if(isSplit(p,s))rows=secLanes(p,s).filter(l=>l.items.length).map(l=>{const k="L:"+s+"|"+l.name,lf=fold.has(k);
-        return`<button type="button" class="lanehd" data-act="rFold" data-k="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}</span><span class="sm">${l.items.length}</span></button>${lf?"":l.items.map(i=>reviewItemHTML(p,i,col)).join("")}`;}).join("");
-      else rows=list.map(i=>reviewItemHTML(p,i,col)).join("");
+      rows=secBlocks(p,s).map(b=>b.one?reviewItemHTML(p,b.one,col):`<div class="tblock" style="--c:${col}"><div class="tblock-h">At the same time</div>`+b.lanes.map(l=>{const k=laneKey(s,b,l),lf=fold.has(k);
+        return`<button type="button" class="lanehd" data-act="rFold" data-k="${esc(k)}" aria-expanded="${!lf}" style="--c:${col};background:${tint(col)}">${lf?ICON.go:ICON.down}${l.group?groupDots(l.group):""}<span class="grow">${esc(laneLabel(l))}</span><span class="sm">${l.items.length}</span></button>${lf?"":l.items.map(i=>reviewItemHTML(p,i,col)).join("")}`;}).join("")+`</div>`).join("");
     }
     return`<section class="vsec">
       <button type="button" class="vsec-h tg" style="border-bottom-color:${col}" data-act="rFold" data-k="${esc(s)}" aria-expanded="${!f}"><span class="badge" style="background:${col}">${si+1}</span><h2>${esc(s)}</h2><span class="sm">${noted?noted+" with notes":""}</span>${f?ICON.go:ICON.down}</button>
@@ -1860,6 +1897,40 @@ function sheetClassStu(s){
   return sheetHead("Students",`<div class="small">${sl?esc(slotLabel(sl)):esc(planTitle(p))+" · special class"}</div>`)+tabs+find+big+body+
     `<p class="small" style="margin:10px 0 0">Belts come from the Kata Tracker. Attendance itself stays in Muster Hall.</p>`;
 }
+/* Drag to reorder exercises in Edit plan (Gary, Nov 23): hold the dotted handle and move; the list moves around the
+   exercise as it passes the middle of a neighbour; the page scrolls near the top or bottom. Order saves on release. */
+let DRAG=null;
+const ecompSib=(el,dir)=>{let n=dir<0?el.previousElementSibling:el.nextElementSibling;while(n&&!n.classList.contains("ecomp"))n=dir<0?n.previousElementSibling:n.nextElementSibling;return n;};
+function dragMove(y){
+  const d=DRAG;if(!d)return;d.lastY=y;
+  d.row.style.transform=`translateY(${y-d.startY}px)`;
+  const rc=d.row.getBoundingClientRect(),mid=rc.top+rc.height/2;
+  const nx=ecompSib(d.row,1),pv=ecompSib(d.row,-1);
+  if(nx){const r=nx.getBoundingClientRect();if(mid>r.top+r.height/2){nx.after(d.row);d.row.style.transform="";const now=d.row.getBoundingClientRect().top;d.startY=y-(rc.top-now);d.row.style.transform=`translateY(${y-d.startY}px)`;d.moved=true;}}
+  if(pv){const r=pv.getBoundingClientRect();if(mid<r.top+r.height/2){pv.before(d.row);d.row.style.transform="";const now=d.row.getBoundingClientRect().top;d.startY=y-(rc.top-now);d.row.style.transform=`translateY(${y-d.startY}px)`;d.moved=true;}}
+}
+function dragTick(){const d=DRAG;if(!d)return;const y=d.lastY,edge=90;let v=0;
+  if(y<edge)v=-Math.ceil((edge-y)/6);else if(y>innerHeight-edge-70)v=Math.ceil((y-(innerHeight-edge-70))/6);
+  if(v){const before=scrollY;scrollBy(0,v);const moved=scrollY-before;if(moved){d.startY-=moved;dragMove(y);}}
+  d.raf=requestAnimationFrame(dragTick);}
+document.addEventListener("pointerdown",e=>{
+  const h=e.target.closest&&e.target.closest(".dragh");if(!h||DRAG)return;const row=h.closest(".ecomp");if(!row)return;
+  const p=planById(PLAN);if(!p||!canEditR(p))return;
+  e.preventDefault();try{h.setPointerCapture(e.pointerId);}catch(_){}
+  DRAG={row,list:row.parentElement,startY:e.clientY,lastY:e.clientY,pid:e.pointerId,moved:false,raf:0};
+  row.classList.add("dragging");if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
+  DRAG.raf=requestAnimationFrame(dragTick);
+},{passive:false});
+document.addEventListener("pointermove",e=>{if(!DRAG||e.pointerId!==DRAG.pid)return;e.preventDefault();dragMove(e.clientY);},{passive:false});
+function dragEnd(e){
+  const d=DRAG;if(!d||(e&&e.pointerId!==d.pid))return;DRAG=null;cancelAnimationFrame(d.raf);
+  d.row.classList.remove("dragging");d.row.style.transform="";
+  if(!d.moved)return;
+  const ids=[...d.list.querySelectorAll(":scope > .ecomp")].map(r=>r.dataset.id);
+  let pid="";ids.forEach((id,k)=>{const it=itemById(id);if(!it)return;pid=it.plan;if(it.order!==k+1)store.update("items",id,{order:k+1});});
+  if(pid)touchPlan(pid);renderView();
+}
+document.addEventListener("pointerup",dragEnd);document.addEventListener("pointercancel",dragEnd);
 /* After adding someone from the find list: redraw, then put the cursor back so the keyboard stays up */
 function csRefind(){if(!sheet||sheet.type!=="classStu")return;const b=$("#sheetBox"),top=b?b.scrollTop:0;renderSheet();if(b)b.scrollTop=top;
   const f=$("#csFind");if(f){f.focus({preventScroll:true});const v=f.value;f.setSelectionRange(v.length,v.length);}}
@@ -2222,6 +2293,7 @@ function renderSheet(){
     case"classStu":h=sheetClassStu(s);break;
     case"groups":h=sheetGroups(s);break;
     case"cgroups":h=sheetCGroups(s);break;
+    case"lane":h=sheetLane(s);break;
     case"consol":h=sheetConsol();break;
     case"notify":h=sheetNotify();break;
     case"feedback":h=sheetFeedback();break;
@@ -2272,7 +2344,7 @@ function sheetItem(s){
   return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
   `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
   ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.addedBy?`<p style="margin:8px 0 0"><span class="tag creator">${ICON.user}${esc(lib.addedBy)}</span></p>`:""}${lib.description?`<h3>Instructions</h3>${stepsHTML(lib.description)}`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
-  ${p&&isSplit(p,it.section)?`<div class="field"><span class="label">${groupsWord(p)==="Groups"?"Group":"Belt group"}</span><div class="chips">${groupsFor(p).map(g=>`<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="${esc(g.name)}" aria-pressed="${eqi(it.lane,g.name)}">${groupDots(g)}<span style="margin-left:4px">${esc(g.name)}</span></button>`).join("")}<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">Everyone</button></div></div>`:""}
+  ${p?`<div class="field"><span class="label">Group</span><div class="chips">${laneOptions(p).map(g=>`<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="${esc(g.name)}" aria-pressed="${eqi(it.lane,g.name)}">${g.group?groupDots(g.group):""}<span style="margin-left:4px">${esc(g.name)}</span></button>`).join("")}<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">Everyone</button></div></div>`:""}
   <form id="itemForm" data-id="${esc(it.id)}">
     <div class="field"><label for="fMin">Minutes for this class</label>
       <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
@@ -2598,7 +2670,7 @@ document.addEventListener("click",e=>{
       renderView();const el=document.getElementById("qn-"+id);if(el)el.focus();break;} // the one box that opens the keyboard by itself (Gary, Nov 20)
     case"qnClose":QOPEN.delete(t.dataset.id);renderView();break;
     case"foldAll":case"openAll":{if(!p)break;const shut=act==="foldAll",secs=planSections(p);
-      const keys=secs.slice();secs.forEach(s=>{if(isSplit(p,s))secLanes(p,s).forEach(l=>keys.push("L:"+s+"|"+l.name));});
+      const keys=secs.slice();secs.forEach(s=>{laneKeys(p,s).forEach(k=>keys.push(k));});
       const ids=itemsOf(p.id).map(i=>i.id);
       if(planMode==="review"){tPut("rfold",p.id,new Set(shut?keys.concat(["c:after","c:skip","c:notes"]):[]));tPut("rexp",p.id,new Set(shut?[]:ids));}
       else if(planMode==="edit"){tPut("efold",p.id,new Set(shut?keys.concat(["c:mix"]):[]));tPut("eexp",p.id,new Set(shut?[]:ids));}
@@ -2612,11 +2684,11 @@ document.addEventListener("click",e=>{
       if(!nx){toast(`Next ${day}’s class has no plan yet. Make it first, then tap this again.`);break;}
       if(!canEditR(nx)){toast("You can’t edit next week’s plan. Ask its owner to add it.");break;}
       addItem(nx,it.section,{id:it.exercise,name:it.name,minutes:it.minutes},{note:it.note,lane:it.lane||""});toast(`Added to ${fmtDay(nx.date)}`);break;}
-    case"splitSec":{if(!p||!canEditR(p))break;const sec=t.dataset.sec,on=!isSplit(p,sec);
-      store.update("plans",p.id,{split:on?(p.split||[]).concat(sec):(p.split||[]).filter(x=>!eqi(x,sec)),editedBy:who(),updated:Date.now()});
-      if(on){const g=groupsFor(p)[0];if(g)secItems(p,sec).filter(i=>!i.lane).forEach(i=>store.update("items",i.id,{lane:g.name}));
-        toast(g?"Each group now has its own exercises. Tap Add for a group to fill it.":"This class has no groups yet. Make them under Students → Class roster.");}
-      break;}
+    case"laneOpen":openSheet({type:"lane",id:t.dataset.id});break;
+    case"laneSet":{const it=itemById(t.dataset.id);if(!it)break;store.update("items",it.id,{lane:t.dataset.v});touchPlan(it.plan);closeSheet();break;}
+    case"askDelItem":{const it=itemById(t.dataset.id);if(it)openSheet({type:"confirm",center:true,title:`Delete ${it.name}?`,text:"It comes out of this plan only. The library keeps it.",yes:"Delete",act:"delItem",id:it.id});break;}
+    case"delItem":{const it=itemById(t.dataset.id);if(!it)break;const copy=Object.assign({},it);delete copy.id;store.del("items",it.id);touchPlan(it.plan);closeSheet();
+      toast(`Deleted ${it.name}`,[{label:"Undo",fn:()=>{store.add("items",copy);touchPlan(copy.plan);}}]);break;}
     case"itemLane":{const it=itemById(t.dataset.id);if(!it)break;store.update("items",it.id,{lane:t.dataset.v});touchPlan(it.plan);renderSheet();break;}
     case"classStudents":if(!p)break;if(sheet)swapSheet({type:"classStu",tab:"tonight",q:""});else openSheet({type:"classStu",tab:"tonight",q:""});break;
     case"csTab":if(sheet){sheet.tab=t.dataset.v;sheet.find=false;sheet.q="";renderSheet();}break;
@@ -2779,6 +2851,8 @@ document.addEventListener("submit",e=>{
     }).catch(()=>{btn.disabled=false;$("#pwMsg").textContent="Can’t reach the dojo sheet. Check your connection and try again.";});
     return;}
   if(f.classList.contains("nform")){addClassNote(f);return;}
+  if(id==="laneForm"){const it=itemById(f.dataset.id),v=($("#laneNew").value||"").replace(/,/g," ").replace(/\s+/g," ").trim().slice(0,30);if(!it||!v)return;
+    store.update("items",it.id,{lane:v});touchPlan(it.plan);closeSheet();return;}
   if(f.classList.contains("rform")){const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!p||!txt)return;
     const lines=ptLines(p.review);lines.push(txt);inp.value="";store.update("plans",p.id,{review:ptJoin(lines)});
     setTimeout(()=>{const ni=document.getElementById("rv-"+p.id);if(ni)ni.focus({preventScroll:true});},0);return;}
