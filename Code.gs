@@ -52,6 +52,7 @@ const INSTR = {
     ['joined', 'Joined', 'datetime', 160],
     ['lastSeen', 'Last signed in', 'datetime', 160],
     ['notify', 'Notification settings', 'text', 220],
+    ['signedOut', 'Signed out at', 'datetime', 160], // an admin's "Sign out on every device" (Nov 27)
   ],
 };
 
@@ -113,6 +114,9 @@ const SCHEMA = {
       ['split', 'Sections split by belt group', 'list', 220],
       ['away', 'Away tonight', 'list', 200],
       ['dropins', 'Drop-ins tonight', 'list', 180],
+      // History (Gary, Nov 27): who taught it and that night's groups and roster, saved once the class is over
+      ['taught', 'Taught by', 'list', 200],
+      ['snap', 'Groups and roster that night (saved after class)', 'text', 300],
     ],
   },
   items: {
@@ -132,6 +136,7 @@ const SCHEMA = {
       ['updated', 'Updated', 'datetime', 160],
       ['lane', 'Belt group', 'text', 130],
       ['skip', 'Skipped in class (Yes/blank)', 'text', 150],
+      ['block', 'Same-time block', 'text', 110], // exercises sharing a block run at the same time, one lane per group
     ],
   },
   exercises: {
@@ -195,6 +200,8 @@ const SCHEMA = {
       ['name', 'Group', 'text', 160],
       ['members', 'Students', 'list', 320],
       ['order', 'Order', 'num', 60],
+      ['belts', 'By belt (blank = hand-picked)', 'list', 200],
+      ['color', 'Colour', 'text', 90],
       ['addedBy', 'Added by', 'text', 120],
       ['updated', 'Updated', 'datetime', 160],
     ],
@@ -207,6 +214,24 @@ const SCHEMA = {
       ['value', 'Value', 'text', 260],
       ['colour', 'Colour (hex)', 'text', 100],
       ['inNew', 'In every new plan (Yes/blank)', 'text', 200],
+      ['ended', 'Ended on (class times)', 'date', 140], // a class time that stopped; its past plans keep it
+    ],
+  },
+  // Who teaches each class time (Gary, Nov 27). Rows are never deleted: taking someone off sets Until,
+  // so the record of who taught what stays. Status Asked = waiting for an admin or the class's team.
+  team: {
+    sheet: 'Class team', key: 'who',
+    cols: [
+      ['id', 'ID', 'id', 90],
+      ['slot', 'Timeslot ID', 'text', 110],
+      ['slotName', 'Class time', 'text', 230],
+      ['who', 'Instructor ID', 'text', 110],
+      ['name', 'Instructor', 'text', 150],
+      ['from', 'From', 'date', 120],
+      ['until', 'Until', 'date', 120],
+      ['status', 'Status (blank/Asked/Declined)', 'text', 150],
+      ['addedBy', 'Added by', 'text', 120],
+      ['updated', 'Updated', 'datetime', 160],
     ],
   },
 };
@@ -278,16 +303,26 @@ function api(body) {
     if (req.unsubscribe) dropEndpoints_([req.unsubscribe], me.email);
     if (req.notifyTest) props.setProperty('TEST_' + me.id, String(Date.now()));
     if (req.feedback) addFeedback_(me, req.feedback);
+    let adminDid = false;
+    if (req.admin) {
+      if (!isAdmin_(me, people)) return fail_('not_admin', 'Only admins can do that.');
+      const r = admin_(me, people, req.admin);
+      if (r && r.ok === false) return r;
+      adminDid = true;
+    }
     if (req.ops && req.ops.length) {
       // Newer columns (Next week, Nov 5; belt groups and skips, Nov 21): older sheets get them on first use
       Object.keys(NEW_COLS).forEach(function (coll) {
         if (req.ops.some(function (o) { return o && o.coll === coll && o.data && NEW_COLS[coll].some(function (k) { return k in o.data; }); })) ensureCols_(SCHEMA[coll]);
       });
+      if (req.ops.some(function (o) { return o && o.coll === 'team'; }) && !ss_().getSheetByName(SCHEMA.team.sheet)) buildTab_(ss_(), SCHEMA.team);
       const acc = access_(me, people, readRaw_());
       req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });
       SpreadsheetApp.flush();
     }
-    const out = { ok: true, token: token, me: me_(me, people), state: stateFor_(me, people), sheetUrl: ss_().getUrl() };
+    const pplNow = adminDid ? instrRows_() : people;
+    const out = { ok: true, token: token, me: me_(me, pplNow), state: stateFor_(me, pplNow), sheetUrl: ss_().getUrl() };
+    if (adminDid) out.admin = adminInfo_(me, pplNow, req.admin);
     if (req.feedback || req.myFeedback) out.feedback = myFeedback_(me);
     return out;
   } catch (err) {
@@ -301,7 +336,7 @@ function api(body) {
 /* Instructor accounts                                                 */
 /* ------------------------------------------------------------------ */
 
-const NEW_COLS = { notes: ['next'], plans: ['split', 'away', 'dropins'], items: ['lane', 'skip'] };
+const NEW_COLS = { notes: ['next'], plans: ['split', 'away', 'dropins', 'taught', 'snap'], items: ['lane', 'skip', 'block'], cgroups: ['belts', 'color'], lists: ['ended'] };
 const fail_ = function (error, message) { return { ok: false, error: error, message: message }; };
 const normEmail_ = function (e) { return String(e || '').trim().toLowerCase(); };
 
@@ -434,7 +469,10 @@ function checkToken_(token) {
   if (parts.length !== 3) return null;
   const p = parts[0] + '.' + parts[1];
   if (sign_(p) !== parts[2] || Number(parts[1]) < Date.now()) return null;
-  return findInstr_('id', parts[0]); // a deleted instructor row signs that person out
+  const o = findInstr_('id', parts[0]); // a deleted instructor row signs that person out
+  // An admin's "Sign out on every device": tokens made before then stop working
+  if (o && o.signedOut && Number(parts[1]) - TOKEN_DAYS * 864e5 < o.signedOut) return null;
+  return o;
 }
 
 function verifyGoogle_(credential, clientId) {
@@ -620,7 +658,38 @@ function access_(me, people, raw) {
   raw.items.forEach(function (i) { acc.items[i.id] = i.plan; });
   acc.notes = {};
   (raw.notes || []).forEach(function (n) { acc.notes[n.id] = { owner: normEmail_(n.owner), share: /^every/i.test(String(n.share || '')) ? 'all' : 'me', plan: n.plan }; });
+  // Class teams (Nov 27): instructors on a class time can edit that class's plans they can see
+  acc.lists = {};
+  raw.lists.forEach(function (r) { acc.lists[r.id] = r.list; });
+  acc.slots = slotsOf_(raw);
+  acc.team = {}; acc.teamRows = {};
+  const now = Date.now();
+  (raw.team || []).forEach(function (t) {
+    acc.teamRows[t.id] = t;
+    if (onNow_(t, now)) (acc.team[t.slot] = acc.team[t.slot] || {})[t.who] = true;
+  });
+  raw.plans.forEach(function (p) { const sl = slotOfPlan_(acc.slots, p); if (sl) acc.plans[p.id].slot = sl.id; });
   return acc;
+}
+/** A team row that counts today: not a request, started, not ended. */
+function onNow_(t, now) {
+  return !t.status && (!t.from || t.from <= now) && (!t.until || t.until > now);
+}
+const onTeam_ = function (acc, slotId) { return !!slotId && !!acc.team[slotId] && !!acc.team[slotId][acc.me.id]; };
+/** Class times from Lists, with their row ID and the day they ended (if they did). */
+function slotsOf_(raw) {
+  return raw.lists.filter(function (r) { return /^timeslot$/i.test(r.list); }).map(function (r) {
+    const s = parseSlot_(r.value);
+    return s ? Object.assign(s, { id: r.id, ended: r.ended || null }) : null;
+  }).filter(Boolean);
+}
+/** The class time a plan sits in: same weekday and start time (and the class time hadn't ended by then). */
+function slotOfPlan_(slots, p) {
+  if (!p || !p.date) return null;
+  const key = keyOf_(p.date), d = dowOf_(key), st = startOf_(p.time);
+  if (!st) return null;
+  const fit = slots.filter(function (s) { return s.day === d && s.start === st; });
+  return fit.filter(function (s) { return !s.ended || keyOf_(s.ended) >= key; })[0] || null;
 }
 function sees_(acc, r) {
   if (!r) return false;
@@ -629,7 +698,7 @@ function sees_(acc, r) {
   if (r.share === 'me') return false;
   return r.share.indexOf(acc.email) >= 0;
 }
-function canEdit_(acc, r) { return !!r && ((r.owner && r.owner === acc.email) || (acc.admin && sees_(acc, r))); }
+function canEdit_(acc, r) { return !!r && ((r.owner && r.owner === acc.email) || ((acc.admin || onTeam_(acc, r.slot)) && sees_(acc, r))); }
 function canShare_(acc, r) { return !!r && ((r.owner && r.owner === acc.email) || (!r.owner && acc.admin)); }
 
 /** The app sends 'me', 'all' or instructor IDs; the sheet keeps Only me / Everyone / emails. */
@@ -649,7 +718,35 @@ function allowOp_(acc, op) {
   delete data.owner;
   const out = { op: op.op, coll: op.coll, id: op.id, data: data };
   if (op.coll === 'lists') {
-    if (op.op === 'del' || /^timeslot$/i.test(String(data.list || ''))) return acc.admin ? out : null;
+    const isSlot = /^timeslot$/i.test(String(data.list || '')) || /^timeslot$/i.test(String(acc.lists[op.id] || ''));
+    if (op.op === 'del' || isSlot) return acc.admin ? out : null;
+    return out;
+  }
+  if (op.coll === 'team') {
+    // Admins and anyone already on a class's team add or take off instructors. Anyone may ask to help (for
+    // themselves) or take back their own request. Rows are end-dated, never deleted, so history stays.
+    const t = acc.teamRows[op.id];
+    const slot = t ? t.slot : data.slot;
+    const boss = acc.admin || onTeam_(acc, slot);
+    const nameFor = function (id) { const p = acc.people.filter(function (x) { return x.id === id; })[0]; return p ? nameOf_(p) : ''; };
+    if (op.op === 'add' && !t) {
+      if (!data.slot || !data.who) return null;
+      data.name = nameFor(data.who) || String(data.name || '');
+      if (data.status === 'Asked') {
+        if (data.who !== acc.me.id) return null;
+        data.from = ''; data.until = '';
+      } else {
+        if (!boss) return null;
+        data.status = ''; data.from = data.from || Date.now(); data.until = '';
+      }
+      acc.teamRows[op.id] = { id: op.id, slot: data.slot, who: data.who, status: data.status };
+      return out;
+    }
+    if (!t) return null;
+    if (op.op === 'del') return (t.status === 'Asked' && t.who === acc.me.id) || (boss && t.status) ? out : null;
+    if (!boss) return null;
+    out.op = 'update';
+    ['slot', 'who', 'name', 'slotName'].forEach(function (k) { delete data[k]; });
     return out;
   }
   if (op.coll === 'plans' || op.coll === 'exercises') {
@@ -741,9 +838,224 @@ function stateFor_(me, people) {
     exercises: dress(raw.exercises, acc.exercises),
     lists: raw.lists,
     roster: (raw.roster || []).map(function (r) { return { id: r.id, slot: r.slot, slotName: r.slotName, who: r.who }; }),
-    cgroups: (raw.cgroups || []).map(function (r) { return { id: r.id, slot: r.slot, name: r.name, members: r.members, order: r.order }; }),
+    cgroups: (raw.cgroups || []).map(function (r) { return { id: r.id, slot: r.slot, name: r.name, members: r.members, order: r.order, belts: r.belts || [], color: r.color || '' }; }),
+    team: (raw.team || []).map(function (t) { return { id: t.id, slot: t.slot, slotName: t.slotName, who: t.who, name: t.name, from: t.from, until: t.until, status: t.status, addedBy: t.addedBy }; }),
     people: people.map(function (p) { return { id: p.id, name: nameOf_(p), admin: isAdmin_(p, people) }; }),
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Manage access (admins, Gary Nov 27)                                 */
+/* ------------------------------------------------------------------ */
+/*
+ * {admin: {action, who, role, code, coll, id}}. Actions: info (default), role, reset, signout, remove, unshare, code.
+ * Admins never see other people's private plans, exercises or notes: only counts, and what they could see anyway.
+ */
+function admin_(me, people, a) {
+  a = a || {};
+  const act = String(a.action || 'info');
+  if (act === 'info') return { ok: true };
+  if (act === 'code') {
+    const code = String(a.code || '').trim();
+    if (code.length < 4) return fail_('short_code', 'Use at least 4 characters for the dojo code.');
+    PropertiesService.getScriptProperties().setProperty('DOJO_CODE', code);
+    return { ok: true };
+  }
+  const t = people.filter(function (p) { return p.id === a.who; })[0];
+  if (!t) return fail_('no_person', 'That instructor isn\'t in the sheet any more.');
+  const admins = people.filter(function (p) { return isAdmin_(p, people); });
+  const self = t.id === me.id;
+  // Until someone has Admin in the Role column, the first instructor is the admin; write that down first
+  const pinAdmins = function () {
+    if (!people.some(function (p) { return /^admin/i.test(String(p.role || '')); })) admins.forEach(function (p) { updInstr_(p, { role: 'Admin' }); });
+  };
+  if (act === 'role') {
+    const admin = /^admin/i.test(String(a.role || ''));
+    if (!admin && isAdmin_(t, people) && admins.length <= 1) return fail_('last_admin', 'Someone has to stay an admin. Make another instructor an admin first.');
+    pinAdmins();
+    updInstr_(t, { role: admin ? 'Admin' : 'Instructor' });
+    return { ok: true };
+  }
+  if (act === 'reset') { updInstr_(t, { hash: '', salt: '' }); return { ok: true }; }
+  if (act === 'signout') {
+    if (self) return fail_('self', 'Use Sign out on your own profile instead.');
+    ensureCols_(INSTR);
+    updInstr_(t, { signedOut: Date.now() });
+    return { ok: true };
+  }
+  if (act === 'remove') {
+    if (self) return fail_('self', 'You can\'t remove yourself.');
+    if (isAdmin_(t, people) && admins.length <= 1) return fail_('last_admin', 'Someone has to stay an admin.');
+    pinAdmins();
+    const raw = readRaw_(), now = Date.now();
+    (raw.team || []).forEach(function (r) {
+      if (r.who !== t.id) return;
+      if (r.status === 'Asked') applyTo_(SCHEMA.team, { op: 'update', id: r.id, data: { status: 'Declined', until: now } });
+      else if (!r.status && (!r.until || r.until > now)) applyTo_(SCHEMA.team, { op: 'update', id: r.id, data: { until: now } });
+    });
+    applyTo_(INSTR, { op: 'del', id: t.id });
+    return { ok: true };
+  }
+  if (act === 'unshare') {
+    const sch = SCHEMA[a.coll];
+    if (a.coll !== 'plans' && a.coll !== 'exercises') return fail_('bad_request', 'Unknown list.');
+    const raw = readRaw_();
+    const r = raw[a.coll].filter(function (x) { return x.id === a.id; })[0];
+    if (!r || normEmail_(r.owner) !== normEmail_(me.email)) return fail_('not_owner', 'Only the person who made it can change who sees it.');
+    const sh = shareOf_(r.share);
+    if (!Array.isArray(sh)) return fail_('shared_all', 'This is shared with everyone. Change it from the item itself.');
+    const left = sh.filter(function (e) { return e !== normEmail_(t.email); });
+    applyTo_(sch, { op: 'update', id: r.id, data: { share: left.length ? left.join(', ') : SHARE_ME } });
+    return { ok: true };
+  }
+  return fail_('bad_request', 'Unknown admin request.');
+}
+
+/** What the Manage access page shows: everyone, the dojo code, requests, and one person in detail. */
+function adminInfo_(me, people, a) {
+  a = a || {};
+  const raw = readRaw_(), now = Date.now();
+  const byEmail = {};
+  people.forEach(function (p) { byEmail[normEmail_(p.email)] = p; });
+  const label = function (email) { if (!email) return 'Dojo library'; const p = byEmail[normEmail_(email)]; return p ? nameOf_(p) : 'Someone no longer here'; };
+  const counts = function (acc) {
+    const seenPlans = {};
+    const plans = raw.plans.filter(function (p) { const ok = sees_(acc, acc.plans[p.id]); if (ok) seenPlans[p.id] = true; return ok; }).length;
+    const notes = (raw.notes || []).filter(function (n) { const x = acc.notes[n.id]; return seenPlans[n.plan] && (x.owner === acc.email || x.share === 'all'); }).length;
+    return { plans: plans, exercises: raw.exercises.filter(function (e) { return sees_(acc, acc.exercises[e.id]); }).length, notes: notes };
+  };
+  const list = people.map(function (p) {
+    const c = counts(access_(p, people, raw));
+    return { id: p.id, name: nameOf_(p), admin: isAdmin_(p, people), me: p.id === me.id, joined: p.joined || null, lastSeen: p.lastSeen || null,
+      google: !!p.google, password: !!p.hash, plans: c.plans, exercises: c.exercises, notes: c.notes };
+  });
+  const asks = (raw.team || []).filter(function (r) { return r.status === 'Asked'; })
+    .map(function (r) { return { id: r.id, who: r.who, name: r.name, slot: r.slot, slotName: r.slotName, at: r.updated || null }; });
+  const out = { code: PropertiesService.getScriptProperties().getProperty('DOJO_CODE') || '', people: list, asks: asks };
+  const t = a.who ? people.filter(function (p) { return p.id === a.who; })[0] : null;
+  if (t) {
+    const accT = access_(t, people, raw), accMe = access_(me, people, raw);
+    const tEmail = normEmail_(t.email);
+    const why = function (r) { return r.share === 'all' ? 'Everyone' : (r.share.length === 1 ? 'Just them' : 'Chosen people'); };
+    const shared = [];
+    raw.plans.forEach(function (p) {
+      const x = accT.plans[p.id];
+      if (!sees_(accT, x) || x.owner === tEmail || !sees_(accMe, accMe.plans[p.id])) return;
+      shared.push({ coll: 'plans', id: p.id, date: p.date, time: p.time, focus: p.focus, type: p.type, owner: label(x.owner), why: why(x),
+        edit: canEdit_(accT, x), stop: x.owner === accMe.email && Array.isArray(x.share) });
+    });
+    raw.exercises.forEach(function (e) {
+      const x = accT.exercises[e.id];
+      if (!sees_(accT, x) || x.owner === tEmail || !sees_(accMe, accMe.exercises[e.id])) return;
+      shared.push({ coll: 'exercises', id: e.id, name: e.name, section: e.section, owner: label(x.owner), why: why(x), edit: canEdit_(accT, x),
+        stop: x.owner === accMe.email && Array.isArray(x.share) });
+    });
+    const slots = slotsOf_(raw);
+    const history = (raw.team || []).filter(function (r) { return r.who === t.id && !r.status; }).map(function (r) {
+      const to = r.until && r.until < now ? r.until : now;
+      const n = raw.plans.filter(function (p) {
+        if (!p.date || p.date > now || (r.from && keyOf_(p.date) < keyOf_(r.from)) || keyOf_(p.date) > keyOf_(to)) return false;
+        const sl = slotOfPlan_(slots, p);
+        return sl && sl.id === r.slot;
+      }).length;
+      return { id: r.id, slot: r.slot, slotName: r.slotName, from: r.from || null, until: r.until || null, current: onNow_(r, now), classes: n };
+    }).sort(function (x, y) { return (y.from || 0) - (x.from || 0); });
+    const mine = list.filter(function (p) { return p.id === t.id; })[0];
+    out.person = Object.assign({}, mine, { shared: shared, history: history });
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------------ */
+/* Class history (Gary, Nov 27)                                        */
+/* ------------------------------------------------------------------ */
+/*
+ * Once a class is over, its plan keeps who taught it (Taught by) and that night's groups and roster (snap),
+ * so later changes to the class team, groups, rosters or belts never rewrite the past. Runs from cron_ and
+ * from the sheet menu. A plan with something in its snap column is done; Taught by is only filled when blank.
+ */
+const GROUP_COLS_ = ['#E0A100', '#1E7FD6', '#8E2CB0', '#E0603A', '#0F8B8D', '#2E9E48', '#C2185B', '#5D4037'];
+const GROUP_DEFAULT_ = [['White–Yellow', ['White', 'Yellow']], ['Green–Blue', ['Green', 'Blue']], ['Purple+', ['Purple', 'Brown', 'Black']]];
+const BELTS_ = ['White', 'Yellow', 'Green', 'Blue', 'Purple', 'Brown', 'Black'];
+function beltIdx_(t) {
+  let best = -1;
+  String(t || '').split(/[\/,&]| or | and /i).forEach(function (p) {
+    const i = BELTS_.map(function (b) { return b.toLowerCase(); }).indexOf(p.trim().toLowerCase());
+    if (i >= 0 && (best < 0 || i < best)) best = i;
+  });
+  return best;
+}
+const squash_ = function (v) { return String(v || '').replace(/\s+/g, ' ').trim().toLowerCase(); };
+/** A class's groups, as the app shows them: its own list, or the dojo's belt groups when it has none. */
+function classGroups_(raw, sl) {
+  const defaults = function () {
+    const rows = raw.lists.filter(function (r) { return /^belt group$/i.test(r.list); }).map(function (r) {
+      const m = /^\s*([^:]+?)\s*:\s*(.*)$/.exec(r.value || '');
+      return m ? { name: m[1].trim(), belts: m[2].split(/[,;]+/).map(function (b) { const i = beltIdx_(b); return i >= 0 ? BELTS_[i] : ''; }).filter(String) } : null;
+    }).filter(Boolean);
+    return (rows.length ? rows : GROUP_DEFAULT_.map(function (g) { return { name: g[0], belts: g[1] }; }))
+      .map(function (g, i) { return { name: g.name, belts: g.belts, members: [], color: GROUP_COLS_[i % GROUP_COLS_.length] }; });
+  };
+  if (!sl) return defaults();
+  const rows = (raw.cgroups || []).filter(function (g) { return g.slot === sl.id; }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); })
+    .map(function (g, i) { return { name: g.name, belts: g.belts || [], members: g.members || [], color: g.color || GROUP_COLS_[i % GROUP_COLS_.length] }; });
+  const set = raw.lists.some(function (r) { return /^custom groups$/i.test(r.list) && (r.value === sl.id || squash_(r.value) === squash_(sl.value)); });
+  if (!rows.length) return set ? [] : defaults();
+  // Older classes kept hand-picked groups beside the dojo's belt groups; until the list is saved, show both
+  if (!set && rows.every(function (g) { return !g.belts.length; })) return defaults().concat(rows);
+  return rows;
+}
+function endOf_(p) {
+  const key = keyOf_(p.date);
+  const m = /(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})/.exec(String(p.time || ''));
+  if (m) return atOf_(key, hm_(m[2]));
+  const st = startOf_(p.time);
+  if (st) return atOf_(key, st) + (Number(p.length) || 105) * 60000;
+  return atOf_(key, '23:59');
+}
+function snapshot_(now, max) {
+  const raw = readRaw_();
+  const todo = raw.plans.filter(function (p) { return p.date && !p.snap && endOf_(p) <= now; });
+  if (!todo.length) return 0;
+  ensureCols_(SCHEMA.plans);
+  const slots = slotsOf_(raw);
+  const people = instrRows_();
+  const byId = {};
+  people.forEach(function (p) { byId[p.id] = nameOf_(p); });
+  const belt = {};
+  students_().forEach(function (s) { belt[squash_(s.name)] = beltIdx_(s.belt); });
+  let n = 0;
+  todo.slice(0, max || 60).forEach(function (p) {
+    const sl = slotOfPlan_(slots, p), key = keyOf_(p.date);
+    const data = {};
+    if (!(p.taught && p.taught.length)) {
+      const names = (raw.team || []).filter(function (t) {
+        return sl && t.slot === sl.id && !t.status && (!t.from || keyOf_(t.from) <= key) && (!t.until || keyOf_(t.until) >= key);
+      }).map(function (t) { return byId[t.who] || t.name; }).filter(String);
+      if (names.length) data.taught = names;
+      else if (p.addedBy) data.taught = [p.addedBy];
+    }
+    const roster = sl ? (raw.roster || []).filter(function (r) { return r.slot === sl.id; }).map(function (r) { return r.who; })
+      .filter(function (w, i, a) { return w && a.indexOf(w) === i; }) : [];
+    const away = (p.away || []).map(squash_);
+    const drop = (p.dropins || []).filter(function (d) { return !roster.some(function (r) { return squash_(r) === squash_(d); }); });
+    const all = roster.concat(drop);
+    const groups = classGroups_(raw, sl).map(function (g) {
+      const members = g.belts.length
+        ? all.filter(function (nm) { const b = belt[squash_(nm)]; return b != null && b >= 0 && g.belts.indexOf(BELTS_[b]) >= 0; })
+        : g.members.slice();
+      return { name: g.name, color: g.color, belts: g.belts, members: members };
+    });
+    data.snap = JSON.stringify({ v: 1, at: now, roster: roster, here: all.filter(function (nm) { return away.indexOf(squash_(nm)) < 0; }), groups: groups });
+    applyTo_(SCHEMA.plans, { op: 'update', id: p.id, data: data });
+    n++;
+  });
+  return n;
+}
+/** Sheet menu: save the history of every class that's over now (normally done every few minutes). */
+function saveClassHistory() {
+  const n = snapshot_(Date.now(), 500);
+  SpreadsheetApp.getUi().alert(n ? 'Saved who taught and the groups for ' + n + ' past ' + (n === 1 ? 'class.' : 'classes.') : 'Every past class already has its history saved.');
 }
 
 /* ------------------------------------------------------------------ */
@@ -857,7 +1169,9 @@ function cron_(req) {
   const last = Number(props.getProperty('CRON_LAST')) || now - 5 * 60000;
   const from = Math.max(last, now - 2 * 3600000); // never send more than 2 hours of missed reminders
   props.setProperty('CRON_LAST', String(now));
-  return { ok: true, pushes: due_(from, now) };
+  const pushes = due_(from, now);
+  try { snapshot_(now, 40); } catch (e) { /* history waits for the next run */ }
+  return { ok: true, pushes: pushes };
 }
 
 const DOW_ = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -1078,6 +1392,7 @@ function onOpen() {
     .addItem('Connect to the Kata Tracker…', 'connectKataTracker')
     .addItem('Set up notifications…', 'setUpNotifications')
     .addItem('Set up / repair sheets', 'setup')
+    .addItem('Save class history now', 'saveClassHistory')
     .addSeparator()
     .addItem('Sign everyone out', 'signEveryoneOut')
     .addToUi();

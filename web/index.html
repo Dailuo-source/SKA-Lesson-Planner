@@ -750,7 +750,6 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .tblock-h{font-size:11.5px;font-weight:800;color:var(--c);margin:0 0 2px}
 .tblock .lanehd{margin-top:4px}
 .lane{display:block}
-#laneForm .inp{flex:1;min-width:0}
 .segtabs.sm{margin:6px 0 0}
 .segtabs.sm button{height:34px;font-size:13px;border-radius:14px}
 .csfind{padding:8px 10px;margin-top:6px;border-color:var(--red)}
@@ -759,6 +758,71 @@ ul.vpts{font-size:14.5px;line-height:1.4}
 .sheet.finding{padding-bottom:70vh}
 .grow-row .chip.sm{height:32px;padding:0 10px;font-size:13px}
 
+/* ---------- Nov 27: groups per class, same-time blocks, class teams, Manage access ---------- */
+.gsw{width:12px;height:12px;border-radius:4px;display:inline-block;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.gstack{display:inline-flex;gap:2px;flex:none}
+.secfoot{display:grid;grid-template-columns:1fr 1fr}
+.secfoot .addrow+.addrow{border-left:1px dashed var(--line2)}
+.eblock{margin:6px 8px 8px;border:2px solid var(--c);border-radius:12px;overflow:hidden;background:#fff}
+.eblock-h{display:flex;align-items:center;gap:6px;padding:5px 6px 5px 9px;background:var(--c);color:#fff;font-size:13px}
+.eblock-h svg{width:16px;height:16px}
+.bsplit{min-height:30px;padding:0 10px;border-radius:15px;border:1px solid rgba(255,255,255,.75);background:transparent;color:#fff;font-size:12px;font-weight:800}
+.blane{margin:6px 6px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.blane-h{display:flex;align-items:center;gap:6px;padding:3px 4px 3px 6px;background:color-mix(in srgb,var(--g) 12%,#fff)}
+.blane-h .gchip{margin:0;border-color:var(--g)}
+.blane-h .iconbtn{width:34px;height:34px}
+.blane .item{border-top:1px solid #F0F0F0}
+.addrow.sm{min-height:36px;padding:6px 10px;font-size:12.5px;border-top:1px dashed #EAEAEA}
+.addrow.lanebtn{justify-content:center;margin:6px 6px 6px;width:calc(100% - 12px);border:1px dashed var(--c);border-radius:18px;min-height:38px;font-size:13px}
+.lrows{display:flex;flex-direction:column;gap:6px}
+.lrow{display:flex;align-items:center;gap:9px;min-height:52px;padding:5px 10px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left;color:var(--ink)}
+.lrow[aria-pressed=true]{border:2px solid var(--ink);background:#FAFAFA}
+.lrow .small{display:block;font-weight:700}
+.gnum{width:28px;height:28px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.gnum.all{background:var(--sunk);color:var(--ink)}
+.gnum svg{width:16px;height:16px}
+.lradio{width:24px;height:24px;border-radius:50%;border:2px solid var(--line2);flex:none;display:flex;align-items:center;justify-content:center;color:transparent}
+.lrow[aria-pressed=true] .lradio{background:var(--red);border-color:var(--red);color:#fff}
+.lradio svg{width:14px;height:14px}
+.gcard{border:1px solid var(--line);border-radius:12px;margin-top:8px;overflow:hidden}
+.gcard-h{display:flex;align-items:center;gap:9px;width:100%;min-height:48px;padding:6px 10px;border:0;background:#fff;text-align:left;color:var(--ink)}
+.gcard-h .small{display:block;font-weight:700}
+.gcard-h>svg{width:16px;height:16px;color:var(--muted)}
+.gnames{display:flex;flex-wrap:wrap;gap:4px;padding:0 10px 8px}
+.gname{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:12px;background:#F3F3F3;font-size:12px;font-weight:700}
+.gloose{margin-top:8px;border:1px dashed var(--line2);border-radius:12px;padding:7px 10px}
+.gloose .small{display:block}
+.swrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.swb{width:34px;height:34px;border-radius:10px;border:3px solid #fff;box-shadow:0 0 0 1px var(--line2)}
+.swb[aria-pressed=true]{border-color:var(--ink);box-shadow:none}
+.gprev{margin-top:10px;border-radius:10px;background:var(--sunk);padding:7px 10px;font-size:12.5px;font-weight:700}
+.confirm{margin-top:8px;border:1px solid var(--red);border-radius:12px;padding:9px 10px;background:#FFF5F6}
+.confirm .small{margin:2px 0 8px}
+.teamrow{display:flex;align-items:center;gap:9px;min-height:46px;padding:4px 0;border-bottom:1px solid #F0F0F0}
+.teamrow .small{display:block;font-weight:700}
+.teamrow>svg{width:18px;height:18px;color:var(--ink2);flex:none}
+.teamrow .btn.small{min-height:34px;padding:0 10px;font-size:12.5px}
+.teamrow.past{opacity:.75}
+.askbox{margin-top:8px;border:1px solid #E0A100;background:#FFF8E1;border-radius:12px;padding:7px 10px}
+.ava{width:34px;height:34px;border-radius:50%;color:#fff;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.pchip .ava{width:22px;height:22px;font-size:10px;margin-left:-6px}
+.pickrow .ava{width:38px;height:38px;font-size:14px}
+.rolepill{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:9px;background:var(--sunk);color:var(--ink2);font-size:11px;font-weight:800;vertical-align:1px}
+.rolepill.on{background:var(--red);color:#fff}
+.segtabs.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.accslot{padding:8px 10px;margin-top:8px}
+.pchip.on{background:#111;border-color:#111;color:#fff}
+.pchip.add{border-style:dashed}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.tiles div{border:1px solid var(--line);border-radius:12px;padding:6px 9px}
+.tiles b{display:block;font-size:20px;line-height:1.2}
+.tiles span{font-size:11.5px;font-weight:700;color:var(--muted)}
+.codeval{font-size:16px;letter-spacing:.06em}
+.studstrip.taught .m{font-weight:700}
+.studstrip:disabled{opacity:1}
+.viewonly .notebtn{margin-left:auto}
+.pchip .small{color:inherit;opacity:.85;font-weight:700}
+.linkbtn svg{width:16px;height:16px;flex:none}
 /* ---------- big screens (Gary, Oct 20): tabs in the red bar, wider pages, panels slide in from the right ---------- */
 @media (min-width:1000px){
   main{max-width:none;padding:18px 28px 32px}
@@ -823,7 +887,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v29"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v30"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -846,7 +910,7 @@ const ICON={
   copy:svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   up:svg('<path d="M6 15l6-6 6 6"/>',2.4), down:svg('<path d="M6 9l6 6 6-6"/>',2.4),
   clock:svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
-  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), lock:svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), people:svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c2.2.6 3.5 2.4 3.5 5.4"/>'), globe:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'), clock:svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), history:svg('<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/>',2.2), eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
+  search:svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>'), lanes:svg('<path d="M8 4v16M16 4v16"/><path d="M4 8h4M16 16h4"/>'), shield:svg('<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>'), check:svg('<path d="M5 12.5l4.5 4.5L19 7"/>',2.6), user:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',2.4), share:svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>'), review:svg('<path d="M7 4h10a2 2 0 0 1 2 2v14l-4-3H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h4"/>'), lock:svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), people:svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c2.2.6 3.5 2.4 3.5 5.4"/>'), globe:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'), clock:svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), history:svg('<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/>',2.2), eye:svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'), trash:svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
 };
 
 /* ---------- dates and times ---------- */
@@ -928,9 +992,11 @@ function fmtTime(v){const t=parseTime(v);if(!t)return"";const a=clock12(t.start)
   return a.slice(-4)===b.slice(-4)?a.slice(0,-5)+"–"+b:a+"–"+b;}
 function slots(){return listRows("Timeslot").map(r=>{const m=/^\s*([a-z]{3})[a-z]*\.?\s+(\d{1,2}:\d{2}\s*[-–]\s*\d{1,2}:\d{2})\s*(.*)$/i.exec(r.value);if(!m)return null;
   const day=DAYS.findIndex(d=>d.slice(0,3).toLowerCase()===m[1].toLowerCase());const t=parseTime(m[2]);
-  return day<0||!t?null:Object.assign({id:r.id,day,label:m[3].trim()},t);}).filter(Boolean)
+  return day<0||!t?null:Object.assign({id:r.id,day,label:m[3].trim(),ended:r.ended||0},t);}).filter(Boolean)
   .sort((a,b)=>(DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day))||(toMin(a.start)-toMin(b.start)));}
-const slotsOn=k=>{const d=new Date(keyMs(k)).getDay();return slots().filter(x=>x.day===d);};
+/* A class time that ended (Nov 27) stays on the calendar up to its last day, so past classes keep their name */
+const liveSlots=()=>slots().filter(x=>!x.ended);
+const slotsOn=k=>{const d=new Date(keyMs(k)).getDay();return slots().filter(x=>x.day===d&&(!x.ended||dayKey(x.ended)>=k));};
 const dayName=k=>DAYS[new Date(keyMs(k)).getDay()];
 const whenLine=p=>fmtLongDay(p.date)+(parseTime(p.time)?" · "+fmtTime(p.time):"");
 /* ---------- point-form notes: stored in the sheet as "• point" lines ---------- */
@@ -957,7 +1023,7 @@ function addPointAfter(box,row){const tmp=document.createElement("div");tmp.inne
    SYNC — the Google Sheet is the source of truth.
    Changes show on screen right away, then go to the sheet in batches.
    ===================================================================== */
-let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[],roster:[],cgroups:[]};
+let S={plans:[],items:[],exercises:[],lists:[],people:[],notes:[],students:[],roster:[],cgroups:[],team:[]};
 let ready=false,API=LS.get("api","")||API_URL,lastSync=0;
 let queue=[],inflight=false,flushT=null,retryT=null,wantStudents=false;
 let tab="plans",PLAN=LS.get("plan",""),plansFilter=LS.get("pfilter","All"),libFilter="All",libQuery="";
@@ -981,14 +1047,16 @@ const store={
   del(c,id){enqueue({op:"del",coll:c,id});}
 };
 const strs=v=>Array.isArray(v)?v.map(s=>String(s).trim()).filter(Boolean):String(v==null?"":v).split(",").map(s=>s.trim()).filter(Boolean);
+const parseSnap=v=>{if(v&&typeof v==="object")return v;try{const o=JSON.parse(String(v||""));return o&&typeof o==="object"?o:null;}catch(e){return null;}};
 function normalize(st){
   st=st||{};const str=v=>String(v==null?"":v).trim();const num=(v,d)=>v==null||v===""||isNaN(+v)?d:+v;
   return{
-    lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),inNew:str(r.inNew)})),
-    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),split:strs(r.split),away:strs(r.away),dropins:strs(r.dropins),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
-    items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy),lane:str(r.lane),skip:/^y/i.test(str(r.skip))?"Yes":""})),
+    lists:(st.lists||[]).map(r=>Object.assign({},r,{list:str(r.list),value:str(r.value),colour:str(r.colour),inNew:str(r.inNew),ended:num(r.ended,0)})),
+    plans:(st.plans||[]).map(r=>Object.assign({},r,{date:num(r.date,0),time:str(r.time),focus:str(r.focus),type:str(r.type),length:num(r.length,105),sections:strs(r.sections),skipped:strs(r.skipped),split:strs(r.split),away:strs(r.away),dropins:strs(r.dropins),taught:strs(r.taught),snap:parseSnap(r.snap),review:str(r.review),addedBy:str(r.addedBy),editedBy:str(r.editedBy),updated:num(r.updated,0)})),
+    items:(st.items||[]).map(r=>Object.assign({},r,{plan:str(r.plan),section:str(r.section),order:num(r.order,0),name:str(r.name),minutes:Math.max(0,num(r.minutes,0)),note:str(r.note),live:str(r.live),exercise:str(r.exercise),addedBy:str(r.addedBy),editedBy:str(r.editedBy),lane:str(r.lane),block:str(r.block),skip:/^y/i.test(str(r.skip))?"Yes":""})),
     roster:(st.roster||[]).map(r=>({id:str(r.id),slot:str(r.slot),slotName:str(r.slotName),who:str(r.who)})).filter(r=>r.slot&&r.who),
-    cgroups:(st.cgroups||[]).map(r=>({id:str(r.id),slot:str(r.slot),name:str(r.name),members:strs(r.members),order:+r.order||0})).filter(r=>r.slot&&r.name),
+    cgroups:(st.cgroups||[]).map(r=>({id:str(r.id),slot:str(r.slot),name:str(r.name),members:strs(r.members),order:+r.order||0,belts:strs(r.belts).map(b=>BELTS.find(x=>eqi(x,b))).filter(Boolean),color:str(r.color)})).filter(r=>r.slot&&r.name),
+    team:(st.team||[]).map(r=>({id:str(r.id),slot:str(r.slot),slotName:str(r.slotName),who:str(r.who),name:str(r.name),from:num(r.from,0),until:num(r.until,0),status:str(r.status),addedBy:str(r.addedBy)})).filter(r=>r.slot&&r.who),
     people:(st.people||[]).map(r=>({id:str(r.id),name:str(r.name),admin:!!r.admin})).filter(r=>r.id),
     notes:(st.notes||[]).map(r=>Object.assign({},r,{plan:str(r.plan),item:str(r.item),kind:str(r.kind)||"Class",who:str(r.who),text:str(r.text),done:str(r.done),next:str(r.next),share:r.share==="all"?"all":"me",addedBy:str(r.addedBy),created:num(r.created,0)||num(r.updated,0)})).filter(r=>r.text),
     students:(st.students||[]).map(r=>({name:str(r.name),belt:str(r.belt)})).filter(r=>r.name),
@@ -1083,52 +1151,64 @@ function addItem(p,sec,ex,extra){
   const id=store.add("items",Object.assign({plan:p.id,section:sec,order,name:ex.name,minutes:ex.minutes||10,note:"",exercise:ex.id||"",addedBy:who(),editedBy:""},extra||{}));
   touchPlan(p.id);return id;
 }
-/* ---------- Belt groups, class rosters and who's here tonight (Gary, Nov 21) ----------
-   Belt groups live in Lists as "Name: Belt, Belt" rows (list "Belt group"); with none saved, SKA's usual three are used.
+/* ---------- Groups, class rosters and who's here tonight ----------
    Each timeslot keeps a roster (Class roster tab) kept by hand, since Muster Hall can't be read. A plan's
-   "Here tonight" = its timeslot's roster minus Away tonight, plus Drop-ins. Belts come from the Kata Tracker. */
+   "Here tonight" = its timeslot's roster minus Away tonight, plus Drop-ins. Belts come from the Kata Tracker.
+   Groups (Gary, Nov 27): one list per class time (Class groups tab). Each group is By belt (its belts: everyone on the
+   roster with those belts) or Hand-picked (its students); someone can be in several. A class with no list uses the
+   dojo's belt groups (Lists "Belt group" rows, else SKA's usual three). Saving a class's list adds a Lists
+   "Custom groups" row for it. Once a class is over the sheet saves that night's groups and roster with the plan
+   (snap), so later changes never rewrite past classes. */
 const GROUP_DEFAULT=[["White–Yellow",["White","Yellow"]],["Green–Blue",["Green","Blue"]],["Purple+",["Purple","Brown","Black"]]];
+const GCOL=["#E0A100","#1E7FD6","#8E2CB0","#E0603A","#0F8B8D","#2E9E48","#C2185B","#5D4037"];
+const squash=v=>String(v||"").replace(/\s+/g," ").trim().toLowerCase();
 function beltGroups(){
   const rows=listRows("Belt group").map(r=>{const m=/^\s*([^:]+?)\s*:\s*(.*)$/.exec(r.value);if(!m)return null;
-    return{id:r.id,name:m[1].trim(),belts:m[2].split(/[,;]+/).map(b=>BELTS.find(x=>eqi(x,b.trim()))).filter(Boolean)};}).filter(g=>g&&g.name);
-  return rows.length?rows:GROUP_DEFAULT.map(([name,belts])=>({id:"",name,belts}));
+    return{name:m[1].trim(),belts:m[2].split(/[,;]+/).map(b=>BELTS.find(x=>eqi(x,b.trim()))).filter(Boolean)};}).filter(g=>g&&g.name);
+  return(rows.length?rows:GROUP_DEFAULT.map(([name,belts])=>({name,belts}))).map((g,i)=>({id:"",name:g.name,belts:g.belts,members:[],color:GCOL[i%GCOL.length]}));
 }
 const beltIdxOf=name=>looseBelt(beltOf(name));
-/* Custom groups (Gary, Nov 23): per class time, hand-picked students, someone can be in several.
-   A class uses them instead of belt groups while Lists has a "Custom groups" row naming the class time. */
-const CG_COL=["#5B3FA8","#0F6E6A","#B85A14","#2F5DC0","#A00D25","#8A4B00","#157A6E","#6A3FB8"];
-const customOn=sl=>!!sl&&listRows("Custom groups").some(r=>r.value===sl.id||eqi(r.value,slotText(sl)));
-const customGroups=sl=>sl?S.cgroups.filter(g=>g.slot===sl.id).sort((a,b)=>a.order-b.order).map((g,i)=>({id:g.id,name:g.name,members:g.members,col:CG_COL[i%CG_COL.length]})):[];
-const groupsFor=p=>{const sl=slotOfPlan(p);return customOn(sl)?customGroups(sl):beltGroups();};
-const isCustom=p=>customOn(slotOfPlan(p));
-const inGroup=(g,n)=>g.members?g.members.some(m=>eqi(m,n)):(b=>b>=0&&g.belts.includes(BELTS[b]))(beltIdxOf(n));
-/* Names sorted into group boxes; with custom groups a name can sit in several. Whoever is in none goes last. */
-function bucket(names,gs){const rest=gs.length&&gs[0].members?"Not in a group":"No belt yet";
-  return gs.map(g=>({name:g.name,g,names:names.filter(n=>inGroup(g,n))})).concat([{name:rest,g:null,names:names.filter(n=>!gs.some(g=>inGroup(g,n)))}]).filter(b=>b.names.length);}
-const groupsWord=p=>isCustom(p)?"Groups":"Belt groups";
+const groupsSet=sl=>!!sl&&listRows("Custom groups").some(r=>r.value===sl.id||squash(r.value)===squash(slotText(sl)));
+function classGroups(sl){
+  if(!sl)return beltGroups();
+  const set=groupsSet(sl);
+  const rows=S.cgroups.filter(g=>g.slot===sl.id).sort((a,b)=>a.order-b.order).map((g,i)=>({id:g.id,name:g.name,belts:g.belts||[],members:g.members||[],color:okHex(g.color)?g.color:GCOL[i%GCOL.length]}));
+  if(!rows.length)return set?[]:beltGroups();
+  if(!set&&rows.every(g=>!g.belts.length))return beltGroups().concat(rows); // older classes: belt groups plus hand-picked ones
+  return rows;}
+const snapOf=p=>p&&p.snap&&Array.isArray(p.snap.groups)?p.snap:null;
+const groupsFor=p=>{const sn=snapOf(p);return sn?sn.groups.map((g,i)=>({id:"",name:String(g.name||""),belts:[],members:strs(g.members),color:okHex(g.color)?g.color:GCOL[i%GCOL.length],saved:true})):classGroups(slotOfPlan(p));};
+const isBeltG=g=>!!(g&&g.belts&&g.belts.length);
+const inGroup=(g,n)=>isBeltG(g)?(b=>b>=0&&g.belts.includes(BELTS[b]))(beltIdxOf(n)):(g.members||[]).some(m=>eqi(m,n));
+/* Names sorted into group boxes; a name can sit in several. Whoever is in none goes last. */
+function bucket(names,gs){
+  return gs.map(g=>({name:g.name,g,names:names.filter(n=>inGroup(g,n))})).concat([{name:"Not in any group",g:null,names:names.filter(n=>!gs.some(g=>inGroup(g,n)))}]).filter(b=>b.names.length);}
+const groupsWord=()=>"Groups";
 const byBelt=(a,b)=>{const x=beltIdxOf(a),y=beltIdxOf(b);return((x<0?99:x)-(y<0?99:y))||a.localeCompare(b);};
-const groupDots=g=>g.members?`<span class="kdot" style="background:${g.col}" aria-hidden="true"></span>`:g.belts.slice(0,2).map(b=>`<span class="kdot" style="background:${BELT_COL[b]}" aria-hidden="true"></span>`).join("");
-/* The timeslot a plan sits in: same weekday and start time */
-function slotOfPlan(p){if(!p||!p.date)return null;const t=parseTime(p.time);if(!t)return null;const d=new Date(p.date).getDay();
-  return slots().find(x=>x.day===d&&x.start===t.start)||null;}
+const groupDots=g=>`<span class="gsw" style="background:${g&&g.color||"#9A9A9A"}" aria-hidden="true"></span>`;
+const groupHow=(g,names)=>{const k=names.filter(n=>inGroup(g,n)).length;return(isBeltG(g)?"By belt · "+g.belts.join(", "):g.saved?"Saved after class":"Hand-picked")+" · "+k+(k===1?" student":" students");};
+/* The timeslot a plan sits in: same weekday and start time (a class time that ended still holds its past plans) */
+function slotOfPlan(p){if(!p||!p.date)return null;const t=parseTime(p.time);if(!t)return null;const d=new Date(p.date).getDay(),k=dayKey(p.date);
+  return slots().filter(x=>x.day===d&&x.start===t.start).find(x=>!x.ended||dayKey(x.ended)>=k)||null;}
 const slotText=x=>x?DAYS[x.day].slice(0,3)+" "+x.key+(x.label?" "+x.label:""):"";
 const slotLabel=x=>x?DAYS[x.day]+"s · "+fmtTime(x.key)+(x.label?" · "+x.label:""):"";
 const rosterOf=slotId=>slotId?[...new Set(S.roster.filter(r=>r.slot===slotId).map(r=>r.who))].sort(byBelt):[];
-function tonight(p){const sl=slotOfPlan(p),roster=rosterOf(sl&&sl.id);
+function tonight(p){const sl=slotOfPlan(p),sn=snapOf(p),roster=sn&&Array.isArray(sn.roster)?strs(sn.roster).sort(byBelt):rosterOf(sl&&sl.id);
   const away=new Set((p.away||[]).map(x=>x.toLowerCase()));
   const drop=(p.dropins||[]).filter(n=>!roster.some(r=>eqi(r,n)));
   const here=roster.filter(n=>!away.has(n.toLowerCase())).concat(drop).sort(byBelt);
   return{slot:sl,roster,here,away:roster.filter(n=>away.has(n.toLowerCase())),drop};}
-/* Belt-group lanes of a split section: each group in order, then any lane name no longer in the list, then "Everyone" */
-/* Groups per exercise (Gary, Nov 23): each exercise is for Everyone or for one group (items lane; any name).
-   Back-to-back exercises that have groups run at the same time, each group going through its own in order;
-   that block takes as long as its longest group. Order comes from dragging in Edit plan. */
-/* Every group an exercise can use: this class's groups first, then the other kind (belt or custom) */
-const allGroups=p=>{const sl=slotOfPlan(p),a=groupsFor(p),b=isCustom(p)?beltGroups():customGroups(sl);return a.concat(b.filter(g=>!a.some(x=>eqi(x.name,g.name))));};
-function secBlocks(p,sec){const its=secItems(p,sec),gs=allGroups(p),out=[];
-  its.forEach(it=>{if(!it.lane){out.push({one:it,idx:out.length});return;}
-    let b=out[out.length-1];if(!b||!b.lanes){b={lanes:[],idx:out.length};out.push(b);}
-    let l=b.lanes.find(x=>eqi(x.name,it.lane));if(!l){l={name:it.lane,group:gs.find(g=>eqi(g.name,it.lane))||null,items:[]};b.lanes.push(l);}
+/* Same-time blocks (Gary, Nov 27): exercises that share a block (items "block") run at the same time, one lane per
+   group (items "lane"), each lane going through its own exercises in order; the block takes as long as its longest
+   lane. Everything outside a block is for everyone. Older plans had no block: grouped exercises next to each other
+   count as one block ("auto:" id) until something in it is changed. */
+const allGroups=p=>groupsFor(p);
+function secBlocks(p,sec){const its=secItems(p,sec),gs=groupsFor(p),out=[],at={};let legacy=null;
+  its.forEach(it=>{let bid=it.block;
+    if(!bid&&it.lane){if(!legacy)legacy="auto:"+it.id;bid=legacy;}else legacy=null;
+    if(!bid){out.push({one:it,idx:out.length});return;}
+    let b=at[bid];if(!b){b=at[bid]={id:bid,lanes:[],idx:out.length};out.push(b);}
+    let l=b.lanes.find(x=>eqi(x.name,it.lane||""));if(!l){l={name:it.lane||"",group:gs.find(g=>eqi(g.name,it.lane))||null,items:[]};b.lanes.push(l);}
     l.items.push(it);});
   out.forEach(b=>{if(b.lanes){const rank=l=>{const i=gs.findIndex(g=>eqi(g.name,l.name));return i<0?99:i;};b.lanes.sort((x,y)=>rank(x)-rank(y));}});
   return out;}
@@ -1136,11 +1216,38 @@ const laneMin=l=>l.items.reduce((a,i)=>a+liveMin(i),0);
 const blockMin=b=>b.one?liveMin(b.one):b.lanes.reduce((m,l)=>Math.max(m,laneMin(l)),0);
 const laneKey=(sec,b,l)=>"L:"+sec+"|"+b.idx+"|"+l.name;
 const laneKeys=(p,sec)=>secBlocks(p,sec).filter(b=>b.lanes).flatMap(b=>b.lanes.map(l=>laneKey(sec,b,l)));
-/* Group names offered for an exercise: this class's groups, then any other name already used in the plan */
-const laneOptions=p=>{const gs=allGroups(p),names=gs.map(g=>g.name);itemsOf(p.id).forEach(i=>{if(i.lane&&!names.some(n=>eqi(n,i.lane)))names.push(i.lane);});return names.map(n=>({name:n,group:gs.find(g=>eqi(g.name,n))||null}));};
-const laneChip=(p,name)=>{const g=allGroups(p).find(x=>eqi(x.name,name));return(g?groupDots(g):`<span class="kdot" style="background:#9A9A9A" aria-hidden="true"></span>`)+esc(name);};
+const laneOptions=p=>groupsFor(p).map(g=>({name:g.name,group:g}));
+const laneChip=(p,name)=>{const g=groupsFor(p).find(x=>eqi(x.name,name));return groupDots(g)+esc(name);};
 const laneLabel=l=>l.name||"Everyone";
 const hereIn=(p,l)=>l.group?tonight(p).here.filter(n=>inGroup(l.group,n)).length:0;
+/* Display order of a section's exercises (blocks lane by lane), for renumbering after a change */
+const flatIds=(p,sec)=>secBlocks(p,sec).flatMap(b=>b.one?[b.one.id]:b.lanes.flatMap(l=>l.items.map(i=>i.id)));
+function reorderIds(ids){ids.forEach((id,k)=>{const it=itemById(id);if(it&&it.order!==k+1)store.update("items",id,{order:k+1});});}
+/* An older "auto:" block gets a real ID the first time it's changed */
+function realBlock(p,sec,bid){if(!String(bid).startsWith("auto:"))return bid;const b=secBlocks(p,sec).find(x=>x.id===bid);const nid=uid();
+  if(b)b.lanes.forEach(l=>l.items.forEach(i=>store.update("items",i.id,{block:nid})));return nid;}
+const itemsSnap=ids=>ids.map(id=>{const i=itemById(id);return i?[id,{block:i.block,lane:i.lane,order:i.order}]:null;}).filter(Boolean);
+const restoreItems=snap=>{snap.forEach(([id,d])=>{if(itemById(id))store.update("items",id,d);});};
+
+/* ---------- Class teams (Gary, Nov 27) ----------
+   Who teaches each class time (Class team tab). Instructors on the team can edit the class's plans they can see; admins
+   and anyone already on the team add or take off instructors (several per class). Rows are end-dated, never deleted,
+   so the record of who taught when stays. Anyone can Ask to help. A plan's Taught by is its own list (someone covering,
+   or saved after class), else the team on that day. */
+const teamRows=slotId=>S.team.filter(r=>r.slot===slotId);
+const teamOn=(r,k)=>!r.status&&(!r.from||dayKey(r.from)<=k)&&(!r.until||dayKey(r.until)>=k);
+const teamNow=slotId=>teamRows(slotId).filter(r=>!r.status&&(!r.until||r.until>Date.now()));
+const teamPast=slotId=>teamRows(slotId).filter(r=>!r.status&&r.until&&r.until<=Date.now()).sort((a,b)=>b.until-a.until);
+const teamAsks=slotId=>teamRows(slotId).filter(r=>r.status==="Asked");
+const onTeam=sl=>!!sl&&!!ME&&teamNow(sl.id).some(r=>r.who===ME.id);
+const canTeam=sl=>!!sl&&(isAdmin()||onTeam(sl));
+const teamName=r=>personName(r.who)||r.name||"Someone";
+const myAsk=sl=>!!sl&&!!ME&&teamAsks(sl.id).find(r=>r.who===ME.id);
+function taughtBy(p){if(p.taught&&p.taught.length)return p.taught;const sl=slotOfPlan(p);if(!sl||!p.date)return[];const k=dayKey(p.date);
+  return teamRows(sl.id).filter(r=>teamOn(r,k)).map(teamName);}
+const monthYear=ms=>ms?new Date(ms).toLocaleDateString("en-CA",{month:"short",year:"numeric"}):"";
+const teamSpan=r=>(r.from?monthYear(r.from):"Before Nov 2026")+" – "+(r.until&&r.until<=Date.now()?monthYear(r.until):"now");
+function teamAdd(sl,id){store.add("team",{slot:sl.id,slotName:slotText(sl),who:id,name:personName(id),from:Date.now(),until:"",status:"",addedBy:who()});}
 
 /* ---------- dojo kata, read from the SKA Kata Tracker (names, belts, how many students still need each) ---------- */
 let KATA=null;try{KATA=JSON.parse(LS.get("kata","null"));}catch(e){KATA=null;}
@@ -1268,7 +1375,7 @@ function planCard(p,next){
 const shiftKey=(k,n)=>{const d=new Date(keyMs(k));d.setDate(d.getDate()+n);return dayKey(d.getTime());};
 const weekStartKey=k=>{const d=new Date(keyMs(k));return shiftKey(k,-((d.getDay()+6)%7));};
 const monthKey=(k,n)=>{const d=new Date(keyMs(k));d.setDate(1);d.setMonth(d.getMonth()+(n||0));return dayKey(d.getTime());};
-function classDays(){const set=new Set(slots().map(x=>x.day));if(!set.size)S.plans.forEach(p=>{if(p.date)set.add(new Date(p.date).getDay());});return DAY_ORDER.filter(d=>set.has(d));}
+function classDays(){const set=new Set(liveSlots().map(x=>x.day));if(!set.size)S.plans.forEach(p=>{if(p.date)set.add(new Date(p.date).getDay());});return DAY_ORDER.filter(d=>set.has(d));}
 const dayOK=k=>plansFilter==="All"||new Date(keyMs(k)).getDay()===+plansFilter;
 function dayEntries(k){
   if(!dayOK(k))return[];
@@ -1330,7 +1437,7 @@ function viewPlans(){
   const up=list.filter(p=>p.date>=t0).sort(byWhen);
   const past=list.filter(p=>p.date<t0).sort((a,b)=>byWhen(b,a));
   const chips=[["All","All days"]].concat(days.map(d=>[String(d),DAYS[d].slice(0,3)])).map(([v,l])=>`<button type="button" class="chip sm" data-act="pfilter" data-v="${v}" aria-pressed="${plansFilter===v}">${l}</button>`).join("");
-  const noSlots=!slots().length;
+  const noSlots=!liveSlots().length;
   const listHTML=(up.length?`<h2 class="grouph">Coming up</h2>`+up.map((p,i)=>planCard(p,i===0)).join(""):"")+(past.length?`<h2 class="grouph">Past classes</h2>`+past.map(p=>planCard(p,false)).join(""):"");
   return`<div class="stack plansview">
     <div class="phead"><h1>Lesson plans</h1><div class="row" style="gap:8px"><button type="button" class="iconbtn outline" data-act="students" aria-label="Student notes">${ICON.user}</button><button type="button" class="btn outline square slotsbtn" data-act="slots">${ICON.clock}Class times</button></div></div>
@@ -1348,7 +1455,7 @@ function viewPlans(){
 
 /* ---------- This class ---------- */
 /* Edit plan row (Gary, Nov 23): drag handle, name (tap to open), group chip, minutes, delete (asks first) */
-function itemHTML(p,it,col){
+function itemHTML(p,it,col,inBlock){
   const lib=exById(it.exercise);
   const changed=lib&&it.minutes!==lib.minutes;
   const meta=changed?`${esc(it.editedBy||it.addedBy||"Someone")} changed to ${it.minutes} min · library ${lib.minutes}`:(it.addedBy?`Added by ${esc(it.addedBy)}`:(lib?"From the library":"One-off for this class"));
@@ -1356,22 +1463,42 @@ function itemHTML(p,it,col){
   return`<div class="item ecomp${open&&creator?" cornered":""}" data-id="${esc(it.id)}">${open?ctagHTML(creator):""}
     <div class="r1"><button type="button" class="dragh" aria-label="Drag to move ${esc(it.name)}" title="Drag to move">${ICON.grip}</button>
       <div class="grow" style="min-width:0"><button type="button" class="ttg" data-act="eCard" data-id="${esc(it.id)}" aria-expanded="${open}"><span class="nm">${esc(it.name)}</span>${!open&&np?`<span class="qnb">${np} ${np===1?"note":"notes"}</span>`:""}</button>
-        <button type="button" class="gchip${it.lane?" on":""}" data-act="laneOpen" data-id="${esc(it.id)}" aria-label="Group for ${esc(it.name)}: ${esc(it.lane||"Everyone")}">${it.lane?laneChip(p,it.lane):ICON.people+"Everyone"}${ICON.down}</button></div>
+        ${inBlock?"":`<button type="button" class="gchip" data-act="laneOpen" data-id="${esc(it.id)}" aria-label="Who does ${esc(it.name)}: Everyone">${ICON.people}Everyone${ICON.down}</button>`}</div>
       <div class="stepper"><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="-5" aria-label="5 minutes less for ${esc(it.name)}">${ICON.minus}</button><div class="v"${changed?` style="color:${col}"`:""}>${it.minutes}m</div><button type="button" data-act="bump" data-id="${esc(it.id)}" data-d="5" aria-label="5 minutes more for ${esc(it.name)}">${ICON.plus}</button></div>
       <button type="button" class="iconbtn" data-act="askDelItem" data-id="${esc(it.id)}" aria-label="Delete ${esc(it.name)} from this plan">${ICON.trash}</button></div>
     ${open?`<div class="tbody">${ptsHTML(it.note)}<div class="meta" style="${changed?"color:"+col:""}">${meta}</div><button type="button" class="notebtn grey" data-act="editItem" data-id="${esc(it.id)}">${ICON.edit}Edit for this class</button></div>`:""}
   </div>`;
 }
-/* Group for one exercise: this class's groups, names already used, or a new name */
+/* A same-time block in Edit plan (Gary, Nov 27): one lane per group, each with its own exercises */
+function blockHTML(p,sec,b,col){const bm=blockMin(b);
+  return`<div class="eblock" style="--c:${col}" data-block="${esc(b.id)}">
+    <div class="eblock-h">${ICON.lanes}<b class="grow">At the same time · ${bm} min</b><button type="button" class="bsplit" data-act="blockSplit" data-sec="${esc(sec)}" data-block="${esc(b.id)}">Split up</button></div>
+    ${b.lanes.map(l=>{const m=laneMin(l);return`<div class="blane" data-block="${esc(b.id)}" data-lane="${esc(l.name)}">
+      <div class="blane-h" style="--g:${l.group?l.group.color:"#9A9A9A"}"><button type="button" class="gchip on" data-act="laneOpen" data-sec="${esc(sec)}" data-block="${esc(b.id)}" data-lane="${esc(l.name)}" aria-label="Group for this lane: ${esc(laneLabel(l))}. Change it">${groupDots(l.group)}${esc(laneLabel(l))}${ICON.down}</button><span class="small grow">${m} min${m<bm?` · ${bm-m} min spare`:""}</span><button type="button" class="iconbtn" data-act="laneOut" data-sec="${esc(sec)}" data-block="${esc(b.id)}" data-lane="${esc(l.name)}" aria-label="Take ${esc(laneLabel(l))} out of this block">${ICON.x}</button></div>
+      ${l.items.map(it=>itemHTML(p,it,col,true)).join("")}
+      <button type="button" class="addrow sm" data-act="pick" data-sec="${esc(sec)}" data-block="${esc(b.id)}" data-lane="${esc(l.name)}" style="color:${col}">${ICON.plus}Add to ${esc(laneLabel(l))}</button></div>`;}).join("")}
+    <button type="button" class="addrow lanebtn" data-act="laneNew" data-sec="${esc(sec)}" data-block="${esc(b.id)}" style="color:${col}">${ICON.plus}Another group</button>
+  </div>`;}
+/* Who does it? (Gary, Nov 27): only this class's groups. For an exercise (join the block above or start one), a lane of a
+   block (the whole lane moves), another lane, or a new block (then its exercises). New group opens the groups editor. */
+function laneRow(p,g,on,names,here){const k=g?names.filter(n=>inGroup(g,n)).length:names.length,h=g?here.filter(n=>inGroup(g,n)).length:here.length;
+  return`<button type="button" class="lrow" data-act="laneSet" data-v="${esc(g?g.name:"")}" aria-pressed="${on}">${g?`<span class="gnum" style="background:${g.color}">${k}</span>`:`<span class="gnum all">${ICON.people}</span>`}<span class="grow"><b>${esc(g?g.name:"Everyone")}</b><span class="small">${g?(isBeltG(g)?"By belt":g.saved?"Saved after class":"Hand-picked")+" · ":""}${k} ${k===1?"student":"students"}${here.length&&here.length!==names.length?` · ${h} here`:""}</span></span><span class="lradio" aria-hidden="true">${ICON.check}</span></button>`;}
 function sheetLane(s){
-  const it=itemById(s.id),p=it&&planById(it.plan);if(!it||!p)return sheetHead("Group")+`<p>This exercise was removed.</p>`;
-  const opts=laneOptions(p);
-  return sheetHead("Who does it?",`<div class="small">${esc(it.name)}</div>`)+
-    `<div class="chips"><button type="button" class="pchip" data-act="laneSet" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">${ICON.people}Everyone</button>
-      ${opts.map(o=>`<button type="button" class="pchip" data-act="laneSet" data-id="${esc(it.id)}" data-v="${esc(o.name)}" aria-pressed="${eqi(it.lane,o.name)}">${o.group?groupDots(o.group):""}${esc(o.name)}</button>`).join("")}</div>
-    <form id="laneForm" data-id="${esc(it.id)}" style="margin-top:10px;display:flex;gap:6px;align-items:center"><label for="laneNew" class="vh">New group name</label><input class="inp" id="laneNew" type="text" maxlength="30" placeholder="New group, e.g. Sparring team" autocomplete="off"><button type="submit" class="iconbtn round red" aria-label="Use this group">${ICON.plus}</button></form>
-    <p class="small" style="margin:8px 0 0">Exercises next to each other that have groups run at the same time, each group doing its own. Drag them in Edit plan to line them up.</p>
-    ${isCustom(p)?"":`<p class="small" style="margin:6px 0 0">Want named groups of students? Make them under Students → Class roster → Groups → Custom groups.</p>`}`;
+  const p=planById(PLAN);if(!p)return sheetHead("Who does it?")+`<p>This class was removed.</p>`;
+  const it=s.id?itemById(s.id):null;if(s.id&&!it)return sheetHead("Who does it?")+`<p>This exercise was removed.</p>`;
+  const gs=groupsFor(p),T=tonight(p),names=T.roster.length?T.roster:T.here,here=T.here;
+  let title="Who does it?",sub="",cur=null,used=[],note="";
+  if(it){sub=esc(it.name);cur="";note="Picking a group puts this exercise in the same-time block just above it, or starts one.";}
+  else if(s.mode==="lane"){sub="One lane of a same-time block";cur=s.lane;note="Every exercise in this lane moves to the group you pick.";}
+  else if(s.mode==="newLane"){title="Another group";sub="Who works at the same time?";const b=secBlocks(p,s.sec).find(x=>x.id===s.block);used=b?b.lanes.map(l=>l.name):[];note="Then pick their exercises.";}
+  else{title="Same-time block";sub="Pick the first group, then its exercises. Add more groups after.";}
+  const opts=gs.filter(g=>!used.some(u=>eqi(u,g.name)));
+  const sl=slotOfPlan(p);
+  return sheetHead(title,`<div class="small">${sub}</div>`)+
+    `<div class="lrows">${it?laneRow(p,null,true,names,here):""}${opts.map(g=>laneRow(p,g,cur!=null&&eqi(cur,g.name),names,here)).join("")}</div>
+    ${!opts.length?`<p class="small">${gs.length?"Every group is already in this block.":"This class has no groups yet."}</p>`:""}
+    ${sl&&!snapOf(p)?`<div class="btnrow" style="margin-top:10px"><button type="button" class="btn outline small" data-act="newGroup">${ICON.plus}New group</button><button type="button" class="btn outline small" data-act="openGroups">${ICON.edit}Manage groups</button></div>`:""}
+    ${note?`<p class="small" style="margin:8px 0 0">${note}</p>`:""}`;
 }
 /* Class mix (Gary, Nov 21): who's on this class's roster, by belt and belt group */
 function beltBarHTML(names){const n=names.length||1;const segs=BELTS.map(b=>{const k=names.filter(x=>beltIdxOf(x)===BELTS.indexOf(b)).length;return k?`<span style="width:${(k/n*100).toFixed(2)}%;background:${BELT_COL[b]}"></span>`:"";}).join("");
@@ -1381,7 +1508,7 @@ function mixCard(p){
   const T=tonight(p),names=T.roster.length?T.roster:T.here,open=!tGet("efold",p.id).has("c:mix");
   if(!names.length)return`<button type="button" class="studstrip" data-act="classStudents">${ICON.people}<span class="grow"><b>Class mix</b> · ${T.slot?"set up who’s in this class":"special class, add who’s coming"}</span>${ICON.go}</button>`;
   const gs=groupsFor(p).map(g=>{const k=names.filter(x=>inGroup(g,x)).length;return k?`<span class="sg">${groupDots(g)}${esc(g.name)} · <b>${k}</b></span>`:"";}).join("");
-  return`<section class="card mixc"><div class="chd"><button type="button" class="ttg" data-act="eFold" data-k="c:mix" aria-expanded="${open}">${open?ICON.down:ICON.go}<h2>Class mix</h2><span class="cnt">${names.length} ${T.roster.length?"on the roster":"coming"}</span></button><button type="button" class="notebtn grey" data-act="classStudents">${ICON.people}Students</button></div>
+  return`<section class="card mixc"><div class="chd"><button type="button" class="ttg" data-act="eFold" data-k="c:mix" aria-expanded="${open}">${open?ICON.down:ICON.go}<h2>Class mix</h2><span class="cnt">${names.length} ${T.roster.length?"on the roster":"coming"}</span></button><button type="button" class="notebtn grey" data-act="openGroups">${ICON.lanes}Groups</button><button type="button" class="notebtn grey" data-act="classStudents">${ICON.people}Students</button></div>
     ${open?`${beltBarHTML(names)}<div class="sgs wrap">${gs}</div>`:""}</section>`;
 }
 function viewPlan(){
@@ -1403,8 +1530,8 @@ function viewPlan(){
     let body="";
     if(!sk&&!fold){
       /* one flat list you can drag; a thin line marks exercises that run at the same time */
-      body=secBlocks(p,s).map(b=>b.one?itemHTML(p,b.one,col):`<div class="eblockl" style="--c:${col}">At the same time · ${blockMin(b)} min</div>`+b.lanes.map(l=>l.items).flat().sort((x,y)=>x.order-y.order).map(it=>itemHTML(p,it,col)).join("")).join("")
-        +`<button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" style="color:${col}">${ICON.plus}Add from library</button>`;
+      body=secBlocks(p,s).map(b=>b.one?itemHTML(p,b.one,col):blockHTML(p,s,b,col)).join("")
+        +`<div class="secfoot"><button type="button" class="addrow" data-act="pick" data-sec="${esc(s)}" style="color:${col}">${ICON.plus}Add from library</button><button type="button" class="addrow" data-act="newBlock" data-sec="${esc(s)}" style="color:${col}">${ICON.lanes}Same-time block</button></div>`;
     }
     return`<section class="card section">
       <div class="shead ewrap" style="background:${sk?"#F5F5F5":tint(col)}">
@@ -1419,6 +1546,7 @@ function viewPlan(){
   return`<div class="stack">
     <div class="editbanner">${ICON.edit}<span>Editing. Changes save as you go; tap <b>Save plan</b> when you’re done.</span></div>
     ${planHead(p,esc(whenLine(p)),edited,"Plan options: date, time, focus, sharing, copy, delete")}
+    ${taughtRow(p)}
     ${recapHTML(p)}
     ${mixCard(p)}
     <button type="button" class="pickrow" data-act="planInfo" style="margin:0"><span class="nm" style="font-weight:700">${parseTime(p.time)?`<b>${esc(fmtTime(p.time))}</b>`:"No set time"} · <span style="color:var(--muted)">change date or time</span></span>${ICON.clock}</button>
@@ -1441,7 +1569,8 @@ const clock=m=>Math.floor(m/60)+":"+pad(m%60);
 const qnLines=ptLines;
 const splitQn=x=>{const m=x.match(/^(\d{1,2}:\d{2}\s*[ap]\.?m\.?)\s*[·-]\s*(.*)$/i);return m?{t:m[1],x:m[2]}:{t:"",x:x};};
 function viewOnlyNote(p){if(canEditR(p))return"";
-  return`<div class="viewonly">${ICON.eye}<span>${esc(personName(p.ownerId)||"Another instructor")}’s plan, shared with you to view. To change it, use ⋯ → <b>Copy to a new date</b>.</span></div>`;}
+  const sl=slotOfPlan(p),asked=myAsk(sl);
+  return`<div class="viewonly">${ICON.eye}<span class="grow">${esc(personName(p.ownerId)||"Another instructor")}’s plan, shared with you to view.${sl?` You’re not on the ${esc(shortSlot(sl))} team.`:""} To change it, use ⋯ → <b>Copy to a new date</b>${sl?", or ask to help with the class":""}.</span>${sl?`<button type="button" class="notebtn" data-act="teamOpen" data-slot="${esc(sl.id)}">${asked?"Asked":"Ask to help"}</button>`:""}</div>`;}
 /* Teaching mode (Gary, Nov 5): tick off each exercise (kept on this phone), "You are here" = the first one not ticked,
    tap a section header to fold it (a section folds by itself when its last exercise is ticked), and each exercise shows
    the clock time it should start ("≈ 8:15 p.m.") when the plan has a start time. */
@@ -1575,6 +1704,7 @@ function viewTeach(p){
   return`<div class="stack">
     ${viewOnlyNote(p)}
     ${planHead(p,esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(tot)} of ${fmtHM(len)}${diff>0?` · ${fmtHM(diff)} to spare`:diff<0?` · ${fmtHM(-diff)} over`:""}`,"Plan options: edit, date, focus, copy, delete")}
+    ${taughtRow(p)}
     ${studStrip(p)}
     ${any?teachBar(p):""}
     ${recapHTML(p)}
@@ -1634,6 +1764,7 @@ function viewReview(p){
   return`<div class="stack">
     ${viewOnlyNote(p)}
     ${planHead(p,"Class review · "+esc(whenLine(p)),`${p.type?esc(p.type)+" · ":""}${fmtHM(planTotal(p))} taught`,"Plan options: teaching view, edit, copy, delete")}
+    ${taughtRow(p)}
     ${studStrip(p)}
     <div class="rvsum">${sum}</div>
     ${foldRow()}
@@ -1919,14 +2050,8 @@ function sheetClassStu(s){
         :`<p class="small">${sl?"No one on this class’s roster yet. Add students under Class roster.":"No one yet."}</p>`}
       ${ed?`<button type="button" class="notebtn" data-act="csToggleFind" style="--c:var(--red);margin-top:8px" aria-expanded="${!!s.find}">${ICON.plus}Drop-in for tonight</button>`:""}`;
   }else{
-    const gOpen=!CSFOLD.has("c:groups");
-    const cust=customOn(sl),cgs=customGroups(sl);
-    const gList=cust?(cgs.length?cgs.map(g=>{const k=T.roster.filter(n=>inGroup(g,n));return`<div class="skrow">${groupDots(g)}<span class="grow"><b>${esc(g.name)}</b><span class="small">${k.length?esc(k.slice(0,4).join(", "))+(k.length>4?` +${k.length-4}`:""):"No one yet"}</span></span><b>${k.length}</b></div>`;}).join(""):`<p class="small" style="margin:4px 0">No groups for this class yet.</p>`)
-      :beltGroups().map(g=>`<div class="skrow">${groupDots(g)}<span class="grow"><b>${esc(g.name)}</b><span class="small">${esc(g.belts.join(", "))}</span></span><b>${T.roster.filter(n=>inGroup(g,n)).length}</b></div>`).join("");
-    body=`<section class="card rvhead" style="margin-top:8px">${cardHead("c:groups",gOpen,"Groups",null,`<button type="button" class="notebtn grey" data-act="${cust?"editCGroups":"editGroups"}">${ICON.edit}Edit</button>`).replace('data-act="rFold"','data-act="csFold"')}
-      ${gOpen?`<div class="segtabs sm" role="radiogroup" aria-label="How this class splits"><button type="button" role="radio" aria-checked="${!cust}" data-act="cgMode" data-v="belt"${!cust?' style="background:#111;color:#fff"':""}>Belt groups</button><button type="button" role="radio" aria-checked="${cust}" data-act="cgMode" data-v="custom"${cust?' style="background:#111;color:#fff"':""}>Custom groups</button></div>
-      <p class="small" style="margin:6px 0 4px">${cust?"Groups you pick for this class. Someone can be in more than one.":"Belt groups are the same for every class."}</p>${gList}`:""}</section>
-      ${T.roster.length?csGroups(p,T.roster).map(b=>{const k="r:"+b.name,open=!CSFOLD.has(k);
+    body=``+
+      `${T.roster.length?csGroups(p,T.roster).map(b=>{const k="r:"+b.name,open=!CSFOLD.has(k);
         return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="csFold" data-k="${esc(k)}" aria-expanded="${open}">${open?ICON.down:ICON.go}${b.g?groupDots(b.g):""}<span class="nm">${esc(b.name)}</span><span class="nbc">${b.names.length}</span></button></div>
           ${open?`<div class="gbody">${b.names.map(n=>`<div class="csrow">${beltDot(n)}<span class="grow">${esc(n)}</span><span class="small">${esc(beltOf(n)||"No belt")}</span><button type="button" class="iconbtn" data-act="csRemove" data-v="${esc(n)}" aria-label="Take ${esc(n)} off this class">${ICON.x}</button></div>`).join("")}</div>`:""}</div>`;}).join("")
         :`<p class="small" style="margin-top:8px">No one on the roster for ${esc(slotLabel(sl))} yet.</p>`}
@@ -1936,20 +2061,28 @@ function sheetClassStu(s){
   const find=s.find?`<section class="card csfind"><div class="nbline"><b class="grow">${tab==="roster"?"Add to this class":"Drop-in for tonight"}</b><button type="button" class="chip sm" data-act="csToggleFind">Done</button></div>
     <div class="findbox">${ICON.search}<input class="inp" id="csFind" type="search" value="${esc(s.q||"")}" placeholder="Find a member" autocomplete="off" aria-label="Find a member"></div><div id="csRes" style="margin-top:6px">${csFindHTML(p,s)}</div>
     <p class="small" style="margin:6px 0 0">New to the dojo? <button type="button" class="linkbtn" data-act="addStudent" style="display:inline;min-height:0;font-size:12px">Add them in the Kata Tracker</button> first.</p></section>`:"";
-  return sheetHead("Students",`<div class="small">${sl?esc(slotLabel(sl)):esc(planTitle(p))+" · special class"}</div>`)+tabs+find+big+body+
+  const gs=groupsFor(p),grp=`<button type="button" class="pickrow" data-act="openGroups" style="margin:8px 0 0"><span class="gstack">${gs.slice(0,4).map(g=>groupDots(g)).join("")}</span><span class="nm">Groups<span class="small" style="display:block;font-weight:700">${gs.length?esc(gs.map(g=>g.name).join(", ")):"None yet. Make some for this class."}</span></span>${ICON.go}</button>`;
+  return sheetHead("Students",`<div class="small">${sl?esc(slotLabel(sl)):esc(planTitle(p))+" · special class"}</div>`)+tabs+find+big+(sl?grp:"")+body+
     `<p class="small" style="margin:10px 0 0">Belts come from the Kata Tracker. Attendance itself stays in Muster Hall.</p>`;
 }
 /* Drag to reorder exercises in Edit plan (Gary, Nov 23): hold the dotted handle and move; the list moves around the
    exercise as it passes the middle of a neighbour; the page scrolls near the top or bottom. Order saves on release. */
 let DRAG=null;
-const ecompSib=(el,dir)=>{let n=dir<0?el.previousElementSibling:el.nextElementSibling;while(n&&!n.classList.contains("ecomp"))n=dir<0?n.previousElementSibling:n.nextElementSibling;return n;};
+/* Rows of the section being dragged in, top to bottom, across lanes; a row's box is its lane, else the section */
+const secRows=row=>{const sec=row.closest("section");return sec?[...sec.querySelectorAll(".ecomp")]:[];};
+const boxOf=el=>el.closest(".blane")||el.closest("section");
+function dragPlace(d,y,rc,fn){fn();d.row.style.transform="";const now=d.row.getBoundingClientRect().top;d.startY=y-(rc.top-now);d.row.style.transform=`translateY(${y-d.startY}px)`;d.moved=true;}
 function dragMove(y){
   const d=DRAG;if(!d)return;d.lastY=y;
   d.row.style.transform=`translateY(${y-d.startY}px)`;
   const rc=d.row.getBoundingClientRect(),mid=rc.top+rc.height/2;
-  const nx=ecompSib(d.row,1),pv=ecompSib(d.row,-1);
-  if(nx){const r=nx.getBoundingClientRect();if(mid>r.top+r.height/2){nx.after(d.row);d.row.style.transform="";const now=d.row.getBoundingClientRect().top;d.startY=y-(rc.top-now);d.row.style.transform=`translateY(${y-d.startY}px)`;d.moved=true;}}
-  if(pv){const r=pv.getBoundingClientRect();if(mid<r.top+r.height/2){pv.before(d.row);d.row.style.transform="";const now=d.row.getBoundingClientRect().top;d.startY=y-(rc.top-now);d.row.style.transform=`translateY(${y-d.startY}px)`;d.moved=true;}}
+  const rows=secRows(d.row),i=rows.indexOf(d.row),nx=rows[i+1],pv=rows[i-1],box=boxOf(d.row),blk=d.row.closest(".eblock");
+  if(nx){const r=nx.getBoundingClientRect(),same=boxOf(nx)===box;
+    if(same?mid>r.top+r.height/2:mid>r.top+10){dragPlace(d,y,rc,()=>same?nx.after(d.row):nx.before(d.row));return;}}
+  else if(blk&&mid>blk.getBoundingClientRect().bottom){dragPlace(d,y,rc,()=>blk.after(d.row));return;}
+  if(pv){const r=pv.getBoundingClientRect(),same=boxOf(pv)===box;
+    if(same?mid<r.top+r.height/2:mid<r.bottom-10){dragPlace(d,y,rc,()=>same?pv.before(d.row):pv.after(d.row));return;}}
+  else if(blk&&mid<blk.getBoundingClientRect().top){dragPlace(d,y,rc,()=>blk.before(d.row));return;}
 }
 function dragTick(){const d=DRAG;if(!d)return;const y=d.lastY,edge=90;let v=0;
   if(y<edge)v=-Math.ceil((edge-y)/6);else if(y>innerHeight-edge-70)v=Math.ceil((y-(innerHeight-edge-70))/6);
@@ -1959,52 +2092,189 @@ document.addEventListener("pointerdown",e=>{
   const h=e.target.closest&&e.target.closest(".dragh");if(!h||DRAG)return;const row=h.closest(".ecomp");if(!row)return;
   const p=planById(PLAN);if(!p||!canEditR(p))return;
   e.preventDefault();try{h.setPointerCapture(e.pointerId);}catch(_){}
-  DRAG={row,list:row.parentElement,startY:e.clientY,lastY:e.clientY,pid:e.pointerId,moved:false,raf:0};
+  DRAG={row,startY:e.clientY,lastY:e.clientY,pid:e.pointerId,moved:false,raf:0};
   row.classList.add("dragging");if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}
   DRAG.raf=requestAnimationFrame(dragTick);
 },{passive:false});
 document.addEventListener("pointermove",e=>{if(!DRAG||e.pointerId!==DRAG.pid)return;e.preventDefault();dragMove(e.clientY);},{passive:false});
+/* On release: the row takes the block and group of the lane it landed in (or none), and the section is renumbered */
 function dragEnd(e){
   const d=DRAG;if(!d||(e&&e.pointerId!==d.pid))return;DRAG=null;cancelAnimationFrame(d.raf);
   d.row.classList.remove("dragging");d.row.style.transform="";
   if(!d.moved)return;
-  const ids=[...d.list.querySelectorAll(":scope > .ecomp")].map(r=>r.dataset.id);
-  let pid="";ids.forEach((id,k)=>{const it=itemById(id);if(!it)return;pid=it.plan;if(it.order!==k+1)store.update("items",id,{order:k+1});});
-  if(pid)touchPlan(pid);renderView();
+  const p=planById(PLAN),sec=d.row.closest("section"),it=itemById(d.row.dataset.id);if(!p||!sec||!it)return;
+  const ids=[...sec.querySelectorAll(".ecomp")].map(r=>r.dataset.id),lane=d.row.closest(".blane");
+  let blk="",ln="";
+  if(lane){blk=lane.dataset.block;ln=lane.dataset.lane;
+    if(blk.startsWith("auto:")){const nid=uid(),mates=[...lane.closest(".eblock").querySelectorAll(".ecomp")].map(r=>r.dataset.id).filter(id=>id!==it.id);
+      mates.forEach(id=>store.update("items",id,{block:nid}));blk=nid;}}
+  if(it.block!==blk||!eqi(it.lane,ln))store.update("items",it.id,{block:blk,lane:ln});
+  reorderIds(ids);touchPlan(p.id);renderView();
 }
 document.addEventListener("pointerup",dragEnd);document.addEventListener("pointercancel",dragEnd);
 /* After adding someone from the find list: redraw, then put the cursor back so the keyboard stays up */
 function csRefind(){if(!sheet||sheet.type!=="classStu")return;const b=$("#sheetBox"),top=b?b.scrollTop:0;renderSheet();if(b)b.scrollTop=top;
   const f=$("#csFind");if(f){f.focus({preventScroll:true});const v=f.value;f.setSelectionRange(v.length,v.length);}}
-/* Custom groups for one class time (Gary, Nov 23): pick students from the roster; someone can be in several groups */
+/* Groups for one class time (Gary, Nov 27): a list of groups, each By belt or Hand-picked; tap one to edit it */
+const groupSlot=s=>s&&s.slot?slots().find(x=>x.id===s.slot)||null:slotOfPlan(planById(PLAN));
+const newGroupEd=sl=>{const used=classGroups(sl).map(g=>g.color);return{key:"",name:"",color:GCOL.find(c=>!used.includes(c))||GCOL[0],kind:"pick",belts:[],members:[],confirm:false};};
 function sheetCGroups(s){
-  const p=planById(PLAN),sl=slotOfPlan(p);if(!sl)return sheetHead("Custom groups")+`<p>This plan isn’t at a class time, so it has no groups.</p>`;
+  const sl=groupSlot(s),p=planById(PLAN);
+  if(!sl)return sheetHead("Groups")+`<p class="small">This plan isn’t at a class time, so it uses the dojo’s belt groups: ${esc(beltGroups().map(g=>g.name).join(", "))}.</p>`;
   const roster=rosterOf(sl.id);
-  if(!s.rows)s.rows=customGroups(sl).map((g,i)=>({id:g.id,name:g.name,members:g.members.slice(),open:false}));
-  if(!s.rows.length)s.rows.push({id:"",name:"",members:[],open:true});
-  const none=roster.filter(n=>!s.rows.some(r=>r.members.some(m=>eqi(m,n))));
-  const rows=s.rows.map((r,i)=>{const col=CG_COL[i%CG_COL.length],gone=r.members.filter(m=>!roster.some(n=>eqi(n,m)));
-    return`<div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="cgFold" data-i="${i}" aria-expanded="${!!r.open}">${r.open?ICON.down:ICON.go}<span class="kdot" style="background:${col}"></span><span class="nm" id="cgh-${i}">${esc(r.name||"New group")}</span><span class="nbc">${r.members.length}</span></button>
-      <button type="button" class="iconbtn" data-act="cgDel" data-i="${i}" aria-label="Remove this group">${ICON.trash}</button></div>
-      ${r.open?`<div class="gbody"><label for="cgname-${i}" class="vh">Group name</label><input class="inp" id="cgname-${i}" type="text" maxlength="30" value="${esc(r.name)}" placeholder="Group name, e.g. Competition team" autocomplete="off">
-        <div class="chips" style="margin-top:6px">${roster.concat(gone).map(n=>`<button type="button" class="pchip" data-act="cgPick" data-i="${i}" data-v="${esc(n)}" aria-pressed="${r.members.some(m=>eqi(m,n))}">${beltDot(n)}${esc(n)}</button>`).join("")}</div>
-        ${roster.length?"":`<p class="small">Add students to this class’s roster first.</p>`}</div>`:""}</div>`;}).join("");
-  return sheetHead("Custom groups",`<div class="small">${esc(slotLabel(sl))}</div>`)+
-    `<p class="small" style="margin:-4px 0 6px">Tap students to put them in a group. Someone can be in more than one.</p>${rows}
-    <button type="button" class="btn outline small" data-act="cgAdd" style="margin-top:8px">${ICON.plus}Add a group</button>
-    ${none.length&&roster.length?`<p class="small" style="margin:8px 0 0">Not in a group: ${esc(none.join(", "))}</p>`:""}
-    <div class="btnrow" style="margin-top:12px"><button type="button" class="btn outline" data-act="grpBack">Cancel</button><button type="button" class="btn primary" data-act="cgSave">Save groups</button></div>`;
+  if(s.ed){const e=s.ed,pool=[...new Set(roster.concat(e.members))].sort(byBelt);
+    const inIt=e.kind==="belt"?roster.filter(n=>(b=>b>=0&&e.belts.includes(BELTS[b]))(beltIdxOf(n))):e.members.slice().sort(byBelt);
+    return sheetHead(e.key?"Edit group":"New group",`<div class="small">${esc(slotLabel(sl))}</div>`)+
+      `<div class="field"><label for="cgName">Name</label><input class="inp" id="cgName" type="text" maxlength="30" value="${esc(e.name)}" placeholder="e.g. Sparring team" autocomplete="off"></div>
+      <span class="label">Colour</span><div class="swrow">${GCOL.map(c=>`<button type="button" class="swb" data-act="cgColor" data-v="${c}" aria-pressed="${e.color===c}" aria-label="Colour ${c}" style="background:${c}"></button>`).join("")}</div>
+      <span class="label">Who’s in it?</span>
+      <div class="segtabs sm" role="radiogroup" aria-label="Who’s in it"><button type="button" role="radio" aria-checked="${e.kind==="belt"}" data-act="cgKind" data-v="belt"${e.kind==="belt"?' style="background:#111;color:#fff"':""}>By belt</button><button type="button" role="radio" aria-checked="${e.kind!=="belt"}" data-act="cgKind" data-v="pick"${e.kind!=="belt"?' style="background:#111;color:#fff"':""}>Hand-picked</button></div>
+      ${e.kind==="belt"?`<p class="small" style="margin:6px 0 4px">Tap the belts. Everyone on this class’s roster with those belts is in, and a grading moves them for you.</p><div class="chips">${BELTS.map(b=>`<button type="button" class="pchip" data-act="cgBelt" data-v="${b}" aria-pressed="${e.belts.includes(b)}"><span class="kdot" style="background:${BELT_COL[b]}"></span>${b}</button>`).join("")}</div>`
+        :`<p class="small" style="margin:6px 0 4px">Tap students to add or take them out.</p>${pool.length?`<div class="chips">${pool.map(n=>`<button type="button" class="pchip" data-act="cgPick" data-v="${esc(n)}" aria-pressed="${e.members.some(m=>eqi(m,n))}">${beltDot(n)}${esc(n)}</button>`).join("")}</div>`:`<p class="small">Add students to this class’s roster first (Students → Class roster).</p>`}`}
+      <div class="gprev"><b>${inIt.length} ${inIt.length===1?"student":"students"}:</b> ${esc(inIt.join(", ")||"nobody yet")}</div>
+      ${e.confirm?`<div class="confirm"><b>Delete ${esc(e.key)}?</b><p class="small">Exercises given to this group in coming classes go back to Everyone. Past classes keep it.</p><div class="btnrow"><button type="button" class="btn outline small" data-act="cgKeep">Keep</button><button type="button" class="btn primary small" data-act="cgDelOne">Delete</button></div></div>`:""}
+      <div class="btnrow" style="margin-top:12px">${e.key?`<button type="button" class="iconbtn" data-act="cgAskDel" aria-label="Delete this group" style="color:var(--red)">${ICON.trash}</button>`:""}<button type="button" class="btn outline" data-act="cgCancel">Cancel</button><button type="button" class="btn primary" data-act="cgSaveOne">Save group</button></div>`;}
+  const gs=classGroups(sl),loose=roster.filter(n=>!gs.some(g=>inGroup(g,n)));
+  return sheetHead("Groups",`<div class="small">${esc(slotLabel(sl))}</div>`)+
+    `${p&&snapOf(p)&&(()=>{const q=slotOfPlan(p);return q&&q.id===sl.id;})()?`<p class="viewonly" style="margin-bottom:8px">${ICON.clock}<span>This class is over, so it keeps the groups it had that night. Changes here count from now on.</span></p>`:""}
+    <p class="small" style="margin:-4px 0 6px">This class’s groups, all in one place. Give an exercise to a group from its chip in Edit plan.</p>
+    ${gs.map(g=>{const m=isBeltG(g)?roster.filter(n=>inGroup(g,n)):g.members.slice().sort(byBelt);
+      return`<div class="gcard"><button type="button" class="gcard-h" data-act="cgEdit" data-v="${esc(g.name)}" aria-label="Edit ${esc(g.name)}"><span class="gnum" style="background:${g.color}">${m.length}</span><span class="grow"><b>${esc(g.name)}</b><span class="small">${isBeltG(g)?"By belt · "+esc(g.belts.join(", ")):"Hand-picked"} · ${m.length} ${m.length===1?"student":"students"}</span></span>${ICON.edit}</button>
+        ${m.length?`<div class="gnames">${m.map(n=>`<span class="gname">${beltDot(n)}${esc(n)}</span>`).join("")}</div>`:""}</div>`;}).join("")||`<p class="small">No groups for this class yet.</p>`}
+    ${loose.length?`<div class="gloose"><b>Not in any group · ${loose.length}</b><span class="small">${esc(loose.join(", "))}</span></div>`:""}
+    <button type="button" class="btn outline block" data-act="newGroup" style="margin-top:10px">${ICON.plus}New group</button>
+    <p class="small" style="margin:8px 0 0">Belt groups fill themselves from the Kata Tracker. Hand-picked groups only change when you change them. Someone can be in more than one group.</p>
+    ${s.back?`<button type="button" class="btn outline block" data-act="grpBack" style="margin-top:10px">Done</button>`:""}`;
 }
-/* Belt groups editor: "Name: Belt, Belt" rows in Lists. Each belt sits in one group. */
-function sheetGroups(s){
-  if(!s.rows)s.rows=beltGroups().map(g=>({name:g.name,belts:g.belts.slice()}));
-  const rows=s.rows.map((r,i)=>`<div class="grow-row card"><div class="row" style="gap:6px"><label for="gname-${i}" class="vh">Group name</label><input class="inp" id="gname-${i}" type="text" maxlength="30" value="${esc(r.name)}" placeholder="e.g. Beginners" autocomplete="off"><button type="button" class="iconbtn" data-act="grpDel" data-i="${i}" aria-label="Remove this group">${ICON.trash}</button></div>
-      <div class="chips" style="margin-top:6px">${BELTS.map(b=>`<button type="button" class="chip sm" data-act="grpBelt" data-i="${i}" data-v="${b}" aria-pressed="${r.belts.includes(b)}"><span class="kdot" style="background:${BELT_COL[b]};margin-right:5px"></span>${b}</button>`).join("")}</div></div>`).join("");
-  return sheetHead("Belt groups",`<div class="small">For the whole dojo</div>`)+
-    `<p class="small" style="margin:-4px 0 8px">Tap belts to put them in a group. A belt can only be in one group.</p><div class="stack">${rows}</div>
-    <button type="button" class="btn outline small" data-act="grpAdd" style="margin-top:8px">${ICON.plus}Add a group</button>
-    <div class="btnrow" style="margin-top:12px"><button type="button" class="btn outline" data-act="grpBack">Cancel</button><button type="button" class="btn primary" data-act="grpSave">Save groups</button></div>`;
-}
+/* Write a class's group list to the sheet (the dojo's belt groups become its own the first time); name → row ID */
+function saveGroupsList(sl){const cur=classGroups(sl),ids={};
+  if(!groupsSet(sl))store.add("lists",{list:"Custom groups",value:sl.id,colour:"",inNew:""});
+  cur.forEach((g,i)=>{if(g.id){ids[g.name.toLowerCase()]=g.id;const r=S.cgroups.find(x=>x.id===g.id);if(r&&r.order!==i+1)store.update("cgroups",g.id,{order:i+1});}
+    else ids[g.name.toLowerCase()]=store.add("cgroups",{slot:sl.id,slotName:slotText(sl),name:g.name,belts:g.belts,members:[],color:g.color,order:i+1,addedBy:who()});});
+  return ids;}
+/* Coming classes at this class time (past ones keep what they had) */
+const comingPlans=sl=>S.plans.filter(x=>canEditR(x)&&!isPast(x)&&!snapOf(x)&&(q=>q&&q.id===sl.id)(slotOfPlan(x)));
+function saveGroup(s){const sl=groupSlot(s);if(!sl||!s.ed)return false;const e=s.ed;
+  const name=String(e.name||"").replace(/[,:]/g," ").replace(/\s+/g," ").trim().slice(0,30);
+  if(!name){toast("Give the group a name.");return false;}
+  if(classGroups(sl).some(g=>eqi(g.name,name)&&!eqi(g.name,e.key))){toast(`This class already has a group called ${name}.`);return false;}
+  if(e.kind==="belt"&&!e.belts.length){toast("Pick at least one belt.");return false;}
+  const ids=saveGroupsList(sl),id=e.key?ids[e.key.toLowerCase()]:"";
+  const data={slot:sl.id,slotName:slotText(sl),name,belts:e.kind==="belt"?BELTS.filter(b=>e.belts.includes(b)):[],members:e.kind==="belt"?[]:e.members.slice(),color:e.color};
+  if(id)store.update("cgroups",id,data);else store.add("cgroups",Object.assign({order:Object.keys(ids).length+1,addedBy:who()},data));
+  if(e.key&&!eqi(e.key,name))comingPlans(sl).forEach(x=>itemsOf(x.id).forEach(i=>{if(eqi(i.lane,e.key))store.update("items",i.id,{lane:name});}));
+  toast("Group saved");return true;}
+function deleteGroup(s){const sl=groupSlot(s);if(!sl||!s.ed||!s.ed.key)return;const key=s.ed.key,ids=saveGroupsList(sl),id=ids[key.toLowerCase()];
+  if(id)store.del("cgroups",id);
+  comingPlans(sl).forEach(x=>itemsOf(x.id).forEach(i=>{if(eqi(i.lane,key))store.update("items",i.id,{lane:"",block:""});}));
+  toast(`${key} deleted`);}
+
+/* ---------- Taught by (Gary, Nov 27) ---------- */
+function taughtRow(p){const names=taughtBy(p),sl=slotOfPlan(p),ed=canEditR(p);
+  if(!names.length&&!sl&&!ed)return"";
+  const txt=names.length?esc(names.join(", ")):sl?"No one on this class’s team yet":"Not set";
+  const own=p.taught&&p.taught.length&&!snapOf(p)&&sl?" · this class only":"";
+  const act=ed?"taughtOpen":sl?"teamOpen":"";
+  return`<button type="button" class="studstrip taught"${act?` data-act="${act}"`:" disabled"}>${ICON.user}<span class="grow"><b>Taught by</b><span class="m"> ${txt}${own}</span></span>${act?ICON.go:""}</button>`;}
+function sheetTaught(s){const p=planById(PLAN);if(!p)return sheetHead("Taught by");
+  const sl=slotOfPlan(p),k=p.date?dayKey(p.date):todayKey(),team=sl?teamRows(sl.id).filter(r=>teamOn(r,k)).map(teamName):[];
+  if(!s.sel)s.sel=new Set(p.taught&&p.taught.length?p.taught:team);
+  const names=[...new Set(S.people.map(x=>x.name).concat([...s.sel]))];
+  return sheetHead("Taught by",`<div class="small">${esc(whenLine(p))}</div>`)+
+    `<p class="small" style="margin:-4px 0 8px">${sl?`Normally the class team: <b>${esc(team.join(", ")||"no one yet")}</b>. If someone covers, pick who’s teaching this one.`:"Pick who’s teaching this class."}</p>
+    <div class="chips">${names.map(n=>`<button type="button" class="pchip" data-act="taughtPick" data-v="${esc(n)}" aria-pressed="${[...s.sel].some(x=>eqi(x,n))}">${esc(n)}</button>`).join("")}</div>
+    <div class="btnrow" style="margin-top:12px">${sl?`<button type="button" class="btn outline" data-act="taughtTeam">Use the class team</button>`:""}<button type="button" class="btn primary" data-act="taughtSave">Save</button></div>
+    ${sl?`<button type="button" class="linkbtn" data-act="teamOpen" style="margin-top:6px">${ICON.people}&nbsp;Class team for ${esc(slotLabel(sl))}</button>`:""}`;}
+
+/* ---------- Class team panel (Gary, Nov 27) ---------- */
+const AVA=["#C8102E","#1E7FD6","#2E9E48","#8E2CB0","#E0603A","#0F8B8D","#5D4037","#C2185B"];
+const avaCol=id=>AVA[[...String(id||"")].reduce((a,c)=>a+c.charCodeAt(0),0)%AVA.length];
+const initials2=n=>{const w=String(n||"").split(/\s+/).filter(x=>x&&!/\.$/.test(x));return((w[0]||n||"?")[0]+(w[1]?w[1][0]:"")).toUpperCase();};
+const avatar=(id,name)=>`<span class="ava" style="background:${avaCol(id)}" aria-hidden="true">${esc(initials2(name))}</span>`;
+function sheetTeam(s){const sl=slots().find(x=>x.id===s.slot);if(!sl)return sheetHead("Class team")+`<p>This class time was removed.</p>`;
+  const can=canTeam(sl),now=teamNow(sl.id),past=teamPast(sl.id),asks=teamAsks(sl.id),mine=myAsk(sl),ids=new Set(now.map(r=>r.who));
+  const conf=s.confirm&&now.find(r=>r.id===s.confirm);
+  return sheetHead("Class team",`<div class="small">${esc(slotLabel(sl))}${sl.ended?` · ended ${esc(fmtDay(sl.ended))}`:""}</div>`)+
+    `<p class="small" style="margin:-4px 0 8px">Everyone on the team can edit this class’s plans straight away. Admins and anyone already on the team add or take off instructors. Who can see each plan still follows its own sharing.</p>
+    <span class="label">Instructors · ${now.length}</span>
+    ${now.length?now.map(r=>`<div class="teamrow">${avatar(r.who,teamName(r))}<span class="grow"><b>${esc(teamName(r))}</b><span class="small">${r.from?"Since "+esc(fmtDay(r.from)):"On the team"}${r.addedBy?" · added by "+esc(r.addedBy):""}</span></span>${can?`<button type="button" class="iconbtn" data-act="teamAskOff" data-id="${esc(r.id)}" aria-label="Take ${esc(teamName(r))} off this class">${ICON.x}</button>`:""}</div>`).join(""):`<p class="small">No one yet.</p>`}
+    ${conf?`<div class="confirm"><b>Take ${esc(teamName(conf))} off this class?</b><p class="small">They move to Past instructors, so the record stays. They keep seeing what’s shared with them, but can’t edit this class’s plans.</p><div class="btnrow"><button type="button" class="btn outline small" data-act="teamKeep">Keep</button><button type="button" class="btn primary small" data-act="teamOff" data-id="${esc(conf.id)}">Take off</button></div></div>`:""}
+    ${asks.length&&can?`<div class="askbox"><b>Asked to help with this class</b>${asks.map(r=>`<div class="teamrow">${avatar(r.who,teamName(r))}<span class="grow"><b>${esc(teamName(r))}</b></span><button type="button" class="btn outline small" data-act="teamNo" data-id="${esc(r.id)}">Decline</button><button type="button" class="btn primary small" data-act="teamYes" data-id="${esc(r.id)}">Add</button></div>`).join("")}</div>`:""}
+    ${can?(s.adding?`<span class="label" style="margin-top:10px">Add an instructor</span><div class="chips">${S.people.filter(x=>!ids.has(x.id)).map(x=>`<button type="button" class="pchip" data-act="teamAddP" data-v="${esc(x.id)}">${avatar(x.id,x.name)}${esc(x.name)}</button>`).join("")||`<p class="small">Every instructor is already on this class.</p>`}</div>`
+        :`<button type="button" class="notebtn" data-act="teamAdding" style="margin-top:8px">${ICON.plus}Add an instructor</button>`)
+      :mine?`<div class="askbox"><b>You asked to help with this class</b><p class="small" style="margin:2px 0 6px">The class team and admins will see it.</p><button type="button" class="btn outline small" data-act="teamUnask" data-id="${esc(mine.id)}">Take back my request</button></div>`
+      :`<button type="button" class="btn primary block" data-act="teamAsk" data-v="${esc(sl.id)}" style="margin-top:8px">Ask to help with this class</button>`}
+    ${past.length?`<span class="label" style="margin-top:14px">Past instructors</span>${past.map(r=>`<div class="teamrow past">${avatar(r.who,teamName(r))}<span class="grow"><b>${esc(teamName(r))}</b><span class="small">${esc(teamSpan(r))}</span></span></div>`).join("")}`:""}
+    ${s.back?`<button type="button" class="btn outline block" data-act="grpBack" style="margin-top:12px">Back</button>`:""}`;}
+
+/* ---------- Manage access (admins, Gary Nov 27) ----------
+   Profile → Manage access. People (roles, requests), Classes (who teaches each class time) and Invite (link and dojo
+   code). The sheet answers {admin:{action,who,...}} with the people list and, for one person, what they can see.
+   Admins only ever see counts of other people's private things. */
+let ADMIN=null;
+async function adminCall(a){
+  if(queue.length||inflight)await flush();
+  let res;try{res=await callApi({token:TOKEN,ops:[],admin:a});}catch(e){res={ok:false,message:"Can’t reach the sheet. Try again."};}
+  if(res&&res.ok){ADMIN=res.admin||ADMIN;if(res.me){ME=res.me;LS.set("me",JSON.stringify(ME));}S=normalize(res.state);queue.forEach(applyLocal);onData();}
+  else if(res&&res.error==="bad_token"){signOut("Please sign in again.");return null;}
+  else toast((res&&res.message)||"That didn’t work. Try again.");
+  if(sheet&&(sheet.type==="access"||sheet.type==="accessPerson"))renderSheet();
+  return res&&res.ok?res:null;}
+const appLink=()=>location.origin+location.pathname.replace(/index\.html$/,"");
+const inviteText=()=>`You’re invited to the SKA Lesson Planner.\n1. Open ${appLink()} on your phone.\n2. Tap Create an account and use the dojo code: ${ADMIN&&ADMIN.code||"(ask me)"}\n3. Install it: Android Chrome ⋮ → Add to Home screen; iPhone Safari Share → Add to Home Screen.`;
+const ago=ms=>{if(!ms)return"never";const d=Math.round((Date.now()-ms)/864e5);return d<=0?"today":d===1?"yesterday":d<14?d+" days ago":d<60?Math.round(d/7)+" weeks ago":fmtDay(ms);};
+const shortSlot=sl=>DAYS[sl.day].slice(0,3)+" "+clock12(sl.start).replace(/:00/,"");
+function sheetAccess(s){
+  const tabs=[["people","People"],["classes","Classes"],["invite","Invite"]].map(([k,l])=>`<button type="button" role="tab" aria-selected="${s.tab===k}" data-act="accTab" data-v="${k}"${s.tab===k?' style="background:#111;color:#fff"':""}>${l}</button>`).join("");
+  let body="";
+  if(s.tab==="people"){
+    const asks=S.team.filter(r=>r.status==="Asked");
+    body=(asks.length?`<div class="askbox"><b>Asked to help with a class</b>${asks.map(r=>{const sl=slots().find(x=>x.id===r.slot);return`<div class="teamrow">${avatar(r.who,teamName(r))}<span class="grow"><b>${esc(teamName(r))}</b><span class="small">${esc(sl?slotLabel(sl):r.slotName)}</span></span><button type="button" class="btn outline small" data-act="teamNo" data-id="${esc(r.id)}">Decline</button><button type="button" class="btn primary small" data-act="teamYes" data-id="${esc(r.id)}">Add</button></div>`;}).join("")}</div>`:"")+
+      (!ADMIN?`<p class="small">Loading…</p>`:`<span class="label">${ADMIN.people.length} instructors</span>`+ADMIN.people.map(x=>{const cl=liveSlots().filter(sl=>teamNow(sl.id).some(r=>r.who===x.id)).map(shortSlot);
+        return`<button type="button" class="pickrow" data-act="accessPerson" data-v="${esc(x.id)}">${avatar(x.id,x.name)}<span class="nm">${esc(x.name)}${x.me?" (you)":""} <span class="rolepill${x.admin?" on":""}">${x.admin?"Admin":"Instructor"}</span><span class="small" style="display:block;font-weight:700">${cl.length?"Teaches "+esc(cl.join(", ")):"No classes yet"}</span><span class="small" style="display:block">Signed in ${esc(ago(x.lastSeen))} · sees ${x.plans} plans, ${x.exercises} exercises</span></span>${ICON.go}</button>`;}).join(""));
+  }else if(s.tab==="classes"){
+    body=`<p class="small" style="margin:0 0 6px">Who teaches each class. Instructors on a class can edit its plans straight away; a class can have several. Tap a name to take them off (it stays in the class’s history).</p>`+
+      liveSlots().map(sl=>{const now=teamNow(sl.id),ids=new Set(now.map(r=>r.who));
+        return`<div class="card accslot"><div class="row" style="gap:6px;align-items:baseline"><b class="grow">${esc(DAYS[sl.day].slice(0,3))} ${esc(fmtTime(sl.key))}</b><span class="small">${esc(sl.label||"")} · ${now.length} ${now.length===1?"instructor":"instructors"}</span></div>
+          <div class="chips" style="margin-top:5px">${now.map(r=>`<button type="button" class="pchip on" data-act="teamOff" data-id="${esc(r.id)}" aria-label="Take ${esc(teamName(r))} off">${esc(teamName(r))}${ICON.x}</button>`).join("")}<button type="button" class="pchip add" data-act="accAddSlot" data-slot="${esc(sl.id)}" aria-expanded="${s.addSlot===sl.id}">${ICON.plus}Add</button></div>
+          ${s.addSlot===sl.id?`<div class="chips" style="margin-top:5px">${S.people.filter(x=>!ids.has(x.id)).map(x=>`<button type="button" class="pchip" data-act="teamAddP" data-slot="${esc(sl.id)}" data-v="${esc(x.id)}">${esc(x.name)}</button>`).join("")||`<span class="small">Everyone is on this class.</span>`}</div>`:""}
+          <button type="button" class="linkbtn" data-act="teamOpen" data-slot="${esc(sl.id)}" style="min-height:30px;font-size:12.5px">${ICON.history}&nbsp;Team and history</button></div>`;}).join("")||`<p class="small">No class times yet. Add them under Plans → Class times.</p>`;
+  }else{
+    const code=ADMIN?ADMIN.code:"";
+    body=`<div class="card accslot"><span class="label">App link</span><div class="row" style="gap:6px"><b class="grow" style="overflow-wrap:anywhere">${esc(appLink().replace(/^https?:\/\//,""))}</b><button type="button" class="chip sm" data-act="accCopy" data-v="${esc(appLink())}">Copy</button></div>
+      <span class="label" style="margin-top:10px">Dojo code (needed to sign up)</span>
+      ${s.editCode?`<div class="row" style="gap:6px"><label for="accCode" class="vh">New dojo code</label><input class="inp" id="accCode" type="text" maxlength="30" value="${esc(s.code||"")}" autocomplete="off"><button type="button" class="btn primary small" data-act="accCodeSave">Save</button></div><p class="small">Existing accounts keep working.</p>`
+        :`<div class="row" style="gap:6px"><b class="grow codeval">${!ADMIN?"…":s.show?esc(code):"••••••••"}</b><button type="button" class="chip sm" data-act="accShow">${s.show?"Hide":"Show"}</button><button type="button" class="chip sm" data-act="accCodeEdit">Change</button></div>`}
+      <button type="button" class="btn primary block" data-act="accInvite" style="margin-top:10px"${ADMIN?"":" disabled"}>${ICON.share}Share an invite</button>
+      <p class="small" style="margin:6px 0 0">Sends the link, the dojo code and how to install it, in one message. New instructors start as Instructor; change their role under People.</p></div>`;
+  }
+  return sheetHead("Manage access",`<div class="small">Only admins see this</div>`)+`<div class="segtabs three" role="tablist">${tabs}</div>`+body;}
+function sheetAccessPerson(s){
+  const P=ADMIN&&ADMIN.person&&ADMIN.person.id===s.who?ADMIN.person:null,base=ADMIN&&ADMIN.people.find(x=>x.id===s.who);
+  const back=`<button type="button" class="btn outline block" data-act="grpBack" style="margin-top:12px">Back to everyone</button>`;
+  if(!base)return sheetHead("Instructor")+`<p class="small">Loading…</p>`+back;
+  const x=P||base,me=x.me;
+  const cl=liveSlots().map(sl=>{const on=teamNow(sl.id).some(r=>r.who===x.id);return`<button type="button" class="pchip" data-act="accSlot" data-slot="${esc(sl.id)}" aria-pressed="${on}">${esc(shortSlot(sl))}${sl.label?` <span class="small">${esc(sl.label)}</span>`:""}</button>`;}).join("");
+  const sh=P?P.shared:[],open=!CSFOLD.has("a:shared");
+  const row=it=>`<div class="teamrow">${it.coll==="plans"?ICON.cal:ICON.book}<span class="grow"><b>${it.coll==="plans"?esc(fmtDay(it.date))+" · "+esc(it.focus||(it.type?it.type+" class":"Class plan")):esc(it.name)}</b><span class="small">${esc(it.owner)} · ${esc(it.why)}${it.edit?" · can edit":""}</span></span>${it.stop?`<button type="button" class="chip sm" data-act="accUnshare" data-coll="${esc(it.coll)}" data-id="${esc(it.id)}">Stop sharing</button>`:""}</div>`;
+  const conf=s.confirm,CONF={reset:["Let them reset their password?","Their password is cleared. They choose a new one on the sign-in screen with the dojo code.","Clear password"],
+    signout:["Sign them out on every device?","Every phone and computer asks them to sign in again. Nothing of theirs is deleted.","Sign out"],
+    remove:["Remove "+x.name+" from the app?","They’re signed out and can’t sign back in. Plans they shared stay; their private ones stay in the sheet. Their class history is kept.","Remove"]};
+  return sheetHead(esc(x.name),`<div class="small">${x.joined?"Joined "+esc(fmtDay(x.joined))+" · ":""}signed in ${esc(ago(x.lastSeen))}</div>`)+
+    `<span class="label">Role</span><div class="segtabs sm" role="radiogroup" aria-label="Role"><button type="button" role="radio" aria-checked="${!x.admin}" data-act="accRole" data-v="Instructor"${!x.admin?' style="background:#111;color:#fff"':""}>Instructor</button><button type="button" role="radio" aria-checked="${x.admin}" data-act="accRole" data-v="Admin"${x.admin?' style="background:var(--red);color:#fff"':""}>Admin</button></div>
+    <p class="small" style="margin:4px 0 0">${x.admin?"Admin: can also edit what’s shared with them, change class times, and open Manage access.":"Instructor: sees and copies what’s shared with them; edits their own things and their classes’ plans."}</p>
+    <span class="label" style="margin-top:12px">Classes they teach</span><div class="chips">${cl||`<span class="small">No class times yet.</span>`}</div>
+    <p class="small" style="margin:4px 0 0">They can edit the plans they can see for these classes. For any other class, an admin or that class’s team adds them (or they tap Ask to help).</p>
+    <span class="label" style="margin-top:12px">What they can see</span>
+    <div class="tiles"><div><b>${x.plans}</b><span>plans</span></div><div><b>${x.exercises}</b><span>exercises</span></div><div><b>${x.notes}</b><span>class notes</span></div></div>
+    <div class="gbox"><div class="gbh"><button type="button" class="ttg" data-act="csFold" data-k="a:shared" aria-expanded="${open}">${open?ICON.down:ICON.go}<span class="nm">Shared with them that you can see · ${P?sh.length:"…"}</span></button></div>
+      ${open?`<div class="gbody">${!P?`<p class="small">Loading…</p>`:sh.length?sh.map(row).join(""):`<p class="small">Nothing shared with them yet.</p>`}</div>`:""}</div>
+    <p class="viewonly" style="margin-top:8px">${ICON.lock}<span>Their private plans, exercises and notes stay private, even from admins. Only the person who made something can change who sees it.</span></p>
+    ${P&&P.history.length?`<span class="label" style="margin-top:12px">Classes taught</span>${P.history.map(h=>`<div class="teamrow">${ICON.history}<span class="grow"><b>${esc(h.slotName||"A class time")}</b><span class="small">${h.from?esc(monthYear(h.from)):"Before Nov 2026"} – ${h.current?"now":esc(monthYear(h.until))} · ${h.classes} ${h.classes===1?"class":"classes"}</span></span></div>`).join("")}`:""}
+    <span class="label" style="margin-top:12px">Signing in</span>
+    ${conf&&CONF[conf]?`<div class="confirm"><b>${esc(CONF[conf][0])}</b><p class="small">${esc(CONF[conf][1])}</p><div class="btnrow"><button type="button" class="btn outline small" data-act="accConfirm" data-v="">Keep</button><button type="button" class="btn primary small" data-act="accDo" data-v="${conf}">${esc(CONF[conf][2])}</button></div></div>`:""}
+    <div class="stack" style="gap:6px">${x.password||!x.google?`<button type="button" class="btn outline block" data-act="accConfirm" data-v="reset">Let them reset their password</button>`:""}
+      ${me?"":`<button type="button" class="btn outline block" data-act="accConfirm" data-v="signout">Sign them out on every device</button><button type="button" class="btn danger block" data-act="accConfirm" data-v="remove">Remove from the app</button>`}</div>`+back;}
 
 /* ---------- Notifications (Gary, Oct 30): Profile → Notifications ----------
    Settings live on the instructor's row (ME.notify); each phone signs up separately (push subscription).
@@ -2075,7 +2345,7 @@ function nsSum(k,w){
   return"Notifies you "+(w.day===-1?"the day before":"on class day")+" at "+clock12(w.at||"08:00")+".";
 }
 function sheetNotify(){
-  const n=nsInit();const sl=slots();
+  const n=nsInit();const sl=liveSlots();
   let top="";
   if(pushState==="checking")top=`<p class="small">Checking this device…</p>`;
   else if(pushState==="unsupported")top=`<div class="viewonly">${ICON.eye}<span>This browser can’t show notifications. On an iPhone, add the app to the Home Screen first (Share → Add to Home Screen), then open it from there.</span></div>`;
@@ -2200,6 +2470,7 @@ function viewProfile(){
     <button type="submit" class="btn outline block">Save password</button>
   </form>
   <button type="button" class="pickrow" data-act="feedback" style="margin:0"><span class="nm">Send feedback<span class="small" style="display:block;font-weight:700">Bugs, ideas, anything confusing</span></span>${ICON.go}</button>
+  ${isAdmin()?`<button type="button" class="pickrow" data-act="openAccess" style="margin:0"><span class="nm">Manage access<span class="small" style="display:block;font-weight:700">Instructors, roles, class teams and invites</span></span>${ICON.go}</button>`:""}
   <button type="button" class="pickrow" data-act="notify" style="margin:0"><span class="nm">Notifications<span class="small" style="display:block;font-weight:700">Class reminders, plans to make, assignments to follow up</span></span>${ICON.go}</button>
   <button type="button" class="btn danger block" data-act="signOut">Sign out on this device</button>
   </div>`;
@@ -2333,7 +2604,11 @@ function renderSheet(){
     case"students":h=sheetStudents(s);break;
     case"note":h=sheetNote();break;
     case"classStu":h=sheetClassStu(s);break;
-    case"groups":h=sheetGroups(s);break;
+    case"groups":h=sheetCGroups(s);break;
+    case"team":h=sheetTeam(s);break;
+    case"taught":h=sheetTaught(s);break;
+    case"access":h=sheetAccess(s);break;
+    case"accessPerson":h=sheetAccessPerson(s);break;
     case"cgroups":h=sheetCGroups(s);break;
     case"lane":h=sheetLane(s);break;
     case"consol":h=sheetConsol();break;
@@ -2353,6 +2628,7 @@ function renderSheet(){
         ${!ed?`<button type="button" class="btn primary block" data-act="copyPlan" data-id="${esc(p.id)}" data-focus>${ICON.copy}Copy to a new date</button>`:planMode==="edit"?`<button type="button" class="btn primary block" data-act="savePlan" data-focus>${ICON.check}Save plan</button>`:`<button type="button" class="btn primary block" data-act="editPlan" data-focus>${ICON.edit}Edit plan</button>`}
         ${planMode==="review"?`<button type="button" class="btn ghost block" data-act="setMode" data-m="view">${ICON.list}Teaching view</button>`:planMode==="view"?`<button type="button" class="btn ghost block" data-act="setMode" data-m="review">${ICON.review}Review class</button>`:""}
         ${ed?`<button type="button" class="btn ghost block" data-act="planInfo">${ICON.cal}Change date, time or focus</button>`:""}
+        ${slotOfPlan(p)?`<button type="button" class="btn ghost block" data-act="teamOpen">${ICON.people}Class team</button>`:""}
         ${canShareR(p)?`<button type="button" class="btn ghost block" data-act="sharePlan">${ICON.people}Who can see it: ${esc(shareLabel(p.share))}</button>`:`<p class="small" style="margin:0 0 10px;text-align:center">${esc(personName(p.ownerId)||"Another instructor")}’s plan · shared with ${esc(shareMode(p.share)==="all"?"everyone":"you")}</p>`}
         ${ed?`<button type="button" class="btn ghost block" data-act="copyPlan" data-id="${esc(p.id)}">${ICON.copy}Copy to a new date</button>
         <button type="button" class="btn danger block" data-act="askDelPlan">${ICON.trash}Delete this plan</button>`:""}</div>`;break;}
@@ -2386,7 +2662,6 @@ function sheetItem(s){
   return sheetHead(esc(it.name),secChip(it.section)+"<br>")+
   `<p class="small" style="margin:-6px 0 16px">${it.addedBy?`Added by ${esc(it.addedBy)}`:""}${lib?`${it.addedBy?" · ":""}library time ${lib.minutes} min`:`${it.addedBy?" · ":""}not in the library`}</p>
   ${lib&&(lib.description||toPoints(lib.notes).length)?`<details class="libref"><summary>Instructions and notes from the library</summary>${lib.addedBy?`<p style="margin:8px 0 0"><span class="tag creator">${ICON.user}${esc(lib.addedBy)}</span></p>`:""}${lib.description?`<h3>Instructions</h3>${stepsHTML(lib.description)}`:""}${toPoints(lib.notes).length?`<h3>Notes</h3>${ptsHTML(lib.notes)}`:""}</details>`:""}
-  ${p?`<div class="field"><span class="label">Group</span><div class="chips">${laneOptions(p).map(g=>`<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="${esc(g.name)}" aria-pressed="${eqi(it.lane,g.name)}">${g.group?groupDots(g.group):""}<span style="margin-left:4px">${esc(g.name)}</span></button>`).join("")}<button type="button" class="chip sm" data-act="itemLane" data-id="${esc(it.id)}" data-v="" aria-pressed="${!it.lane}">Everyone</button></div></div>`:""}
   <form id="itemForm" data-id="${esc(it.id)}">
     <div class="field"><label for="fMin">Minutes for this class</label>
       <div class="minbig"><button type="button" data-act="stepMin" data-d="-5" aria-label="5 minutes less">${ICON.minus}</button>
@@ -2431,7 +2706,7 @@ function kataPickHTML(s){
   });
   return html;
 }
-const pickItems=(p,s)=>s.lane!=null?secItems(p,s.sec).filter(i=>eqi(i.lane,s.lane)):secItems(p,s.sec);
+const pickItems=(p,s)=>s.lane!=null?secItems(p,s.sec).filter(i=>eqi(i.lane,s.lane)&&(!s.block||i.block===s.block)):secItems(p,s.sec);
 const pickTitle=s=>"Add to "+esc(s.sec)+(s.lane?" · "+esc(s.lane):"");
 function pickListHTML(s){
   if(s.mode==="kata")return kataPickHTML(s);
@@ -2533,12 +2808,13 @@ function planFormChange(f,t){
   if(t.name==="length")f.querySelector(".lenother").hidden=t.value!=="other";
 }
 function sheetSlots(){
-  const list=slots();const adm=isAdmin();
+  const list=liveSlots(),gone=slots().filter(x=>x.ended);const adm=isAdmin();
   let body=DAY_ORDER.map(d=>{const its=list.filter(x=>x.day===d);if(!its.length)return"";
-    return`<div class="slotday">${DAYS[d]}</div>`+its.map(x=>`<div class="slotrow"><span class="grow">${esc(fmtTime(x.key))}${x.label?` · <span style="color:var(--muted)">${esc(x.label)}</span>`:""}</span>${adm?`<button type="button" class="iconbtn" data-act="delSlot" data-id="${esc(x.id)}" aria-label="Remove ${esc(DAYS[d])} ${esc(fmtTime(x.key))}">${ICON.x}</button>`:""}</div>`).join("");}).join("");
+    return`<div class="slotday">${DAYS[d]}</div>`+its.map(x=>`<div class="slotrow"><span class="grow">${esc(fmtTime(x.key))}${x.label?` · <span style="color:var(--muted)">${esc(x.label)}</span>`:""}</span><button type="button" class="notebtn grey" data-act="teamOpen" data-slot="${esc(x.id)}">${ICON.people}${teamNow(x.id).length||"Team"}</button>${adm?`<button type="button" class="iconbtn" data-act="delSlot" data-id="${esc(x.id)}" aria-label="End ${esc(DAYS[d])} ${esc(fmtTime(x.key))}">${ICON.x}</button>`:""}</div>`).join("");}).join("");
+  if(gone.length)body+=`<div class="slotday" style="margin-top:14px">Ended</div>`+gone.map(x=>`<div class="slotrow"><span class="grow" style="color:var(--muted)">${esc(DAYS[x.day].slice(0,3))} ${esc(fmtTime(x.key))}${x.label?" · "+esc(x.label):""}<span class="small" style="display:block">Ended ${esc(fmtDay(x.ended))} · past classes keep it</span></span><button type="button" class="notebtn grey" data-act="teamOpen" data-slot="${esc(x.id)}">${ICON.history}Team</button>${adm?`<button type="button" class="notebtn grey" data-act="slotBack" data-id="${esc(x.id)}">Bring back</button>`:""}</div>`).join("");
   if(!body)body=`<p class="small">No class times yet.${adm?" Add your class times below.":" An admin can add them."}</p>`;
   const types=classTypes();
-  return sheetHead("Class times",`<div class="small">The dojo’s regular weekly classes. They fill the Plans calendar and the day filter.</div>`)+body+(adm?`<form id="slotForm" class="mt">
+  return sheetHead("Class times",`<div class="small">The dojo’s regular weekly classes. They fill the Plans calendar and the day filter. Ending one keeps its past classes.</div>`)+body+(adm?`<form id="slotForm" class="mt">
     <div class="slotday" style="margin-top:18px">Add a class time</div>
     <div class="field"><label for="slDay">Day</label><select class="inp" id="slDay" name="day">${DAY_ORDER.map(d=>`<option value="${d}">${DAYS[d]}</option>`).join("")}</select></div>
     <div class="field"><span class="label" style="margin:0">Time</span><div class="timein"><input class="inp" name="tStart" type="time" step="300" required aria-label="Start time"><span>to</span><input class="inp" name="tEnd" type="time" step="300" required aria-label="End time"></div></div>
@@ -2629,8 +2905,9 @@ document.addEventListener("click",e=>{
     case"planMenu":openSheet({type:"planMenu"});break;
     case"sharePlan":if(p&&canShareR(p)){if(sheet)swapSheet({type:"share",coll:"plans",id:p.id});else openSheet({type:"share",coll:"plans",id:p.id});}break;
     case"slots":openSheet({type:"slots"});break;
-    case"delSlot":{const r=S.lists.find(x=>x.id===t.dataset.id);if(!r||!isAdmin())break;const copy={list:r.list,value:r.value,colour:r.colour||"",inNew:r.inNew||""};store.del("lists",r.id);renderSheet();
-      toast("Timeslot removed",[{label:"Undo",fn:()=>{store.add("lists",copy);if(sheet&&sheet.type==="slots")renderSheet();}}]);break;}
+    case"delSlot":{const r=S.lists.find(x=>x.id===t.dataset.id);if(!r||!isAdmin())break;store.update("lists",r.id,{ended:Date.now()});renderSheet();
+      toast("Class time ended. Its past classes keep it.",[{label:"Undo",fn:()=>{store.update("lists",r.id,{ended:""});if(sheet&&sheet.type==="slots")renderSheet();}}]);break;}
+    case"slotBack":{const r=S.lists.find(x=>x.id===t.dataset.id);if(!r||!isAdmin())break;store.update("lists",r.id,{ended:""});renderSheet();break;}
     case"copyEx":{const ex=exById(t.dataset.id);if(!ex)break;const id=store.add("exercises",{section:ex.section,name:ex.name,minutes:ex.minutes,description:ex.description,notes:ex.notes,addedBy:ex.addedBy||who(),editedBy:"",share:"me"});
       swapSheet({type:"ex",id});toast("Copied to your library. Only you can see the copy.");break;}
     case"editPlan":if(p&&!canEditR(p))break;if(sheet){hideSheet();planMode="edit";editFromView=true;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}
@@ -2666,17 +2943,17 @@ document.addEventListener("click",e=>{
     case"removeItem":{const form=$("#itemForm");const it=form&&itemById(form.dataset.id);if(!it)break;
       const copy=Object.assign({},it);delete copy.id;store.del("items",it.id);touchPlan(it.plan);closeSheet();
       toast(`Removed ${it.name}`,[{label:"Undo",fn:()=>{store.add("items",copy);touchPlan(copy.plan);}}]);break;}
-    case"pick":if(p)openSheet({type:"pick",plan:p.id,sec:t.dataset.sec,lane:t.dataset.lane,q:"",all:false});break;
+    case"pick":{if(!p)break;const blk=t.dataset.block?realBlock(p,t.dataset.sec,t.dataset.block):"";openSheet({type:"pick",plan:p.id,sec:t.dataset.sec,lane:t.dataset.lane,block:blk,q:"",all:false});break;}
     case"pickAll":if(sheet&&sheet.type==="pick"){sheet.all=!sheet.all;t.setAttribute("aria-pressed",sheet.all);$("#pickList").innerHTML=pickListHTML(sheet);}break;
     case"addEx":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),ex=exById(t.dataset.id);if(!pp||!ex)break;
-      addItem(pp,sheet.sec,ex,sheet.lane!=null?{lane:sheet.lane}:undefined);$("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-id="${ex.id}"]`);if(b)b.focus({preventScroll:true});break;}
+      addItem(pp,sheet.sec,ex,sheet.lane!=null?{lane:sheet.lane,block:sheet.block||""}:undefined);$("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-id="${ex.id}"]`);if(b)b.focus({preventScroll:true});break;}
     case"pickMode":if(sheet&&sheet.type==="pick"){sheet.mode=t.dataset.m;sheet.q="";renderSheet();}break;
     case"pickBelt":if(sheet&&sheet.type==="pick"){sheet.belt=t.dataset.v;renderSheet();}break;
     case"pickCat":if(sheet&&sheet.type==="pick"){sheet.cat=t.dataset.v;renderSheet();}break;
     case"addKata":{if(!sheet||sheet.type!=="pick")break;const pp=planById(sheet.plan),k=dojoKata(t.dataset.name);if(!pp||!k)break;
       const there=pickItems(pp,sheet).filter(i=>eqi(i.name,k.name));
       if(there.length){const it=there[there.length-1];store.del("items",it.id);touchPlan(pp.id);}
-      else addItem(pp,sheet.sec,{id:"",name:k.name,minutes:10},sheet.lane!=null?{lane:sheet.lane}:undefined);
+      else addItem(pp,sheet.sec,{id:"",name:k.name,minutes:10},sheet.lane!=null?{lane:sheet.lane,block:sheet.block||""}:undefined);
       $("#pickList").innerHTML=pickListHTML(sheet);const b=$(`#pickList [data-name="${CSS.escape(k.name)}"]`);if(b)b.focus({preventScroll:true});break;}
     case"noteNew":if(sheet)swapSheet({type:"note"});else openSheet({type:"note"});break;
     case"nbKind":NB.kind=t.dataset.v;NB.item="";if(NB.kind!=="Person"&&NB.kind!=="Assignment"){NB.picked=new Set();NB.whole=false;}renderSheet();break;
@@ -2727,12 +3004,79 @@ document.addEventListener("click",e=>{
       if(!nx){toast(`Next ${day}’s class has no plan yet. Make it first, then tap this again.`);break;}
       if(!canEditR(nx)){toast("You can’t edit next week’s plan. Ask its owner to add it.");break;}
       addItem(nx,it.section,{id:it.exercise,name:it.name,minutes:it.minutes},{note:it.note,lane:it.lane||""});toast(`Added to ${fmtDay(nx.date)}`);break;}
-    case"laneOpen":openSheet({type:"lane",id:t.dataset.id});break;
-    case"laneSet":{const it=itemById(t.dataset.id);if(!it)break;store.update("items",it.id,{lane:t.dataset.v});touchPlan(it.plan);closeSheet();break;}
+    case"laneOpen":{const d=t.dataset;if(d.id)openSheet({type:"lane",id:d.id});else openSheet({type:"lane",mode:"lane",sec:d.sec,block:d.block,lane:d.lane});break;}
+    case"laneNew":openSheet({type:"lane",mode:"newLane",sec:t.dataset.sec,block:t.dataset.block});break;
+    case"newBlock":openSheet({type:"lane",mode:"newBlock",sec:t.dataset.sec});break;
+    case"blockSplit":{if(!p)break;const sec=t.dataset.sec,b=secBlocks(p,sec).find(x=>x.id===t.dataset.block);if(!b)break;
+      const ids=flatIds(p,sec),snap=itemsSnap(ids);b.lanes.forEach(l=>l.items.forEach(i=>store.update("items",i.id,{block:"",lane:""})));reorderIds(ids);touchPlan(p.id);
+      toast("Split into a normal list",[{label:"Undo",fn:()=>{restoreItems(snap);touchPlan(p.id);}}]);break;}
+    case"laneOut":{if(!p)break;const sec=t.dataset.sec,bid=realBlock(p,sec,t.dataset.block),b=secBlocks(p,sec).find(x=>x.id===bid),l=b&&b.lanes.find(x=>eqi(x.name,t.dataset.lane));if(!l)break;
+      const ids=flatIds(p,sec),snap=itemsSnap(ids),out=l.items.map(i=>i.id),inB=b.lanes.flatMap(x=>x.items.map(i=>i.id));
+      const last=Math.max(...inB.map(id=>ids.indexOf(id))),rest=ids.filter(id=>!out.includes(id)),pos=rest.filter(id=>ids.indexOf(id)<=last).length;
+      rest.splice(pos,0,...out);out.forEach(id=>store.update("items",id,{block:"",lane:""}));reorderIds(rest);touchPlan(p.id);
+      toast(`${laneLabel(l)} is out of the block`,[{label:"Undo",fn:()=>{restoreItems(snap);touchPlan(p.id);}}]);break;}
+    case"laneSet":{if(!sheet||sheet.type!=="lane")break;const pp=planById(PLAN);if(!pp)break;const v=t.dataset.v,sh=sheet;
+      if(sh.id){const it=itemById(sh.id);if(!it)break;
+        if(!v)store.update("items",it.id,{lane:"",block:""});
+        else{const bl=secBlocks(pp,it.section),i=bl.findIndex(b=>b.one&&b.one.id===it.id),prev=i>0?bl[i-1]:null;
+          const bid=prev&&prev.lanes?realBlock(pp,it.section,prev.id):uid();store.update("items",it.id,{lane:v,block:bid});}
+        touchPlan(pp.id);closeSheet();break;}
+      if(sh.mode==="lane"){const bid=realBlock(pp,sh.sec,sh.block),b=secBlocks(pp,sh.sec).find(x=>x.id===bid),l=b&&b.lanes.find(x=>eqi(x.name,sh.lane));
+        if(l&&!eqi(l.name,v))l.items.forEach(i=>store.update("items",i.id,{lane:v}));touchPlan(pp.id);closeSheet();break;}
+      const bid=sh.mode==="newLane"?realBlock(pp,sh.sec,sh.block):uid();
+      swapSheet({type:"pick",plan:pp.id,sec:sh.sec,lane:v,block:bid,q:"",all:false});break;}
+    case"openGroups":{const sl=slotOfPlan(p);const ns={type:"cgroups",slot:t.dataset.slot||(sl&&sl.id)||"",back:sheet?Object.assign({},sheet):null};if(sheet)swapSheet(ns);else openSheet(ns);break;}
+    case"newGroup":{const sl=slotOfPlan(p),from=sheet&&sheet.type==="lane"?Object.assign({},sheet):null,slot=sheet&&sheet.type==="cgroups"?sheet.slot:(sl&&sl.id)||"";
+      const ns=sheet&&sheet.type==="cgroups"?sheet:{type:"cgroups",slot,back:from,ret:from};ns.ed=newGroupEd(groupSlot(ns));if(sheet&&sheet.type==="cgroups")renderSheet();else if(sheet)swapSheet(ns);else openSheet(ns);break;}
+    case"cgEdit":{if(!sheet)break;const sl=groupSlot(sheet),g=sl&&classGroups(sl).find(x=>eqi(x.name,t.dataset.v));if(!g)break;
+      sheet.ed={key:g.name,name:g.name,color:g.color,kind:isBeltG(g)?"belt":"pick",belts:g.belts.slice(),members:g.members.slice(),confirm:false};renderSheet();$("#sheetBox").scrollTop=0;break;}
+    case"cgColor":if(sheet&&sheet.ed){sheet.ed.color=t.dataset.v;renderSheet();}break;
+    case"cgKind":if(sheet&&sheet.ed){sheet.ed.kind=t.dataset.v;renderSheet();}break;
+    case"cgBelt":if(sheet&&sheet.ed){const b=t.dataset.v,e=sheet.ed;e.belts=e.belts.includes(b)?e.belts.filter(x=>x!==b):e.belts.concat(b);renderSheet();}break;
+    case"cgPick":if(sheet&&sheet.ed){const v=t.dataset.v,e=sheet.ed;e.members=e.members.some(m=>eqi(m,v))?e.members.filter(m=>!eqi(m,v)):e.members.concat(v);renderSheet();}break;
+    case"cgAskDel":if(sheet&&sheet.ed){sheet.ed.confirm=true;renderSheet();}break;
+    case"cgKeep":if(sheet&&sheet.ed){sheet.ed.confirm=false;renderSheet();}break;
+    case"cgDelOne":if(sheet&&sheet.ed){deleteGroup(sheet);sheet.ed=null;renderSheet();}break;
+    case"cgCancel":if(sheet){if(sheet.ret&&!sheet.ed.key)swapSheet(sheet.ret);else{sheet.ed=null;renderSheet();}}break;
+    case"cgSaveOne":if(sheet&&sheet.ed){const nm=($("#cgName")||{}).value;if(nm!=null)sheet.ed.name=nm;if(!saveGroup(sheet))break;
+      if(sheet.ret&&!sheet.ed.key)swapSheet(sheet.ret);else{sheet.ed=null;renderSheet();}}break;
+    case"grpBack":if(sheet&&sheet.back)swapSheet(sheet.back);else closeSheet();break;
+    case"taughtOpen":{const ns={type:"taught"};if(sheet)swapSheet(ns);else openSheet(ns);break;}
+    case"taughtPick":if(sheet&&sheet.sel){const v=t.dataset.v,had=[...sheet.sel].find(n=>eqi(n,v));if(had)sheet.sel.delete(had);else sheet.sel.add(v);renderSheet();}break;
+    case"taughtTeam":if(p){store.update("plans",p.id,{taught:[]});touchPlan(p.id);toast("Follows the class team");closeSheet();}break;
+    case"taughtSave":if(p&&sheet&&sheet.sel){store.update("plans",p.id,{taught:[...sheet.sel]});touchPlan(p.id);toast("Saved who’s teaching");closeSheet();}break;
+    case"teamOpen":{const sl=t.dataset.slot||(slotOfPlan(p)||{}).id;if(!sl)break;const ns={type:"team",slot:sl,back:sheet&&sheet.type!=="team"?Object.assign({},sheet):null};if(sheet)swapSheet(ns);else openSheet(ns);break;}
+    case"teamAdding":if(sheet){sheet.adding=!sheet.adding;renderSheet();}break;
+    case"teamAddP":{const sl=slots().find(x=>x.id===(t.dataset.slot||(sheet&&sheet.slot)));if(!sl)break;teamAdd(sl,t.dataset.v);if(sheet){sheet.adding=false;sheet.addSlot="";}toast(`${personName(t.dataset.v)} is on ${shortSlot(sl)}`);renderSheet();break;}
+    case"teamAskOff":if(sheet){sheet.confirm=t.dataset.id;renderSheet();}break;
+    case"teamKeep":if(sheet){sheet.confirm="";renderSheet();}break;
+    case"teamOff":{const r=S.team.find(x=>x.id===t.dataset.id);if(!r)break;store.update("team",r.id,{until:Date.now()});if(sheet)sheet.confirm="";renderSheet();
+      toast(`${teamName(r)} is off this class`,[{label:"Undo",fn:()=>{store.update("team",r.id,{until:""});if(sheet)renderSheet();}}]);break;}
+    case"teamYes":{const r=S.team.find(x=>x.id===t.dataset.id);if(!r)break;store.update("team",r.id,{status:"",from:Date.now(),until:""});toast(`${teamName(r)} is on the team`);renderSheet();break;}
+    case"teamNo":{const r=S.team.find(x=>x.id===t.dataset.id);if(!r)break;store.update("team",r.id,{status:"Declined",until:Date.now()});renderSheet();break;}
+    case"teamAsk":{const sl=slots().find(x=>x.id===t.dataset.v);if(!sl||!ME||myAsk(sl))break;store.add("team",{slot:sl.id,slotName:slotText(sl),who:ME.id,name:who(),from:"",until:"",status:"Asked",addedBy:who()});toast("Asked. The class team and admins will see it.");renderSheet();break;}
+    case"teamUnask":{const r=S.team.find(x=>x.id===t.dataset.id);if(r)store.del("team",r.id);renderSheet();break;}
+    case"openAccess":{ADMIN=ADMIN||null;const ns={type:"access",tab:"people"};if(sheet)swapSheet(ns);else openSheet(ns);adminCall({action:"info"});break;}
+    case"accTab":if(sheet){sheet.tab=t.dataset.v;sheet.addSlot="";renderSheet();}break;
+    case"accessPerson":{swapSheet({type:"accessPerson",who:t.dataset.v,back:Object.assign({},sheet),confirm:""});adminCall({action:"info",who:t.dataset.v});break;}
+    case"accAddSlot":if(sheet){sheet.addSlot=sheet.addSlot===t.dataset.slot?"":t.dataset.slot;renderSheet();}break;
+    case"accRole":if(sheet&&sheet.who)adminCall({action:"role",who:sheet.who,role:t.dataset.v}).then(()=>{if(sheet&&sheet.who)adminCall({action:"info",who:sheet.who});});break;
+    case"accSlot":{if(!sheet||!sheet.who)break;const sl=slots().find(x=>x.id===t.dataset.slot);if(!sl)break;const r=teamNow(sl.id).find(x=>x.who===sheet.who);
+      if(r){store.update("team",r.id,{until:Date.now()});toast(`Off ${shortSlot(sl)}`,[{label:"Undo",fn:()=>{store.update("team",r.id,{until:""});if(sheet)renderSheet();}}]);}
+      else teamAdd(sl,sheet.who);renderSheet();break;}
+    case"accConfirm":if(sheet){sheet.confirm=t.dataset.v;renderSheet();}break;
+    case"accDo":{if(!sheet||!sheet.who)break;const a=t.dataset.v,w=sheet.who;sheet.confirm="";
+      adminCall({action:a,who:w}).then(r=>{if(!r)return;toast(a==="remove"?"Removed from the app":a==="signout"?"Signed out on every device":"They can choose a new password with the dojo code");
+        if(a==="remove"){if(sheet&&sheet.back)swapSheet(sheet.back);adminCall({action:"info"});}else adminCall({action:"info",who:w});});break;}
+    case"accUnshare":if(sheet&&sheet.who)adminCall({action:"unshare",who:sheet.who,coll:t.dataset.coll,id:t.dataset.id}).then(r=>{if(r&&sheet&&sheet.who)adminCall({action:"info",who:sheet.who});});break;
+    case"accCopy":{const v=t.dataset.v;try{navigator.clipboard.writeText(v).then(()=>toast("Copied"));}catch(_){toast(v);}break;}
+    case"accShow":if(sheet){sheet.show=!sheet.show;renderSheet();}break;
+    case"accCodeEdit":if(sheet){sheet.editCode=!sheet.editCode;sheet.code=ADMIN&&ADMIN.code||"";renderSheet();}break;
+    case"accCodeSave":if(sheet){const c=String(sheet.code||"").trim();if(c.length<4){toast("Use at least 4 characters.");break;}adminCall({action:"code",code:c}).then(r=>{if(r&&sheet){sheet.editCode=false;sheet.show=true;toast("Dojo code changed. Existing accounts keep working.");renderSheet();}});}break;
+    case"accInvite":{const txt=inviteText();if(navigator.share)navigator.share({title:"SKA Lesson Planner",text:txt}).catch(()=>{});else{try{navigator.clipboard.writeText(txt).then(()=>toast("Invite copied. Paste it in a message."));}catch(_){toast(txt);}}break;}
     case"askDelItem":{const it=itemById(t.dataset.id);if(it)openSheet({type:"confirm",center:true,title:`Delete ${it.name}?`,text:"It comes out of this plan only. The library keeps it.",yes:"Delete",act:"delItem",id:it.id});break;}
     case"delItem":{const it=itemById(t.dataset.id);if(!it)break;const copy=Object.assign({},it);delete copy.id;store.del("items",it.id);touchPlan(it.plan);closeSheet();
       toast(`Deleted ${it.name}`,[{label:"Undo",fn:()=>{store.add("items",copy);touchPlan(copy.plan);}}]);break;}
-    case"itemLane":{const it=itemById(t.dataset.id);if(!it)break;store.update("items",it.id,{lane:t.dataset.v});touchPlan(it.plan);renderSheet();break;}
     case"classStudents":if(!p)break;if(sheet)swapSheet({type:"classStu",tab:"tonight",q:""});else openSheet({type:"classStu",tab:"tonight",q:""});break;
     case"csTab":if(sheet){sheet.tab=t.dataset.v;sheet.find=false;sheet.q="";renderSheet();}break;
     case"csFold":{const k=t.dataset.k;if(CSFOLD.has(k))CSFOLD.delete(k);else CSFOLD.add(k);renderSheet();break;}
@@ -2743,34 +3087,21 @@ document.addEventListener("click",e=>{
     case"csDrop":{if(!p||!canEditR(p))break;const v=t.dataset.v;if(!(p.dropins||[]).some(x=>eqi(x,v)))store.update("plans",p.id,{dropins:(p.dropins||[]).concat(v)});csRefind();break;}
     case"csDropDel":{if(!p||!canEditR(p))break;const v=t.dataset.v;store.update("plans",p.id,{dropins:(p.dropins||[]).filter(x=>!eqi(x,v))});renderSheet();break;}
     case"csAdd":{const sl=slotOfPlan(p);if(!sl)break;const v=t.dataset.v;if(!rosterOf(sl.id).some(x=>eqi(x,v)))store.add("roster",{slot:sl.id,slotName:slotText(sl),who:v,addedBy:who()});toast(`Added ${v}`);csRefind();break;}
-    case"cgMode":{const sl=slotOfPlan(p);if(!sl)break;const want=t.dataset.v==="custom";if(want===customOn(sl))break;
-      if(want){store.add("lists",{list:"Custom groups",value:slotText(sl),colour:"",inNew:""});if(!customGroups(sl).length){swapSheet({type:"cgroups",back:Object.assign({},sheet)});break;}}
-      else listRows("Custom groups").filter(r=>r.value===sl.id||eqi(r.value,slotText(sl))).forEach(r=>store.del("lists",r.id));
-      renderSheet();break;}
-    case"editCGroups":swapSheet({type:"cgroups",back:sheet&&sheet.type==="classStu"?Object.assign({},sheet):null});break;
-    case"cgFold":if(sheet&&sheet.rows){const r=sheet.rows[+t.dataset.i];if(r){r.open=!r.open;renderSheet();}}break;
-    case"cgPick":if(sheet&&sheet.rows){const r=sheet.rows[+t.dataset.i],v=t.dataset.v;if(!r)break;const has=r.members.some(m=>eqi(m,v));r.members=has?r.members.filter(m=>!eqi(m,v)):r.members.concat(v);renderSheet();}break;
-    case"cgDel":if(sheet&&sheet.rows){sheet.rows.splice(+t.dataset.i,1);renderSheet();}break;
-    case"cgAdd":if(sheet&&sheet.rows){sheet.rows.forEach(r=>{r.open=false;});sheet.rows.push({id:"",name:"",members:[],open:true});renderSheet();}break;
-    case"cgSave":{if(!sheet||!sheet.rows)break;const sl=slotOfPlan(planById(PLAN));if(!sl)break;
-      const rows=sheet.rows.map(r=>({id:r.id,name:String(r.name||"").replace(/,/g," ").replace(/\s+/g," ").trim().slice(0,30),members:r.members})).filter(r=>r.name);
-      if(new Set(rows.map(r=>r.name.toLowerCase())).size<rows.length){toast("Two groups have the same name. Give each its own.");break;}
-      const keep=new Set(rows.map(r=>r.id).filter(Boolean));
-      S.cgroups.filter(g=>g.slot===sl.id&&!keep.has(g.id)).forEach(g=>store.del("cgroups",g.id));
-      rows.forEach((r,i)=>{const d={slot:sl.id,slotName:slotText(sl),name:r.name,members:r.members,order:i+1};if(r.id)store.update("cgroups",r.id,d);else store.add("cgroups",Object.assign({addedBy:who()},d));});
-      toast("Groups saved");if(sheet.back)swapSheet(sheet.back);else closeSheet();break;}
+
+
+
+
+
+
+
     case"csRemove":{const sl=slotOfPlan(p);if(!sl)break;const v=t.dataset.v,rows=S.roster.filter(r=>r.slot===sl.id&&eqi(r.who,v));rows.forEach(r=>store.del("roster",r.id));renderSheet();
       toast(`${v} is off this class`,[{label:"Undo",fn:()=>{store.add("roster",{slot:sl.id,slotName:slotText(sl),who:v,addedBy:who()});if(sheet&&sheet.type==="classStu")renderSheet();}}]);break;}
-    case"editGroups":swapSheet({type:"groups",back:sheet&&sheet.type==="classStu"?Object.assign({},sheet):null});break;
-    case"grpBelt":if(sheet&&sheet.rows){const i=+t.dataset.i,b=t.dataset.v,r=sheet.rows[i];if(!r)break;const had=r.belts.includes(b);
-      sheet.rows.forEach(x=>{x.belts=x.belts.filter(y=>y!==b);});if(!had)r.belts.push(b);r.belts.sort((a,c)=>BELTS.indexOf(a)-BELTS.indexOf(c));renderSheet();}break;
-    case"grpDel":if(sheet&&sheet.rows){sheet.rows.splice(+t.dataset.i,1);renderSheet();}break;
-    case"grpAdd":if(sheet&&sheet.rows){sheet.rows.push({name:"",belts:[]});renderSheet();}break;
+
+
+
+
     case"grpBack":if(sheet&&sheet.back)swapSheet(sheet.back);else closeSheet();break;
-    case"grpSave":{if(!sheet||!sheet.rows)break;const rows=sheet.rows.map(r=>({name:String(r.name||"").replace(/[:,]/g," ").replace(/\s+/g," ").trim().slice(0,30),belts:r.belts})).filter(r=>r.name&&r.belts.length);
-      if(!rows.length){toast("Give at least one group a name and a belt.");break;}
-      listRows("Belt group").forEach(r=>store.del("lists",r.id));rows.forEach(r=>store.add("lists",{list:"Belt group",value:r.name+": "+r.belts.join(", "),colour:"",inNew:""}));
-      toast("Belt groups saved");if(sheet.back)swapSheet(sheet.back);else closeSheet();break;}
+
     case"noteNext":{const n=S.notes.find(x=>x.id===t.dataset.id);if(!n||!n.mine)break;const on=!isNext(n);store.update("notes",n.id,{next:on?"Yes":""});
       toast(on?"Shows under Last class next week":"Won’t carry to next week");if(sheet&&sheet.type==="consol")renderSheet();break;}
     case"qnNext":case"rvNext":{if(!p)break;let item="",txt="";
@@ -2852,8 +3183,8 @@ document.addEventListener("input",e=>{
   if(id==="nbFind"){NB.q=e.target.value;const box=$("#nbFindRes"),p0=planById(PLAN);if(box&&p0)box.innerHTML=nbFindHTML(p0);return;}
   if(id==="nbText"){NB.text=e.target.value;return;}
   if(id==="csFind"&&sheet&&sheet.type==="classStu"){sheet.q=e.target.value;const p0=planById(PLAN),box=$("#csRes");if(box&&p0)box.innerHTML=csFindHTML(p0,sheet);return;}
-  if(/^gname-\d+$/.test(id)&&sheet&&sheet.rows){const r=sheet.rows[+id.slice(6)];if(r)r.name=e.target.value;return;}
-  if(/^cgname-\d+$/.test(id)&&sheet&&sheet.rows){const r=sheet.rows[+id.slice(7)];if(r){r.name=e.target.value;const h=document.getElementById("cgh-"+id.slice(7));if(h)h.textContent=r.name||"New group";}return;}
+  if(id==="cgName"&&sheet&&sheet.ed){sheet.ed.name=e.target.value;return;}
+  if(id==="accCode"&&sheet){sheet.code=e.target.value;return;}
   if(id==="stuFind"&&sheet&&sheet.type==="students"){sheet.q=e.target.value;$("#stuList").innerHTML=studentListHTML(sheet.q);return;}
   if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
   if(id==="pickSearch"&&sheet&&sheet.type==="pick"){sheet.q=e.target.value;$("#pickList").innerHTML=pickListHTML(sheet);}
@@ -2894,8 +3225,6 @@ document.addEventListener("submit",e=>{
     }).catch(()=>{btn.disabled=false;$("#pwMsg").textContent="Can’t reach the dojo sheet. Check your connection and try again.";});
     return;}
   if(f.classList.contains("nform")){addClassNote(f);return;}
-  if(id==="laneForm"){const it=itemById(f.dataset.id),v=($("#laneNew").value||"").replace(/,/g," ").replace(/\s+/g," ").trim().slice(0,30);if(!it||!v)return;
-    store.update("items",it.id,{lane:v});touchPlan(it.plan);closeSheet();return;}
   if(f.classList.contains("rform")){const p=planById(f.dataset.id);const inp=f.querySelector("input");const txt=(inp.value||"").replace(/\s+/g," ").trim();if(!p||!txt)return;
     const lines=ptLines(p.review);lines.push(txt);inp.value="";store.update("plans",p.id,{review:ptJoin(lines)});
     setTimeout(()=>{const ni=document.getElementById("rv-"+p.id);if(ni)ni.focus({preventScroll:true});},0);return;}
@@ -2917,7 +3246,7 @@ document.addEventListener("submit",e=>{
     if(f.querySelector(".sharebox"))data.share=readShare(f,"sh");
     if(s.id){const ex=exById(s.id);if(ex&&!canShareR(ex))delete data.share;store.update("exercises",s.id,Object.assign(data,{addedBy:creator,editedBy:who()}));closeSheet();toast("Saved to the library");return;}
     const exId=store.add("exercises",Object.assign(data,{addedBy:creator,editedBy:""}));
-    if(s.addTo){const pp=planById(s.addTo);const ln=s.back&&s.back.lane!=null&&eqi(s.back.sec,data.section)?{lane:s.back.lane}:undefined;if(pp)addItem(pp,data.section,Object.assign({id:exId},data),ln);
+    if(s.addTo){const pp=planById(s.addTo);const ln=s.back&&s.back.lane!=null&&eqi(s.back.sec,data.section)?{lane:s.back.lane,block:s.back.block||""}:undefined;if(pp)addItem(pp,data.section,Object.assign({id:exId},data),ln);
       if(s.back){swapSheet(Object.assign({},s.back,{sec:s.back.sec}));toast(`Added ${data.name}`);return;}}
     closeSheet();toast(`Added ${data.name} to the library`);return;}
   if(id==="newPlanForm"){
@@ -2931,7 +3260,7 @@ document.addEventListener("submit",e=>{
     saveSlotIf(fd,time);
     const pid=store.add("plans",{date:keyMs(val("date")||todayKey()),time,focus:val("focus").slice(0,60),type:val("type")||src.type,length:readLength(fd,src.length||105),
       sections:planSections(src),skipped:src.skipped.slice(),split:(src.split||[]).slice(),share:readShare(f,"sh"),addedBy:who(),editedBy:who(),updated:Date.now()});
-    itemsOf(src.id).forEach(i=>store.add("items",{plan:pid,section:i.section,order:i.order,name:i.name,minutes:i.minutes,note:i.note,exercise:i.exercise,addedBy:i.addedBy,editedBy:i.editedBy,lane:i.lane||""}));
+    itemsOf(src.id).forEach(i=>store.add("items",{plan:pid,section:i.section,order:i.order,name:i.name,minutes:i.minutes,note:i.note,exercise:i.exercise,addedBy:i.addedBy,editedBy:i.editedBy,lane:i.lane||"",block:i.block||""}));
     editFromView=false;finishSheet("plan",pid,"edit");toast("Copied. Make any changes, then tap Save plan.");return;}
   if(id==="infoForm"){const p=planById(PLAN);if(!p){closeSheet();return;}
     const time=readTime(fd);if(String(fd.get("slot"))==="custom"&&!time){toast("Set a start and end time, with the end after the start.");return;}
