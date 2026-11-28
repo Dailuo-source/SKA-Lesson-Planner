@@ -860,17 +860,96 @@ ul.vpts{font-size:14.5px;line-height:1.4}
   .vex h3{font-size:22px}
   .vsteps,.vpts{font-size:17px}
 }
+
+/* ---------- Desktop (Gary, Nov 27): like Pantry Pal and Karate-Ka Companion. 1000 px and wider: side menu instead of
+   tabs, full-width pages, panels docked on the right (no dimming), a side panel for the class preview / library /
+   notes / students, hover highlights. No keyboard shortcuts (Gary: avoid accidental presses). ---------- */
+.rail{display:contents}
+.sidenew,.side,.dpane,.deskmodes{display:none}
+@media (min-width:1000px){
+  :root{--rail:248px;--pane:440px}
+  .rail{display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;width:var(--rail);z-index:30;background:#fff;border-right:1px solid var(--line);padding:14px 12px;box-sizing:border-box;overflow-y:auto;gap:4px}
+  .rail .top{position:static;order:0;background:transparent;color:var(--ink);padding:0 4px 10px;gap:10px}
+  .rail .top .logo{width:42px;height:42px;border-radius:50%;border:1px solid var(--line)}
+  .rail .top .brand b{color:var(--ink);font-size:16px}
+  .rail .top .sync{color:#2E7D32}
+  .rail .top .sync.bad{color:var(--red)}
+  .rail .top .fbbtn,.rail .top .me{display:none!important}
+  .sidenew{display:block;order:1;margin-bottom:6px}
+  .sidenew .btn{width:100%}
+  .rail .tabs{position:static;order:2;transform:none;display:flex;flex-direction:column;align-items:stretch;width:100%;gap:2px;height:auto;padding:0;background:transparent;border:0;left:auto}
+  .rail .tabs button{flex-direction:row;justify-content:flex-start;align-self:stretch;flex:none;max-width:none;margin:0;gap:12px;width:100%;min-height:44px;padding:0 12px;border-radius:12px;color:var(--ink);font-size:15px}
+  .rail .tabs button:hover:not([aria-current=page]){background:var(--sunk)}
+  .rail .tabs button[aria-current=page]{background:var(--red);color:#fff}
+  .side{display:flex;order:3;flex:1;flex-direction:column;gap:2px;min-height:0}
+  .side .shead{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 10px 4px}
+  .side .sitem{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:2px 10px;border:0;border-radius:10px;background:transparent;font-size:13.5px;font-weight:700;color:var(--ink);text-align:left}
+  .side .sitem:hover{background:var(--sunk)}
+.side svg{width:18px;height:18px;flex:none}
+  .side .sitem .d{width:10px;height:10px;border-radius:50%;flex:none}
+  .side .sitem .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side .sitem .m{font-size:12px;color:var(--muted)}
+  .side .sfoot{margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:12px}
+  .side .meb{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:14px;background:var(--sunk);text-align:left;margin-top:4px;color:var(--ink)}
+  .side .meb:hover{background:#ECECEC}
+  .side .meb .av{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+  .side .meb .small{display:block;font-weight:700}
+  body:not(.notabs) main{margin-left:var(--rail);margin-right:0;max-width:none;padding:18px 28px 40px}
+  body.notabs main{margin-left:var(--rail)}
+  body.paned main{margin-right:var(--pane)}
+  body.notabs .rail .tabs,body.notabs .side,body.notabs .sidenew{visibility:hidden}
+  .toast{left:calc(var(--rail) + 24px);right:auto;max-width:560px}
+  body.paned .toast{right:calc(var(--pane) + 24px)}
+  /* panels dock on the right; the page stays usable beside them */
+  .sheetwrap.dock{left:auto;width:var(--pane)}
+  .sheetwrap.dock .scrim{display:none}
+  .sheetwrap.dock .sheet:not(.center){position:absolute;inset:0;width:auto;border-radius:0;border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(0,0,0,.06);padding:18px 20px 24px}
+  .dpane{display:block;position:fixed;top:0;right:0;bottom:0;width:var(--pane);z-index:25;background:#FCFCFC;border-left:1px solid var(--line);padding:16px;box-sizing:border-box;overflow-y:auto}
+  .dpane:empty{display:none}
+  .dpane h2{margin:0;font-size:22px}
+  .dpane svg{width:18px;height:18px;flex:none}
+  .dpane .btn{gap:6px}
+  .dpane .dptabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;border-radius:12px;background:#F0F0F0;margin-bottom:10px}
+  .dpane .dptabs button{min-height:34px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:13px;color:var(--ink)}
+  .dpane .dptabs button[aria-selected=true]{background:#fff}
+  .dpane .dsec{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:#fff;margin-top:8px}
+  .dpane .dsec .small{display:block;font-weight:700}
+  .dpane .lrow2{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:6px}
+  .dpane .lrow2:hover{border-color:var(--ink)}
+  .dpane .lrow2 .small{display:block;font-weight:700}
+  .dpane .dfind{display:flex;align-items:center;gap:8px;min-height:42px;border:1px solid var(--line2);border-radius:12px;padding:0 12px;background:#fff}
+  .dpane .dfind input{flex:1;border:0;outline:0;font-size:14px;background:transparent;min-width:0}
+  .dpane .dhint{font-size:12px;font-weight:700;color:var(--muted);margin-top:8px}
+  .deskmodes{display:flex;gap:3px;padding:3px;border-radius:12px;background:#F0F0F0;align-self:center;flex:none}
+  .deskmodes button{min-height:36px;padding:0 14px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:13px;color:var(--ink)}
+  .deskmodes button[aria-pressed=true]{background:#111;color:#fff}
+  .deskmodes button:disabled{opacity:.4}
+  .secgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:14px;align-items:start}
+  .secgrid>.section{margin:0}
+  .ccard.sel{box-shadow:inset 0 0 0 2px var(--ink)}
+  /* hover highlights (mouse only) */
+  .ccard:hover,.pickrow:hover,.lrow:hover,.gcard-h:hover{filter:brightness(.98)}
+  .item:hover{background:#FAFAFA}
+  .item:hover .dragh{opacity:1;transform:scale(1.15)}
+  .dragh{transition:transform .2s ease,opacity .2s ease}
+  .btn:hover,.chip:hover,.pchip:hover{filter:brightness(.97)}
+}
 </style>
 </head>
 <body>
+<div class="rail" id="rail">
 <header class="top">
   <img class="logo" src="logo-96.png" alt="Scarborough Academy of Karate">
   <div class="brand"><b>SKA Lesson Planner</b><button class="sync" id="sync" data-act="syncNow" type="button"></button></div>
   <button class="fbbtn" id="fbBtn" data-act="feedback" type="button" aria-label="Send feedback" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span>Feedback</span></button>
   <button class="me" id="me" data-act="profile" type="button" hidden></button>
 </header>
-<main id="view" tabindex="-1"></main>
+<div class="sidenew" id="sideNew"></div>
 <nav class="tabs" id="tabs" aria-label="Main"></nav>
+<div class="side" id="side"></div>
+</div>
+<main id="view" tabindex="-1"></main>
+<aside class="dpane" id="dpane" aria-label="Side panel"></aside>
 <div class="sheetwrap" id="sheetWrap" hidden>
   <button class="scrim" type="button" data-act="closeSheet" aria-label="Close" tabindex="-1"></button>
   <div class="sheet" id="sheetBox" role="dialog" aria-modal="true"><div id="sheetBody"></div></div>
@@ -887,7 +966,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v31"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v32"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -1135,6 +1214,7 @@ function planHead(p,kick,sub,menuLabel){
     <div class="pswrap grow"><button type="button" class="psw" data-act="planList" aria-expanded="${planListOpen}" aria-label="Switch lesson plan">
       <span class="grow"><span class="kicker">${kick}</span><h1>${esc(planTitle(p))}</h1>${sub?`<span class="small">${sub}</span>`:""}</span>${ICON.down}</button>
       ${planListOpen?planListHTML(p):""}</div>
+    <div class="deskmodes" role="group" aria-label="Mode"><button type="button" data-act="editPlan" aria-pressed="${planMode==="edit"}"${canEditR(p)?"":" disabled"}>Edit</button><button type="button" data-act="setMode" data-m="view" aria-pressed="${planMode==="view"}">Teach</button><button type="button" data-act="setMode" data-m="review" aria-pressed="${planMode==="review"}">Review</button></div>
     <button type="button" class="iconbtn round pnav" data-act="planStep" data-d="1" aria-label="${next?"Next plan: "+esc(planTitle(next)):"No later plan"}"${next?"":" disabled"}>${ICON.go}</button>
     <button type="button" class="iconbtn outline" data-act="planMenu" aria-label="${menuLabel}">${ICON.more}</button>
   </div>`;
@@ -1325,6 +1405,10 @@ window.addEventListener("popstate",e=>{
 /* =====================================================================
    RENDER
    ===================================================================== */
+const WIDE=matchMedia("(min-width:1000px)"),wide=()=>WIDE.matches;
+try{WIDE.addEventListener("change",()=>{if(sheet)renderSheet();render();});}catch(_){}
+/* Desktop state (Nov 27): the class previewed on Plans, and the side panel's tab, section and search on This class */
+const DESK={sel:null,pane:"lib",sec:"",q:""};
 function render(msg){
   const me=$("#me");
   if(signedIn()){me.hidden=false;me.textContent=initialsOf(ME);me.setAttribute("aria-label","Your profile, "+who());}else me.hidden=true;
@@ -1338,6 +1422,92 @@ function render(msg){
     tb.innerHTML=T.map(([k,l,i])=>`<button type="button" data-act="tab" data-tab="${k}"${tab===k?' aria-current="page"':""}>${i}<span>${l}</span></button>`).join("");
   }
   renderView(msg);
+  renderSide();
+}
+/* ---------- Desktop side menu and side panel (Gary, Nov 27) ---------- */
+/* Show which calendar card is previewed, without redrawing the page (so a double-click still lands) */
+function markSel(el){document.querySelectorAll("#view .ccard.sel").forEach(x=>x.classList.remove("sel"));
+  const s=DESK.sel;if(!el&&s)el=[...document.querySelectorAll("#view .ccard")].find(c=>s.id?c.dataset.id===s.id:c.dataset.k===s.k&&c.dataset.slot===s.slot);if(el)el.classList.add("sel");}
+/* Double-click a calendar card on desktop to open it */
+document.addEventListener("dblclick",e=>{const c=e.target.closest&&e.target.closest("#view .ccard");if(!c||!wide()||tab!=="plans")return;
+  if(c.dataset.act==="openPlan"){const op=planById(c.dataset.id);go("plan",c.dataset.id,op&&isPast(op)?"review":"view");}
+  else if(c.dataset.act==="planSlot")openSheet({type:"newPlan",date:c.dataset.k,slot:c.dataset.slot||"",ptype:c.dataset.type||""});});
+function upcoming(n){const out=[];let k=todayKey();for(let d=0;d<21&&out.length<n;d++,k=shiftKey(k,1))dayEntries(k).forEach(e=>{if(out.length<n&&(e.plan||e.k>=todayKey()))out.push(e);});return out;}
+const entryLine=e=>{const d=new Date(keyMs(e.k)),a=clock12(e.start);return d.toLocaleDateString("en-CA",{weekday:"short",month:"short",day:"numeric"})+" · "+(a?a.replace(/:00/,""):"")+(e.label?" "+e.label:"");};
+function renderSide(){
+  const side=$("#side"),nw=$("#sideNew");if(!side||!nw)return;
+  if(!wide()||!signedIn()||!ready){side.innerHTML="";nw.innerHTML="";return;}
+  nw.innerHTML=`<button type="button" class="btn primary" data-act="newPlan">${ICON.plus}New plan</button>`;
+  let list="",head="";
+  const p=planById(PLAN);
+  if(tab==="plan"&&p){head="This class";
+    list=planSections(p).map((x,i)=>`<button type="button" class="sitem" data-act="deskJump" data-i="${i}"><span class="d" style="background:${secColour(x)}"></span><span class="t">${esc(x)}</span><span class="m">${secTotal(p,x)}m</span></button>`).join("");}
+  else{head="Coming up";
+    list=upcoming(7).map(e=>`<button type="button" class="sitem" data-act="deskPick" data-k="${esc(e.k)}" data-slot="${esc(e.key||"")}" data-id="${esc(e.plan?e.plan.id:"")}" data-type="${esc(e.label||"")}"><span class="d" style="background:${e.plan?"#2E9E48":"#E0A100"}"></span><span class="t">${esc(entryLine(e))}</span><span class="m">${e.k===todayKey()?"Today":e.plan?"Planned":"Plan it"}</span></button>`).join("")||`<p class="small" style="padding:0 10px">No classes in the next 3 weeks.</p>`;}
+  side.innerHTML=`<div class="shead">${head}</div>${list}
+    <div class="sfoot">${isAdmin()?`<button type="button" class="sitem" data-act="openAccess">${ICON.shield}<span class="t">Manage access</span></button>`:""}
+      <button type="button" class="sitem" data-act="feedback">${ICON.msg}<span class="t">Send feedback</span></button>
+      <button type="button" class="meb" data-act="profile"><span class="av">${esc(initialsOf(ME))}</span><span><b>${esc(who())}</b><span class="small">${isAdmin()?"Admin":"Instructor"} · Profile</span></span></button></div>`;
+}
+/* The side panel: a class preview on Plans; Library / Notes / Students on This class. Docked panels cover it. */
+function renderPane(){
+  const pane=$("#dpane");if(!pane)return;
+  let h="";
+  if(wide()&&signedIn()&&ready){if(tab==="plans")h=panePreview();else if(tab==="plan"&&planById(PLAN))h=paneClass(planById(PLAN));}
+  const keep=document.activeElement&&document.activeElement.id==="dpQ"?document.activeElement.selectionStart:null;
+  pane.innerHTML=h;
+  document.body.classList.toggle("paned",!!h||!!(sheet&&wide()&&!sheet.center));
+  if(tab==="plans")markSel();
+  if(keep!=null){const q=$("#dpQ");if(q){q.focus({preventScroll:true});try{q.setSelectionRange(keep,keep);}catch(_){}}}
+}
+function panePreview(){
+  let e=DESK.sel;
+  if(!e){const u=upcoming(1)[0];if(u)e={k:u.k,slot:u.key||"",id:u.plan?u.plan.id:"",type:u.label||""};}
+  if(!e)return`<h2>No classes coming up</h2><p class="small">Add the dojo’s class times under Class times, or start a new plan.</p>`;
+  const p=e.id?planById(e.id):null,d=keyMs(e.k);
+  const sl=p?slotOfPlan(p):slots().find(x=>x.key===e.slot&&x.day===new Date(d).getDay());
+  const when=fmtLongDay(d)+(p&&p.time?" · "+fmtTime(p.time):e.slot?" · "+fmtTime(e.slot):"");
+  if(!p)return`<div class="kicker">${esc(when)}</div><h2>${esc(e.type||"Class")}</h2>
+    <p class="small" style="margin:6px 0 10px">No plan yet for this class.</p>
+    <div class="btnrow"><button type="button" class="btn primary" data-act="planSlot" data-k="${esc(e.k)}" data-slot="${esc(e.slot)}" data-type="${esc(e.type)}">${ICON.plus}Start a plan</button>${sl?`<button type="button" class="btn outline" data-act="teamOpen" data-slot="${esc(sl.id)}">${ICON.people}Class team</button>`:""}</div>`;
+  const T=tonight(p),tb=taughtBy(p);
+  const secs=planSections(p).filter(x=>!isSkipped(p,x)).map(x=>{const bl=secBlocks(p,x);
+    const items=bl.map(b=>b.one?esc(b.one.name):"At the same time: "+b.lanes.map(l=>l.items.map(i=>esc(i.name)).join(", ")+` (${esc(laneLabel(l))})`).join(" · ")).join(" · ");
+    return`<div class="dsec"><div class="row" style="gap:8px"><span class="kdot" style="background:${secColour(x)}"></span><b class="grow">${esc(x)}</b><b style="color:${secColour(x)};font-size:13px">${secTotal(p,x)} min</b></div><span class="small" style="color:var(--muted)">${items||"Nothing added yet"}</span></div>`;}).join("");
+  return`<div class="kicker">${esc(when)}</div><h2>${esc(planTitle(p))}</h2>
+    <span class="small" style="display:block;font-weight:700;color:var(--muted)">${tb.length?"Taught by "+esc(tb.join(", "))+" · ":""}${T.roster.length?T.here.length+" here of "+T.roster.length:""}</span>
+    <div class="btnrow" style="margin-top:10px"><button type="button" class="btn primary" data-act="openPlan" data-id="${esc(p.id)}">Open plan</button><button type="button" class="btn outline" data-act="copyPlan" data-id="${esc(p.id)}">${ICON.copy}Copy</button>${sl?`<button type="button" class="btn outline" data-act="teamOpen" data-slot="${esc(sl.id)}">${ICON.people}Team</button>`:""}</div>
+    ${secs}
+    <p class="dhint">Click a class on the calendar to see it here; double-click to open it.</p>`;
+}
+function paneClass(p){
+  const tabs=[["lib","Library"],["notes","Notes"],["stu","Students"]].map(([k,l])=>`<button type="button" role="tab" aria-selected="${DESK.pane===k}" data-act="dpTab" data-v="${k}">${l}</button>`).join("");
+  let body="";
+  if(DESK.pane==="lib"){
+    const secs=planSections(p);if(DESK.sec!=="*"&&!secs.some(x=>eqi(x,DESK.sec)))DESK.sec=secs[0]||"";
+    const ed=planMode==="edit"&&canEditR(p);
+    body=`<div class="dfind">${ICON.search}<label class="vh" for="dpQ">Search the library</label><input id="dpQ" type="search" placeholder="Search the library" value="${esc(DESK.q)}" autocomplete="off"></div>
+      <div class="chips" style="margin-top:8px">${secs.map(x=>`<button type="button" class="chip" data-act="dpSec" data-v="${esc(x)}" aria-pressed="${eqi(x,DESK.sec)}">${esc(x)}</button>`).join("")}<button type="button" class="chip" data-act="dpSec" data-v="*" aria-pressed="${DESK.sec==="*"}">All</button></div>
+      <div id="dpList">${paneLibList(p,ed)}</div>
+      <p class="dhint">${ed?"Add puts the exercise at the end of "+esc(DESK.sec==="*"?secs[0]||"the plan":DESK.sec)+". Drag it into place or into a group’s lane after.":"Switch to Edit to add exercises."}</p>`;
+  }else if(DESK.pane==="notes"){
+    const ns=notesOf(p.id);
+    body=recapHTML(p)+`<div class="dsec"><b>Class notes · ${ns.length}</b>${ns.length?ns.map(n=>`<span class="small" style="color:var(--ink2);margin-top:3px">• ${n.who?"<b>"+esc(n.who)+":</b> ":""}${esc(n.text)}</span>`).join(""):`<span class="small" style="color:var(--muted)">No notes yet.</span>`}
+      <button type="button" class="btn outline small" data-act="noteNew" style="margin-top:8px">${ICON.plus}Class note</button></div>`;
+  }else{
+    const T=tonight(p),gs=groupsFor(p),names=T.here.length?T.here:T.roster;
+    body=`<div class="dsec"><b>${T.roster.length?T.here.length+" here of "+T.roster.length:"No roster yet"}</b>
+      ${bucket(names,gs).map(b=>`<span class="small" style="margin-top:6px;color:var(--ink)">${b.g?groupDots(b.g):""} <b>${esc(b.name)}</b> · ${b.names.length}</span><span class="small" style="color:var(--muted)">${esc(b.names.join(", "))}</span>`).join("")}
+      <div class="btnrow" style="margin-top:8px"><button type="button" class="btn outline small" data-act="classStudents">${ICON.people}Students</button><button type="button" class="btn outline small" data-act="openGroups">${ICON.lanes}Groups</button></div></div>`;
+  }
+  return`<div class="dptabs" role="tablist">${tabs}</div>`+body;
+}
+function paneLibList(p,ed){
+  const q=DESK.q.trim().toLowerCase(),sec=DESK.sec;
+  const rows=S.exercises.filter(x=>(sec==="*"||eqi(x.section,sec))&&(!q||x.name.toLowerCase().includes(q)||String(x.desc||"").toLowerCase().includes(q))).slice(0,60);
+  if(!rows.length)return`<p class="small" style="margin-top:8px">${q?"Nothing matches.":"No exercises in this section yet."}</p>`;
+  const used=new Set(itemsOf(p.id).map(i=>i.exercise));
+  return rows.map(x=>`<div class="lrow2"><span class="grow"><b>${esc(x.name)}</b><span class="small" style="color:var(--muted)">${esc(x.section)} · ${x.minutes||0} min${used.has(x.id)?" · in this plan":""}</span></span>${ed?`<button type="button" class="btn outline small" data-act="dpAdd" data-id="${esc(x.id)}">${ICON.plus}Add</button>`:""}</div>`).join("");
 }
 function renderView(msg){
   const v=$("#view");
@@ -1354,6 +1524,7 @@ function renderView(msg){
   if(!signedIn()){loadGis();mountGis();}
   Object.keys(typed).forEach(id=>{const el=document.getElementById(id);if(el)el.value=typed[id];});
   if(keep){const el=document.getElementById(keep.id);if(el){el.focus({preventScroll:true});try{if(keep.s!=null)el.setSelectionRange(keep.s,keep.e);}catch(_){}}}
+  renderPane();
 }
 function onData(){if(!ready||!signedIn()||tab==="profile")return;renderView();}
 
@@ -1562,7 +1733,7 @@ function viewPlan(){
       <div class="bar">${segs}</div>
     </div>
     ${foldRow("Sections")}
-    ${sections}
+    <div class="secgrid">${sections}</div>
     <button type="button" class="dashed" data-act="addSection">${ICON.plus}Add a section</button>
     <div class="savebar"><button type="button" class="btn primary block" data-act="savePlan">${ICON.check}Save plan</button></div>
   </div>`;
@@ -2580,11 +2751,11 @@ function signOut(msg){
    ===================================================================== */
 let sheet=null,lastFocus=null;
 function openSheet(s){hideToast();if(!sheet){lastFocus=document.activeElement;history.pushState(Object.assign(stateNow(),{sheet:1}),"");}
-  sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow="hidden";
+  sheet=s;renderSheet();$("#sheetWrap").hidden=false;document.body.style.overflow=wide()&&!s.center?"":"hidden";
   setTimeout(()=>{if($("#sheetWrap").contains(document.activeElement))return;const f=$("#sheetBody [data-focus]")||$("#sheetBody button, #sheetBody input, #sheetBody a");if(f)f.focus({preventScroll:true});},40);}
 function swapSheet(s){sheet=s;renderSheet();$("#sheetBox").scrollTop=0;}
 function closeSheet(){if(history.state&&history.state.sheet)history.back();else hideSheet();}
-function hideSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style.overflow="";if(lastFocus&&document.contains(lastFocus))try{lastFocus.focus({preventScroll:true});}catch(_){}}
+function hideSheet(){sheet=null;$("#sheetWrap").hidden=true;document.body.style.overflow="";document.body.classList.toggle("paned",wide()&&!!$("#dpane").innerHTML);if(lastFocus&&document.contains(lastFocus))try{lastFocus.focus({preventScroll:true});}catch(_){}}
 function finishSheet(t,plan,mode){hideSheet();if(plan!==undefined){PLAN=plan;LS.set("plan",PLAN);}if(mode)planMode=mode;tab=t;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}
 const closeBtn=`<button type="button" class="iconbtn round" data-act="closeSheet" aria-label="Close">${ICON.x}</button>`;
 const sheetHead=(title,sub)=>`<div class="grab"></div><div class="sh"><div class="grow">${sub||""}<h2 id="sheetTitle">${title}</h2></div>${closeBtn}</div>`;
@@ -2592,7 +2763,8 @@ const secChip=s=>{const c=secColour(s);return`<span class="tag" style="color:${c
 
 function renderSheet(){
   const box=$("#sheetBox"),body=$("#sheetBody");const s=sheet;if(!s)return;
-  box.className="sheet"+(s.center?" center":"");box.setAttribute("aria-labelledby","sheetTitle");
+  box.className="sheet"+(s.center?" center":"");$("#sheetWrap").classList.toggle("dock",!s.center);
+  document.body.classList.toggle("paned",wide()&&(!s.center||!!$("#dpane").innerHTML));box.setAttribute("aria-labelledby","sheetTitle");
   let h="";
   switch(s.type){
     case"attend":
@@ -2891,9 +3063,15 @@ document.addEventListener("click",e=>{
     case"calView":calView=t.dataset.v==="month"?"month":"week";calOff=0;LS.set("calview",calView);renderView();break;
     case"calNav":{const v=+t.dataset.v;calOff=v?calOff+v:0;calSel="";renderView();break;}
     case"calSel":calSel=t.dataset.k;renderView();break;
-    case"planSlot":openSheet({type:"newPlan",date:t.dataset.k,slot:t.dataset.slot||"",ptype:t.dataset.type||""});break;
+    case"planSlot":if(wide()&&tab==="plans"&&t.classList.contains("ccard")&&!t.dataset.dbl){DESK.sel={k:t.dataset.k,slot:t.dataset.slot,id:"",type:t.dataset.type};markSel(t);renderPane();break;}openSheet({type:"newPlan",date:t.dataset.k,slot:t.dataset.slot||"",ptype:t.dataset.type||""});break;
     case"lfilter":libFilter=t.dataset.v;renderView();break;
-    case"openPlan":{editFromView=false;const op=planById(t.dataset.id);go("plan",t.dataset.id,op&&isPast(op)?"review":"view");break;}
+    case"deskPick":{const d=t.dataset;if(tab==="plans"){DESK.sel={k:d.k,slot:d.slot,id:d.id,type:d.type};markSel();renderPane();}else if(d.id)go("plan",d.id,isPast(planById(d.id)||{})?"review":"view");else openSheet({type:"newPlan",date:d.k,slot:d.slot,ptype:d.type});break;}
+    case"deskJump":{const el=[...document.querySelectorAll("#view section.section,#view section.vsec")][+t.dataset.i];if(el)el.scrollIntoView({behavior:"smooth",block:"start"});break;}
+    case"dpTab":DESK.pane=t.dataset.v;renderPane();break;
+    case"dpSec":DESK.sec=t.dataset.v;renderPane();break;
+    case"dpAdd":{if(!p||!canEditR(p))break;const ex=S.exercises.find(x=>x.id===t.dataset.id);if(!ex)break;const sec=DESK.sec==="*"?(planSections(p).find(x=>eqi(x,ex.section))||planSections(p)[0]):DESK.sec;
+      addItem(p,sec,ex);toast(`Added ${ex.name} to ${sec}`);break;}
+    case"openPlan":{if(wide()&&tab==="plans"&&t.classList.contains("ccard")&&!t.dataset.dbl){const op=planById(t.dataset.id);DESK.sel={k:op&&op.date?dayKey(op.date):todayKey(),slot:"",id:t.dataset.id,type:""};markSel(t);renderPane();break;}editFromView=false;const op=planById(t.dataset.id);go("plan",t.dataset.id,op&&isPast(op)?"review":"view");break;}
     case"setMode":{const m=t.dataset.m;if(sheet){hideSheet();planMode=m;history.replaceState(stateNow(),"");render();window.scrollTo(0,0);}else go("plan",undefined,m);break;}
     case"qnToLib":{const it=itemById(t.dataset.id);const lib=it&&exById(it.exercise);if(!lib||!canEditR(lib))break;const q=qnLines(it.live)[+t.dataset.i];if(q==null)break;
       const txt=splitQn(q).x,before=lib.notes;const pts=toPoints(lib.notes);if(!pts.some(x=>eqi(x,txt)))pts.push(txt);
@@ -3194,6 +3372,7 @@ document.addEventListener("input",e=>{
   if(id==="nbText"){NB.text=e.target.value;return;}
   if(id==="csFind"&&sheet&&sheet.type==="classStu"){sheet.q=e.target.value;const p0=planById(PLAN),box=$("#csRes");if(box&&p0)box.innerHTML=csFindHTML(p0,sheet);return;}
   if(id==="cgName"&&sheet&&sheet.ed){sheet.ed.name=e.target.value;return;}
+  if(id==="dpQ"){DESK.q=e.target.value;const p=planById(PLAN),l=$("#dpList");if(p&&l)l.innerHTML=paneLibList(p,planMode==="edit"&&canEditR(p));return;}
   if(id==="accCode"&&sheet){sheet.code=e.target.value;return;}
   if(id==="stuFind"&&sheet&&sheet.type==="students"){sheet.q=e.target.value;$("#stuList").innerHTML=studentListHTML(sheet.q);return;}
   if(id==="libSearch"){libQuery=e.target.value;$("#exList").innerHTML=exListHTML();}
