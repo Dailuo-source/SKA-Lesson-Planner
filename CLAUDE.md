@@ -67,6 +67,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 - Time shows as hours and minutes ("1h 40m of 1h 45m planned"); exercise and section times stay in minutes.
 - Every button scales down slightly when pressed, and every tap shows a red-ringed flash and waits 0.1 s before acting (Gary, Oct 30; capture click listener after `needGuard`, `.tapflash`).
 - Back button: every screen/panel is a history entry; at the first screen "Press back again to exit". Every panel has a close control (iPhones).
+- Speed (Nov 27): the last sync is kept on the phone (`skal.cache`, `saveCache`/`loadCache`, this instructor only, cleared on sign-out); the app opens on it at once and refreshes. Code.gs reads Instructors once and the data tabs once per answer (`checkToken_(token, rows)`, `stateFor_`/`adminInfo_` share `raw`); class history runs at most every 15 min (`SNAP_LAST`). Manage access changes are one trip and show at once (`accRole`, `accDo`, `accUnshare`).
 - Sync: optimistic, batched ops, 60 s polling. Panels are never redrawn by a background sync; library search keeps focus.
 - Accounts: HMAC token (`TOKEN_SECRET`, 400 days) in `skal.token`, profile in `skal.me`; `bad_token` signs out. Labels on plans are text at edit time ("Mr. Luo").
 
@@ -95,7 +96,7 @@ Lesson planner for **Scarborough Academy of Karate (SKA)** instructors. A class 
 
 ## Changing things
 
-- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v30`; also bump `APP_VER` in index.html), commit and push to `main`.
+- App files: edit, bump `CACHE` in `web/sw.js` (currently `ska-lesson-planner-v31`; also bump `APP_VER` in index.html), commit and push to `main`.
 - Code.gs: paste into Apps Script and redeploy (**Deploy → Manage deployments → pencil → New version**). Via Claude in Chrome (instance **GARYMAIN**): open script.google.com/home → SKA Lesson Planner, set `monaco.editor.getModels()[0]` to the raw GitHub Code.gs, Ctrl+S, redeploy. New columns must also be added to the live sheet.
 - Commits use author `Claude <noreply@anthropic.com>`.
 
@@ -133,7 +134,7 @@ Inside the `index.html` script, search for:
 - Panels: `openSheet`, `swapSheet`, `closeSheet`, `renderSheet`, `toast`
 
 ## Status
-- Nov 27: groups per class (By belt / Hand-picked), same-time blocks, class teams (edit rights, Ask to help, history), Taught by, Manage access, class history snapshots, ending class times. Cache v30. Code.gs deployed as web app v16 (Nov 27).
+- Nov 27: groups per class (By belt / Hand-picked), same-time blocks, class teams (edit rights, Ask to help, history), Taught by, Manage access, class history snapshots, ending class times. Cache v30. Code.gs deployed as web app v16 (Nov 27); the speed changes in Code.gs (one read per answer) are in the repo, waiting for v17. Cache v31.
 - Working: plans (view / edit / review), teaching mode, Next week notes, shared library, sharing with admins, timeslots and custom lengths, Kata Tracker link, class notes with Last class and student notes, compact layout, Add a new student. Tester Feedback. Cache v24. Web app v12 (Nov 12: Code.gs `custom` flag; v11 Feedback tab; v10 Next week column; v9 Oct 30 notifications + refreshStudents).
 - Testers (Nov 10): Gary is inviting a few SKA instructors (role Instructor) with the app link + dojo code; sign-in is email + password (no `GOOGLE_CLIENT_ID` set).
 - Notifications: live (Nov 10). Worker `ska-lesson-planner-push` at ska-lesson-planner-push.garyluo-gs.workers.dev; sheet setup done; `/run` answers ok. Each phone turns them on in Profile → Notifications.
@@ -143,6 +144,7 @@ Inside the `index.html` script, search for:
 
 Steps only Gary can do (App Atlas shows these as his to-dos). One line each; delete a line once it's done.
 
+- [ ] Deploy Code.gs as web app v17 (faster answers) if Claude hasn't
 - [ ] Put each class's instructors on its team (Profile → Manage access → Classes)
 - [ ] Fill each class's roster once (a class → Students → Class roster)
 - [ ] Turn notifications on on your phone (Profile → Notifications) and pick your classes
@@ -154,6 +156,7 @@ Steps only Gary can do (App Atlas shows these as his to-dos). One line each; del
 - **Motion pack** (`window.MP`, same copy in every app; Climb Buddy is the model): the `<script>` block before `</body>` in `web/index.html`, set up by the `MP.init({...})` line under it. Panels rise from the bottom and slip back down, toasts rise and slip away (setting `.hidden = true` plays the slip-away first, then hides; the app still reads `.hidden` as true at once), a new screen's pieces rise in one after another, and a new row on the same screen rises in. Unhurried (Gary wants animations easy to see); off under reduced motion. If a close function empties or removes the panel, do it after `MP.ms` (or use `MP.out(el, done)`), or the panel slides away empty.
 
 ## Changelog (latest first, keep about 5 lines)
+- 2026-11-27: Speed: opens instantly on the last sync then refreshes; Manage access changes in one trip, shown at once; Code.gs reads the sheet once per answer, history every 15 min. sw v31
 - 2026-11-27: Deployed Code.gs (Class team tab, Manage access, class history, blocks) as web app v16
 - 2026-11-27: Groups made simpler (one list per class, By belt or Hand-picked, editor; picker shows only class groups), same-time blocks you build (lanes, Another group, Split up, drag across lanes), class teams (several instructors; team edits the class; Ask to help; dated history), Taught by, Manage access for admins (roles, classes, what each person sees, reset/sign out/remove, invite), class history saved after each class, ending a class time keeps its past. Code.gs: Class team tab, new columns, admin API, snapshot in cron. sw v30
 - 2026-11-23: Folding slides open and shut everywhere (sections, groups/lanes, exercises, cards, panel boxes, Collapse/Expand all): `foldSnap`/`foldPlay` around fold taps. sw v29

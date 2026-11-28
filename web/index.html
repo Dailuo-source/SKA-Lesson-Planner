@@ -887,7 +887,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz7Id0hiGIUFrRDDywyo8o3
 const ATTEND_URL = "https://my.musterhall.app/today"; // the Lists tab's "Attendance link" overrides this
 const KATA_URL = "https://script.google.com/macros/s/AKfycbwnmXKngbUjC-NAThAD_s7R2JdaKGX5e9R3cjJYdQlkEoWbe84nbdILOKVVsGiRbIlpqw/exec"; // the SKA Kata Tracker's Apps Script (summary feed)
 
-const APP_VER = "v30"; // keep in step with CACHE in sw.js (sent with feedback)
+const APP_VER = "v31"; // keep in step with CACHE in sw.js (sent with feedback)
 const FEEDBACK_TO = "Mr. Luo"; // who reads the Feedback tab
 
 const $=s=>document.querySelector(s);
@@ -1063,6 +1063,10 @@ function normalize(st){
     exercises:(st.exercises||[]).map(r=>Object.assign({},r,{section:str(r.section),name:str(r.name),minutes:num(r.minutes,10),description:str(r.description),notes:str(r.notes),addedBy:str(r.addedBy),editedBy:str(r.editedBy)}))
   };
 }
+/* Speed (Gary, Nov 27): the last sync is kept on this phone, so the app opens straight away on it and then
+   refreshes from the sheet. Only for the signed-in instructor; cleared on sign-out. */
+function saveCache(st){try{if(ME)localStorage.setItem("skal.cache",JSON.stringify({u:ME.id,at:Date.now(),s:st}));}catch(e){try{localStorage.removeItem("skal.cache");}catch(_){}}}
+function loadCache(){try{const c=JSON.parse(localStorage.getItem("skal.cache")||"null");return c&&ME&&c.u===ME.id&&c.s?c:null;}catch(e){return null;}}
 async function flush(){
   if(!signedIn())return;
   if(inflight){clearTimeout(flushT);flushT=setTimeout(flush,400);return;}
@@ -1075,7 +1079,7 @@ async function flush(){
   if(res&&res.ok){
     queue=queue.slice(ops.length);
     if(res.me){ME=res.me;LS.set("me",JSON.stringify(ME));const mb=$("#me");if(mb)mb.textContent=initialsOf(ME);}
-    S=normalize(res.state);queue.forEach(applyLocal);
+    S=normalize(res.state);queue.forEach(applyLocal);saveCache(res.state);
     const first=!ready;ready=true;lastSync=Date.now();setSync("ok");
     if(first){render();loadKata();if(OPEN_PLAN)openFromLink(OPEN_PLAN);}else onData();
     if(fresh&&sheet&&sheet.type==="students"){const l=$("#stuList");if(l)l.innerHTML=studentListHTML(sheet.q);}
@@ -2214,11 +2218,13 @@ function sheetTeam(s){const sl=slots().find(x=>x.id===s.slot);if(!sl)return shee
 let ADMIN=null;
 async function adminCall(a){
   if(queue.length||inflight)await flush();
+  if(sheet&&(sheet.type==="access"||sheet.type==="accessPerson")){sheet.busy=true;}
   let res;try{res=await callApi({token:TOKEN,ops:[],admin:a});}catch(e){res={ok:false,message:"Can’t reach the sheet. Try again."};}
   if(res&&res.ok){ADMIN=res.admin||ADMIN;if(res.me){ME=res.me;LS.set("me",JSON.stringify(ME));}S=normalize(res.state);queue.forEach(applyLocal);onData();}
   else if(res&&res.error==="bad_token"){signOut("Please sign in again.");return null;}
   else toast((res&&res.message)||"That didn’t work. Try again.");
-  if(sheet&&(sheet.type==="access"||sheet.type==="accessPerson"))renderSheet();
+  if(sheet&&(sheet.type==="access"||sheet.type==="accessPerson")){sheet.busy=false;renderSheet();}
+  if(res&&res.ok)saveCache(res.state);
   return res&&res.ok?res:null;}
 const appLink=()=>location.origin+location.pathname.replace(/index\.html$/,"");
 const inviteText=()=>`You’re invited to the SKA Lesson Planner.\n1. Open ${appLink()} on your phone.\n2. Tap Create an account and use the dojo code: ${ADMIN&&ADMIN.code||"(ask me)"}\n3. Install it: Android Chrome ⋮ → Add to Home screen; iPhone Safari Share → Add to Home Screen.`;
@@ -2248,7 +2254,7 @@ function sheetAccess(s){
       <button type="button" class="btn primary block" data-act="accInvite" style="margin-top:10px"${ADMIN?"":" disabled"}>${ICON.share}Share an invite</button>
       <p class="small" style="margin:6px 0 0">Sends the link, the dojo code and how to install it, in one message. New instructors start as Instructor; change their role under People.</p></div>`;
   }
-  return sheetHead("Manage access",`<div class="small">Only admins see this</div>`)+`<div class="segtabs three" role="tablist">${tabs}</div>`+body;}
+  return sheetHead("Manage access",`<div class="small">Only admins see this${s.busy?" · <b>Saving…</b>":""}</div>`)+`<div class="segtabs three" role="tablist">${tabs}</div>`+body;}
 function sheetAccessPerson(s){
   const P=ADMIN&&ADMIN.person&&ADMIN.person.id===s.who?ADMIN.person:null,base=ADMIN&&ADMIN.people.find(x=>x.id===s.who);
   const back=`<button type="button" class="btn outline block" data-act="grpBack" style="margin-top:12px">Back to everyone</button>`;
@@ -2260,7 +2266,7 @@ function sheetAccessPerson(s){
   const conf=s.confirm,CONF={reset:["Let them reset their password?","Their password is cleared. They choose a new one on the sign-in screen with the dojo code.","Clear password"],
     signout:["Sign them out on every device?","Every phone and computer asks them to sign in again. Nothing of theirs is deleted.","Sign out"],
     remove:["Remove "+x.name+" from the app?","They’re signed out and can’t sign back in. Plans they shared stay; their private ones stay in the sheet. Their class history is kept.","Remove"]};
-  return sheetHead(esc(x.name),`<div class="small">${x.joined?"Joined "+esc(fmtDay(x.joined))+" · ":""}signed in ${esc(ago(x.lastSeen))}</div>`)+
+  return sheetHead(esc(x.name),`<div class="small">${x.joined?"Joined "+esc(fmtDay(x.joined))+" · ":""}signed in ${esc(ago(x.lastSeen))}${s.busy?" · <b>Saving…</b>":""}</div>`)+
     `<span class="label">Role</span><div class="segtabs sm" role="radiogroup" aria-label="Role"><button type="button" role="radio" aria-checked="${!x.admin}" data-act="accRole" data-v="Instructor"${!x.admin?' style="background:#111;color:#fff"':""}>Instructor</button><button type="button" role="radio" aria-checked="${x.admin}" data-act="accRole" data-v="Admin"${x.admin?' style="background:var(--red);color:#fff"':""}>Admin</button></div>
     <p class="small" style="margin:4px 0 0">${x.admin?"Admin: can also edit what’s shared with them, change class times, and open Manage access.":"Instructor: sees and copies what’s shared with them; edits their own things and their classes’ plans."}</p>
     <span class="label" style="margin-top:12px">Classes they teach</span><div class="chips">${cl||`<span class="small">No class times yet.</span>`}</div>
@@ -2553,7 +2559,7 @@ async function authCall(payload,btn){
   if(btn&&document.contains(btn)){btn.disabled=false;btn.textContent=btn.dataset.l;}
   if(res&&res.ok){
     TOKEN=res.token;LS.set("token",TOKEN);ME=res.me;LS.set("me",JSON.stringify(ME));if(ME.email)LS.set("email",ME.email);
-    S=normalize(res.state);queue=[];ready=true;lastSync=Date.now();gPending=null;draft=null;authMsg="";authMode="signin";
+    S=normalize(res.state);queue=[];ready=true;lastSync=Date.now();saveCache(res.state);gPending=null;draft=null;authMsg="";authMode="signin";
     tab="plans";history.replaceState({t:"plans",p:PLAN,root:true},"");needGuard=true;render();setSync("ok");window.scrollTo(0,0);
     toast("Welcome, "+who());return;}
   if(res&&res.error==="need_signup"){gPending={credential:payload.credential,email:res.email};
@@ -2563,7 +2569,7 @@ async function authCall(payload,btn){
   showAuthErr((res&&res.message)||"Something went wrong. Try again.");
 }
 function signOut(msg){
-  TOKEN="";ME=null;LS.set("token","");LS.set("me","null");S={plans:[],items:[],exercises:[],lists:[]};ready=false;queue=[];
+  TOKEN="";ME=null;LS.set("token","");LS.set("me","null");try{localStorage.removeItem("skal.cache");}catch(e){}S=normalize({});ready=false;queue=[];ADMIN=null;
   authMode="signin";authMsg=msg||"";draft=null;tab="plans";history.replaceState({t:"plans",p:PLAN,root:true},"");
   try{if(window.google&&google.accounts)google.accounts.id.disableAutoSelect();}catch(e){}
   render();window.scrollTo(0,0);
@@ -3060,15 +3066,19 @@ document.addEventListener("click",e=>{
     case"accTab":if(sheet){sheet.tab=t.dataset.v;sheet.addSlot="";renderSheet();}break;
     case"accessPerson":{swapSheet({type:"accessPerson",who:t.dataset.v,back:Object.assign({},sheet),confirm:""});adminCall({action:"info",who:t.dataset.v});break;}
     case"accAddSlot":if(sheet){sheet.addSlot=sheet.addSlot===t.dataset.slot?"":t.dataset.slot;renderSheet();}break;
-    case"accRole":if(sheet&&sheet.who)adminCall({action:"role",who:sheet.who,role:t.dataset.v}).then(()=>{if(sheet&&sheet.who)adminCall({action:"info",who:sheet.who});});break;
+    case"accRole":{if(!sheet||!sheet.who)break;const w=sheet.who,adm=t.dataset.v==="Admin";
+      // Shown straight away; the sheet answers with the person's details in the same trip
+      if(ADMIN){[ADMIN.people.find(x=>x.id===w),ADMIN.person&&ADMIN.person.id===w?ADMIN.person:null].forEach(x=>{if(x)x.admin=adm;});}renderSheet();
+      adminCall({action:"role",who:w,role:t.dataset.v});break;}
     case"accSlot":{if(!sheet||!sheet.who)break;const sl=slots().find(x=>x.id===t.dataset.slot);if(!sl)break;const r=teamNow(sl.id).find(x=>x.who===sheet.who);
       if(r){store.update("team",r.id,{until:Date.now()});toast(`Off ${shortSlot(sl)}`,[{label:"Undo",fn:()=>{store.update("team",r.id,{until:""});if(sheet)renderSheet();}}]);}
       else teamAdd(sl,sheet.who);renderSheet();break;}
     case"accConfirm":if(sheet){sheet.confirm=t.dataset.v;renderSheet();}break;
     case"accDo":{if(!sheet||!sheet.who)break;const a=t.dataset.v,w=sheet.who;sheet.confirm="";
-      adminCall({action:a,who:w}).then(r=>{if(!r)return;toast(a==="remove"?"Removed from the app":a==="signout"?"Signed out on every device":"They can choose a new password with the dojo code");
-        if(a==="remove"){if(sheet&&sheet.back)swapSheet(sheet.back);adminCall({action:"info"});}else adminCall({action:"info",who:w});});break;}
-    case"accUnshare":if(sheet&&sheet.who)adminCall({action:"unshare",who:sheet.who,coll:t.dataset.coll,id:t.dataset.id}).then(r=>{if(r&&sheet&&sheet.who)adminCall({action:"info",who:sheet.who});});break;
+      if(a==="remove"&&ADMIN){ADMIN.people=ADMIN.people.filter(x=>x.id!==w);if(sheet&&sheet.back)swapSheet(sheet.back);}else renderSheet();
+      adminCall({action:a,who:w}).then(r=>{if(!r)return;toast(a==="remove"?"Removed from the app":a==="signout"?"Signed out on every device":"They can choose a new password with the dojo code");});break;}
+    case"accUnshare":{if(!sheet||!sheet.who)break;const P=ADMIN&&ADMIN.person;if(P)P.shared=P.shared.filter(x=>x.id!==t.dataset.id);renderSheet();
+      adminCall({action:"unshare",who:sheet.who,coll:t.dataset.coll,id:t.dataset.id});break;}
     case"accCopy":{const v=t.dataset.v;try{navigator.clipboard.writeText(v).then(()=>toast("Copied"));}catch(_){toast(v);}break;}
     case"accShow":if(sheet){sheet.show=!sheet.show;renderSheet();}break;
     case"accCodeEdit":if(sheet){sheet.editCode=!sheet.editCode;sheet.code=ADMIN&&ADMIN.code||"";renderSheet();}break;
@@ -3291,7 +3301,10 @@ function boot(){
   readLinkParams();
   if("serviceWorker"in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
   history.replaceState({t:"plans",p:PLAN,root:true},"");
+  const cached=signedIn()&&loadCache();
+  if(cached){S=normalize(cached.s);ready=true;lastSync=cached.at;}
   render();
+  if(cached){setSync("loading");if(OPEN_PLAN)openFromLink(OPEN_PLAN);}
   if(signedIn())flush();
   fetchConfig();
   if(signedIn())loadKata();

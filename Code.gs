@@ -278,13 +278,14 @@ function api(body) {
   if (!lock.tryLock(20000)) return { ok: false, error: 'busy', message: 'The sheet is busy. Try again in a moment.' };
   try {
     if (req.cron) return cron_(req);
-    let me, token;
+    let me, token, rows0 = null;
     if (req.auth) {
       const r = auth_(req);
       if (!r.ok) return r;
       me = r.me; token = r.token;
     } else {
-      me = checkToken_(req.token);
+      rows0 = instrRows_();
+      me = checkToken_(req.token, rows0);
       if (!me) return { ok: false, error: 'bad_token', message: 'Please sign in again.' };
       token = req.token;
       if (req.profile) me = updateProfile_(me, req.profile);
@@ -294,7 +295,8 @@ function api(body) {
         me = r.me;
       }
     }
-    const people = instrRows_();
+    // Speed (Nov 27): the Instructors tab is read once per request unless this request changed it
+    const people = rows0 && !req.profile && !req.password ? rows0 : instrRows_();
     // Back from adding a student in the Kata Tracker: fetch the member list again now
     if (req.refreshStudents) CacheService.getScriptCache().remove('students');
     // Notifications: settings, this phone's push address, a test
@@ -320,9 +322,10 @@ function api(body) {
       req.ops.forEach(function (op) { const o = allowOp_(acc, op); if (o) applyOp_(o); });
       SpreadsheetApp.flush();
     }
-    const pplNow = adminDid ? instrRows_() : people;
-    const out = { ok: true, token: token, me: me_(me, pplNow), state: stateFor_(me, pplNow), sheetUrl: ss_().getUrl() };
-    if (adminDid) out.admin = adminInfo_(me, pplNow, req.admin);
+    const pplNow = adminDid || req.notify ? instrRows_() : people;
+    const raw = readRaw_(); // one read of the data tabs, shared by the state and the Manage access answer
+    const out = { ok: true, token: token, me: me_(me, pplNow), state: stateFor_(me, pplNow, raw), sheetUrl: ss_().getUrl() };
+    if (adminDid) out.admin = adminInfo_(me, pplNow, req.admin, raw);
     if (req.feedback || req.myFeedback) out.feedback = myFeedback_(me);
     return out;
   } catch (err) {
@@ -464,12 +467,13 @@ function makeToken_(id) {
   return p + '.' + sign_(p);
 }
 
-function checkToken_(token) {
+function checkToken_(token, rows) {
   const parts = String(token || '').split('.');
   if (parts.length !== 3) return null;
   const p = parts[0] + '.' + parts[1];
   if (sign_(p) !== parts[2] || Number(parts[1]) < Date.now()) return null;
-  const o = findInstr_('id', parts[0]); // a deleted instructor row signs that person out
+  // A deleted instructor row signs that person out. Rows already read for this request are reused (speed, Nov 27)
+  const o = rows ? rows.filter(function (x) { return x.id && x.id === parts[0]; })[0] || null : findInstr_('id', parts[0]);
   // An admin's "Sign out on every device": tokens made before then stop working
   if (o && o.signedOut && Number(parts[1]) - TOKEN_DAYS * 864e5 < o.signedOut) return null;
   return o;
@@ -796,8 +800,8 @@ function allowOp_(acc, op) {
 }
 
 /** Everything this instructor may see, with sharing turned into app terms (IDs, never emails). */
-function stateFor_(me, people) {
-  const raw = readRaw_();
+function stateFor_(me, people, raw) {
+  raw = raw || readRaw_();
   const acc = access_(me, people, raw);
   const idOf = {};
   people.forEach(function (p) { idOf[normEmail_(p.email)] = p.id; });
@@ -912,9 +916,10 @@ function admin_(me, people, a) {
 }
 
 /** What the Manage access page shows: everyone, the dojo code, requests, and one person in detail. */
-function adminInfo_(me, people, a) {
+function adminInfo_(me, people, a, raw) {
   a = a || {};
-  const raw = readRaw_(), now = Date.now();
+  raw = raw || readRaw_();
+  const now = Date.now();
   const byEmail = {};
   people.forEach(function (p) { byEmail[normEmail_(p.email)] = p; });
   const label = function (email) { if (!email) return 'Dojo library'; const p = byEmail[normEmail_(email)]; return p ? nameOf_(p) : 'Someone no longer here'; };
@@ -1170,7 +1175,11 @@ function cron_(req) {
   const from = Math.max(last, now - 2 * 3600000); // never send more than 2 hours of missed reminders
   props.setProperty('CRON_LAST', String(now));
   const pushes = due_(from, now);
-  try { snapshot_(now, 40); } catch (e) { /* history waits for the next run */ }
+  // Class history: every 15 minutes is plenty, and it keeps the sheet free for instructors in between
+  if (now - (Number(props.getProperty('SNAP_LAST')) || 0) >= 15 * 60000) {
+    props.setProperty('SNAP_LAST', String(now));
+    try { snapshot_(now, 40); } catch (e) { /* history waits for the next run */ }
+  }
   return { ok: true, pushes: pushes };
 }
 
